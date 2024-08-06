@@ -1,0 +1,1 @@
+This folder stores the website's component. (Ex: header, footer, button, etc.)

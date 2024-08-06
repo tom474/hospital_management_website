@@ -1,0 +1,1 @@
+This folder is for the website's mysql database.
