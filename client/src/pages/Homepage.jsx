@@ -1,7 +1,5 @@
 import { Box, Grid, Typography } from "@mui/material";
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import banner from "../assets/image/banner.png";
-import { NavLink } from "react-router-dom";
 
 const Homepage = () => {
     return (
@@ -19,13 +17,14 @@ const Homepage = () => {
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        justifyContent: 'space-between',
                         height: '100%',
                     }}>
-                        <div>
+                        <div style={{
+                            marginTop: '10%',
+                        }}>
                             <Typography variant="h6" component="h1" sx={(theme) => ({
                                 fontWeight: '600',
-                                fontSize: '30px',
+                                fontSize: '35px',
                                 color: theme.palette.color.blue[100],
                             })}>
                                 Hospital  Management System, your partner in hospital management
@@ -33,7 +32,7 @@ const Homepage = () => {
 
                             <Typography variant="p" component="p" sx={{
                                 marginTop: '20px',
-                                fontSize: '17px',
+                                fontSize: '19px',
                                 color: 'black',
                             }}>
                                 We are committed to providing you with the best services to help you manage your hospital effectively.
@@ -41,7 +40,7 @@ const Homepage = () => {
                             </Typography>
                         </div>
 
-                        <NavLink to="/staffs" style={{textDecoration: 'none', color: 'black'}}>
+                        {/* <NavLink to="/staffs" style={{textDecoration: 'none', color: 'black'}}>
                             <Box 
                                 sx={{
                                     display: 'flex',
@@ -67,7 +66,7 @@ const Homepage = () => {
                                     View our staffs
                                 </Typography>
                             </Box>
-                        </NavLink>
+                        </NavLink> */}
                     </Box>
 
 
