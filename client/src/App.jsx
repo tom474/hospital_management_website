@@ -1,5 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./pages/Root";
+import { ThemeProvider } from "@emotion/react";
+import { theme } from "./config/MuiConfig";
 
 const router = createBrowserRouter([{
 	path: "/",
@@ -8,7 +10,9 @@ const router = createBrowserRouter([{
 
 const App = () => {
 	return (
-		<RouterProvider router={router} />
+		<ThemeProvider theme={theme}>
+			<RouterProvider router={router} />
+		</ThemeProvider>
 	);
 }
 
