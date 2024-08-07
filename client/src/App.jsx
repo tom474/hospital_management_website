@@ -4,6 +4,7 @@ import { ThemeProvider } from "@emotion/react";
 import { theme } from "./config/MuiConfig";
 import Homepage from "./pages/Homepage";
 
+// Router configuration of the application.
 const router = createBrowserRouter([{
 	path: "/",
 	element: <Root />,
