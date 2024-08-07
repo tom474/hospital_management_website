@@ -41,7 +41,7 @@ const Homepage = () => {
                             </Typography>
                         </div>
 
-                        <NavLink to="/staffs" style={{textDecoration: 'none'}}>
+                        <NavLink to="/staffs" style={{textDecoration: 'none', color: 'black'}}>
                             <Box 
                                 sx={{
                                     display: 'flex',
