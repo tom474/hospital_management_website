@@ -5,3 +5,7 @@
 #root {
 	background-color: rgb(240 249 255);
 }
+
+.btn-outline.btn-success:hover {
+	color: white;
+}
