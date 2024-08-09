@@ -1,0 +1,1 @@
+This folder stores the website's styling files.
