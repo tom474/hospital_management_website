@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Root from "./pages/Root";
 import Homepage from "./pages/Homepage";
+import PatientDetailPage from "./pages/PatientDetailPage";
 
 export default function App() {
 	const router = createBrowserRouter([
@@ -11,6 +12,15 @@ export default function App() {
 				{
 					index: true,
 					element: <Homepage />
+				},
+				{
+					path: "patient",
+					children: [
+						{
+							path: ":patientId",
+							element: <PatientDetailPage />
+						}
+					]
 				}
 			]
 		}
