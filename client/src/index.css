@@ -9,3 +9,7 @@
 .btn-outline.btn-success:hover {
 	color: white;
 }
+
+.btn-outline.btn-error:hover {
+	color: white;
+}

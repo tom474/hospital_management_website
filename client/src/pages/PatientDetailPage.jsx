@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import Sidebar from "../components/patient/detail/Sidebar";
 import PatientInformation from "../components/patient/detail/PatientInformation";
 import Schedule from "../components/patient/detail/Schedule";
+import TreatmentHistory from "../components/patient/detail/TreatmentHistory";
 
 const patient = {
 	id: 1,
@@ -30,6 +31,9 @@ export default function PatientDetailPage() {
 			)}
 			{option == null && <PatientInformation patient={patient} />}
 			{option == "schedule" && <Schedule patient={patient} />}
+			{option == "treatment_history" && (
+				<TreatmentHistory patient={patient} />
+			)}
 		</div>
 	);
 }

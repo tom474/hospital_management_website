@@ -41,7 +41,7 @@ const columns = [
 	{ key: "doctor", title: "Doctor", size: "w-2/12" },
 	{ key: "time", title: "Time", size: "w-[12%]" },
 	{ key: "purpose", title: "Purpose", size: "w-4/12" },
-	{ key: "action", title: "Action", size: "w-1/12" }
+	{ key: "action", title: "Action", size: "w-[0%]" }
 ];
 
 export default function Schedule({ patient }) {
