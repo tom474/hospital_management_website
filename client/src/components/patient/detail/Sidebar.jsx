@@ -44,7 +44,7 @@ export default function Sidebar({ patient }) {
 	};
 
 	return (
-		<div className="w-3/12 flex flex-col justify-center items-center mt-16 border-solid border-[1px] rounded-xl border-slate-500">
+		<div className="w-3/12 flex flex-col justify-center items-center mt-16 border-solid border-[1px] rounded-xl border-slate-500 h-fit">
 			<div className="flex flex-col items-center mt-4 mb-5">
 				<p className="text-2xl text-blue-600 font-semibold">
 					{patient.firstName} {patient.lastName}
@@ -55,16 +55,16 @@ export default function Sidebar({ patient }) {
 				</p>
 			</div>
 			<div className="w-full rounded-bl-xl rounded-br-xl overflow-clip">
-				<ul className="menu bg-base-200  w-full">
+				<ul className="menu menu-vertical w-full">
 					{sidebarOptions.map((option, index) => (
 						<li
 							key={index}
-							className={`cursor-pointer py-3 p-2 transition delay-150 ease-linear hover:bg-blue-100 ${
-								option.selected ? "bg-blue-100" : ""
+							className={`cursor-pointer mb-1 rounded-xl transition delay-150 ease-in-out ${
+								option.selected ? "bg-blue-200" : ""
 							}`}
 							onClick={() => handleSelectOption(option.title)}
 						>
-							<div className="flex gap-5 ml-4 items-center text-lg">
+							<div className="flex gap-5 p-3 items-center text-lg text-black">
 								{option.icon}
 								<span className="ml-2">{option.title}</span>
 							</div>

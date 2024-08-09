@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import Sidebar from "../components/patient/detail/Sidebar";
+import PatientInformation from "../components/patient/detail/PatientInformation";
 
 const patient = {
 	id: 1,
@@ -7,7 +8,7 @@ const patient = {
 	lastName: "Doe",
 	email: "JohnDoe@gmail.com",
 	phoneNumber: "0901213241",
-	birthDate: "01/01/2000",
+	birthDate: "2000-01-01",
 	bloodType: "A+",
 	address: "123 Main St, Springfield, IL",
 	allergies: "Peanuts, Shellfish, Pollen"
@@ -22,7 +23,11 @@ export default function PatientDetailPage() {
 	return (
 		<div className="flex flex-row gap-2">
 			<Sidebar patient={patient} />
-			<div></div>
+
+			{option == "personal_information" && (
+				<PatientInformation patient={patient} />
+			)}
+			{option == null && <PatientInformation patient={patient} />}
 		</div>
 	);
 }
