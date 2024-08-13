@@ -4,9 +4,9 @@ export default {
 	theme: {
 		extend: {
 			width: {
-				1200: "1200px"
-			}
-		}
+				1200: "1200px",
+			},
+		},
 	},
-	plugins: []
+	plugins: [require("daisyui")],
 };

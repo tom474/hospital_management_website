@@ -1,1 +1,0 @@
-This folder stores the website's pages.
