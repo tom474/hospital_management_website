@@ -9,7 +9,7 @@ export default function Homepage() {
 					management
 				</h1>
 
-				<p className="mt-2 text-xl">
+				<p className="mt-2 text-xl text-black">
 					We are committed to providing you with the best services to
 					help you manage your hospital effectively. Trust us to
 					enhance operations, improve patient care, and optimize
