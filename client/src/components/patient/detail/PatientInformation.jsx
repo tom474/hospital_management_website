@@ -21,7 +21,7 @@ export default function PatientInformation({ patient }) {
 	};
 
 	return (
-		<form onSubmit={onSubmit} className="w-9/12 mt-16 mb-6">
+		<form onSubmit={onSubmit} className="w-9/12 mb-6">
 			<div className="mb-2 flex justify-between">
 				<h1 className="font-semibold text-3xl text-blue-600">
 					Personal Information
@@ -109,7 +109,7 @@ export default function PatientInformation({ patient }) {
 				</div>
 
 				<div className="flex gap-2 mt-3">
-					<div className="w-4/12">
+					<div className="w-6/12">
 						<label
 							htmlFor="phoneNumber"
 							className="text-black text-sm"
@@ -118,7 +118,7 @@ export default function PatientInformation({ patient }) {
 						</label>
 						{isUpdate ? (
 							<input
-								type="text"
+								type="tel"
 								placeholder="Enter phone number"
 								value={patientUpdate.phoneNumber}
 								name="phoneNumber"
@@ -133,7 +133,7 @@ export default function PatientInformation({ patient }) {
 						)}
 					</div>
 
-					<div className="w-4/12">
+					<div className="w-6/12">
 						<label
 							htmlFor="Birthday"
 							className="text-black text-sm"
@@ -153,36 +153,6 @@ export default function PatientInformation({ patient }) {
 						) : (
 							<div className="font-semibold text-black w-full py-2 px-3 rounded-lg border-[1px] border-solid border-gray-400 bg-slate-100">
 								{patientUpdate.birthDate}
-							</div>
-						)}
-					</div>
-					<div className="w-4/12">
-						<label
-							htmlFor="bloodType"
-							className="text-black text-sm"
-						>
-							Blood Type
-						</label>
-						{isUpdate ? (
-							<select
-								defaultValue={patientUpdate.bloodType}
-								name="bloodType"
-								onChange={handleOnChange}
-								className="select select-bordered w-full bg-slate-50 mt-2 text-black font-medium border-sky-200"
-							>
-								<option disabled>Select blood type</option>
-								<option value={"A+"}>A+</option>
-								<option value={"A-"}>A-</option>
-								<option value={"B+"}>B+</option>
-								<option value={"B-"}>B-</option>
-								<option value={"O+"}>O+</option>
-								<option value={"O-"}>O-</option>
-								<option value={"AB+"}>AB+</option>
-								<option value={"AB-"}>AB-</option>
-							</select>
-						) : (
-							<div className="font-semibold text-black w-full py-2 px-3 rounded-lg border-[1px] border-solid border-gray-400 bg-slate-100">
-								{patientUpdate.bloodType}
 							</div>
 						)}
 					</div>

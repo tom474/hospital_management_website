@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Sidebar from "../components/patient/detail/Sidebar";
 import PatientInformation from "../components/patient/detail/PatientInformation";
 import Schedule from "../components/patient/detail/Schedule";
@@ -23,17 +23,28 @@ export default function PatientDetailPage() {
 	const option = queryParams.get("option");
 
 	return (
-		<div className="flex flex-row gap-2">
-			<Sidebar patient={patient} />
+		<div className="mt-4">
+			<div className="mb-3 ">
+				<Link
+					className="text-2xl  font-bold cursor-pointer transition ease-in-out hover:text-blue-600"
+					to={"/patient"}
+				>
+					Back
+				</Link>
+			</div>
 
-			{option == "personal_information" && (
-				<PatientInformation patient={patient} />
-			)}
-			{option == null && <PatientInformation patient={patient} />}
-			{option == "schedule" && <Schedule patient={patient} />}
-			{option == "treatment_history" && (
-				<TreatmentHistory patient={patient} />
-			)}
+			<div className="flex flex-row gap-4">
+				<Sidebar patient={patient} />
+
+				{option == "personal_information" && (
+					<PatientInformation patient={patient} />
+				)}
+				{option == null && <PatientInformation patient={patient} />}
+				{option == "schedule" && <Schedule patient={patient} />}
+				{option == "treatment_history" && (
+					<TreatmentHistory patient={patient} />
+				)}
+			</div>
 		</div>
 	);
 }

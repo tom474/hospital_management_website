@@ -32,8 +32,6 @@ export default function TreatmentModal({ patient }) {
 	const [treatment, setTreatment] = useState({
 		doctor: null,
 		date: null,
-		startTime: "00:00",
-		endTime: "00:00",
 		description: "",
 		diagnoseImage: null,
 		labeResults: null
@@ -137,29 +135,6 @@ export default function TreatmentModal({ patient }) {
 								id="date"
 								className="input input-bordered flex-1 h-10 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
 							/>
-							<div>
-								<input
-									type="time"
-									value={treatment.startTime}
-									onChange={handleOnChange}
-									placeholder="Enter start date"
-									name="statTime"
-									id="statTime"
-									className="input input-bordered h-10 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
-								/>
-							</div>
-							<div>-</div>
-							<div>
-								<input
-									type="time"
-									value={treatment.endTime}
-									onChange={handleOnChange}
-									placeholder="Enter start date"
-									name="endTime"
-									id="endTime"
-									className="input input-bordered h-10 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
-								/>
-							</div>
 						</div>
 					</div>
 

@@ -2,27 +2,31 @@ import { faEye } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import ScheduleDetail from "./ScheduleDetail";
+import { useState } from "react";
 
 const dummyData = [
 	{
 		id: 1,
 		date: "2024-08-01",
 		doctor: "Dr. John Smith",
-		time: "10:00 AM",
+		startTime: "10:00",
+		endTime: "11:00",
 		purpose: "General Checkup"
 	},
 	{
 		id: 2,
 		date: "2024-08-05",
 		doctor: "Dr. Emily Johnson",
-		time: "02:00 PM",
+		startTime: "02:00",
+		endTime: "03:00",
 		purpose: "Follow-up on Blood Test Results"
 	},
 	{
 		id: 3,
 		date: "2024-08-10",
 		doctor: "Dr. Michael Brown",
-		time: "09:00 AM",
+		startTime: "09:00",
+		endTime: "10:00",
 		purpose:
 			"Consultation for Allergy Symptoms Consultation for Allergy SymptomsConsultation for Allergy SymptomsConsultation for Allergy Symptoms"
 	},
@@ -30,31 +34,44 @@ const dummyData = [
 		id: 4,
 		date: "2024-08-12",
 		doctor: "Dr. Sarah Davis",
-		time: "11:30 AM",
+		startTime: "11:30",
+		endTime: "12:30",
 		purpose: "Dermatology Consultation"
 	},
 	{
 		id: 5,
 		date: "2024-08-15",
 		doctor: "Dr. David Wilson",
-		time: "01:00 PM",
+		startTime: "01:00",
+		endTime: "02:00",
 		purpose: "Review of Medication Plan"
 	}
 ];
 
 const columns = [
 	{ key: "date", title: "Date", size: "w-[10%]" },
-	{ key: "doctor", title: "Doctor", size: "w-2/12" },
+	{ key: "doctor", title: "Doctor", size: "w-[15%]" },
 	{ key: "time", title: "Time", size: "w-[12%]" },
 	{ key: "purpose", title: "Purpose", size: "w-4/12" },
 	{ key: "action", title: "Action", size: "w-[0%]" }
 ];
 
 export default function Schedule({ patient }) {
+	const [currentPage, setCurrentPage] = useState(1);
+	const patientsPerPage = 10;
+	const indexOfLastSchedule = currentPage * patientsPerPage;
+	const indexOfFirstSchedule = indexOfLastSchedule - patientsPerPage;
+	const currentSchedule = dummyData.slice(
+		indexOfFirstSchedule,
+		indexOfLastSchedule
+	);
+	const totalPages = Math.ceil(dummyData.length / patientsPerPage);
+	const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
 	console.log(patient);
 	const fullName = `${patient.firstName} ${patient.lastName}`;
 	return (
-		<div className="w-9/12 mt-16 mb-6">
+		<div className="w-9/12 mb-6">
 			<div className="mb-2 flex justify-between">
 				<h1 className="font-semibold text-3xl text-blue-600">
 					Patient Schedule
@@ -77,7 +94,7 @@ export default function Schedule({ patient }) {
 						</tr>
 					</thead>
 					<tbody>
-						{dummyData.map((data, index) => (
+						{currentSchedule.map((data, index) => (
 							<tr key={index}>
 								<td className="align-top text-black">
 									{data.date}
@@ -86,7 +103,7 @@ export default function Schedule({ patient }) {
 									{data.doctor}
 								</td>
 								<td className="align-top text-black">
-									{data.time}
+									{data.startTime} - {data.endTime}
 								</td>
 								<td className="align-top text-black">
 									{data.purpose}
@@ -113,6 +130,21 @@ export default function Schedule({ patient }) {
 						))}
 					</tbody>
 				</table>
+			</div>
+			<div className="flex justify-end mb-5 mt-2">
+				{Array.from({ length: totalPages }, (_, i) => (
+					<button
+						key={i + 1}
+						onClick={() => paginate(i + 1)}
+						className={`px-3 py-1 mx-1 ${
+							currentPage === i + 1
+								? "bg-blue-400 text-white"
+								: "bg-gray-200"
+						} rounded`}
+					>
+						{i + 1}
+					</button>
+				))}
 			</div>
 		</div>
 	);

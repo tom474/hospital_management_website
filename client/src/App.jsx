@@ -19,14 +19,14 @@ export default function App() {
 				{
 					path: "patient",
 					children: [
-            {
-              index: true,
-              element: <PatientPage />,
-            },
-            {
-              path: "add-patient",
-              element: <AddPatientPage />,
-            }
+						{
+							index: true,
+							element: <PatientPage />
+						},
+						{
+							path: "add-patient",
+							element: <AddPatientPage />
+						},
 						{
 							path: ":patientId",
 							element: <PatientDetailPage />

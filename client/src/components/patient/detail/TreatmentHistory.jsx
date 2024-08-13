@@ -3,13 +3,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import TreatmentModal from "./TreatmentModal";
 import TreatmentDetail from "./TreatmentDetail";
+import { useState } from "react";
 
 const dummyData = [
 	{
 		id: 1,
 		date: "2024-08-01",
 		doctor: "Dr. John Smith",
-		time: "10:00 AM",
 		patient: "John Doe",
 		description: "General checkup and routine blood tests."
 	},
@@ -17,7 +17,6 @@ const dummyData = [
 		id: 2,
 		date: "2024-08-02",
 		doctor: "Dr. Emily Johnson",
-		time: "11:15 AM",
 		patient: "John Doe",
 		description: "Consultation regarding chronic back pain."
 	},
@@ -25,7 +24,6 @@ const dummyData = [
 		id: 3,
 		date: "2024-08-03",
 		doctor: "Dr. Michael Brown",
-		time: "09:30 AM",
 		patient: "John Doe",
 		description: "Follow-up appointment for allergy treatment."
 	},
@@ -33,7 +31,6 @@ const dummyData = [
 		id: 4,
 		date: "2024-08-04",
 		doctor: "Dr. Sarah Davis",
-		time: "02:00 PM",
 		patient: "John Doe",
 		description: "Skin examination and treatment plan discussion."
 	},
@@ -41,7 +38,6 @@ const dummyData = [
 		id: 5,
 		date: "2024-08-05",
 		doctor: "Dr. David Wilson",
-		time: "01:45 PM",
 		patient: "John Doe",
 		description:
 			"Review of recent test results and medication adjustment. Review of recent test results and medication adjustment."
@@ -49,21 +45,31 @@ const dummyData = [
 ];
 
 const columns = [
-	{ key: "date", title: "Date", size: "w-[15%]" },
-	{ key: "doctor", title: "Doctor", size: "w-[21%]" },
-	{ key: "time", title: "Time", size: "w-[13%]" },
-	{ key: "patient", title: "Patient", size: "w-2/12" },
-	{ key: "description", title: "Description", size: "w-3/12" },
+	{ key: "date", title: "Date", size: "w-[13%]" },
+	{ key: "doctor", title: "Doctor", size: "w-[18%]" },
+	{ key: "patient", title: "Patient", size: "w-[15%]" },
+	{ key: "description", title: "Description", size: "w-4/12" },
 	{ key: "action", title: "Action", size: "w-[0%]" }
 ];
 
 export default function TreatmentHistory({ patient }) {
+	const [currentPage, setCurrentPage] = useState(1);
+	const patientsPerPage = 10;
+	const indexOfLastTreatment = currentPage * patientsPerPage;
+	const indexOfFirstTreatment = indexOfLastTreatment - patientsPerPage;
+	const currentTreatment = dummyData.slice(
+		indexOfFirstTreatment,
+		indexOfLastTreatment
+	);
+	const totalPages = Math.ceil(dummyData.length / patientsPerPage);
+	const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
 	console.log(patient);
 
 	return (
 		<>
 			<TreatmentModal patient={patient} />
-			<div className="w-9/12 mt-16 mb-6">
+			<div className="w-9/12 mb-6">
 				<div className="mb-2 flex justify-between">
 					<h1 className="font-semibold text-3xl text-blue-600">
 						Treatment History
@@ -95,7 +101,7 @@ export default function TreatmentHistory({ patient }) {
 							</tr>
 						</thead>
 						<tbody>
-							{dummyData.map((data, index) => (
+							{currentTreatment.map((data, index) => (
 								<tr key={index}>
 									<td className="align-top text-black">
 										{data.date}
@@ -103,9 +109,7 @@ export default function TreatmentHistory({ patient }) {
 									<td className="align-top text-black">
 										{data.doctor}
 									</td>
-									<td className="align-top text-black">
-										{data.time}
-									</td>
+
 									<td className="align-top text-black">
 										{data.patient}
 									</td>
@@ -131,6 +135,21 @@ export default function TreatmentHistory({ patient }) {
 							))}
 						</tbody>
 					</table>
+				</div>
+				<div className="flex justify-end mb-5 mt-2">
+					{Array.from({ length: totalPages }, (_, i) => (
+						<button
+							key={i + 1}
+							onClick={() => paginate(i + 1)}
+							className={`px-3 py-1 mx-1 ${
+								currentPage === i + 1
+									? "bg-blue-400 text-white"
+									: "bg-gray-200"
+							} rounded`}
+						>
+							{i + 1}
+						</button>
+					))}
 				</div>
 			</div>
 		</>

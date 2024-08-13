@@ -44,7 +44,7 @@ export default function Sidebar({ patient }) {
 	};
 
 	return (
-		<div className="w-3/12 flex flex-col justify-center items-center mt-16 border-solid border-[1px] rounded-xl border-slate-500 h-fit">
+		<div className="w-3/12 flex flex-col justify-center items-center border-solid border-[1px] rounded-xl border-slate-500 h-fit">
 			<div className="flex flex-col items-center mt-4 mb-5">
 				<p className="text-2xl text-blue-600 font-semibold">
 					{patient.firstName} {patient.lastName}
