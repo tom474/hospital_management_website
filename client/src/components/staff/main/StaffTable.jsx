@@ -117,7 +117,7 @@ const staffs = [
 const columns = [
 	{ key: "ID", title: "ID", size: "w-[2%]" },
 	{ key: "Name", title: "Name", size: "w-[13%]" },
-	{ key: "Email", title: "Email", size: "w-[12%]" },
+	{ key: "Email", title: "Email", size: "w-[8%]" },
 	{ key: "JobType", title: "Job Type", size: "w-1/12" },
 	{ key: "Department", title: "Department", size: "w-1/12" },
 	{ key: "Salary", title: "Salary", size: "w-1/12" },
@@ -159,7 +159,7 @@ export default function StaffTable() {
 		}
 
 		return (
-			<td className="align-top text-black ">
+			<td className="align-top text-black flex justify-center">
 				<p className={`${defaultStyle} `}>{jobType}</p>
 			</td>
 		);
@@ -174,7 +174,11 @@ export default function StaffTable() {
 							{columns.map((column) => (
 								<th
 									key={column.key}
-									className={`${column.size} text-blue-500 text-base`}
+									className={`${
+										column.size
+									} text-blue-500 text-base ${
+										column.key == "JobType" && "text-center"
+									}`}
 								>
 									{column.title}
 								</th>
