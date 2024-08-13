@@ -6,3 +6,11 @@
 	background-color: rgb(240 249 255);
 	color: black;
 }
+
+.btn-outline.btn-success:hover {
+	color: white;
+}
+
+.btn-outline.btn-error:hover {
+	color: white;
+}
