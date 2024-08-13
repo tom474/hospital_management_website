@@ -43,8 +43,8 @@ export default function Header() {
 						to={"/staff"}
 						className={({ isActive }) =>
 							isActive
-								? "text-sm font-semibold leading-6 text-blue-400"
-								: "text-sm font-semibold leading-6 text-gray-900"
+								? "text-base font-semibold leading-6 text-blue-400"
+								: "text-base font-semibold leading-6 text-gray-900"
 						}
 					>
 						Staff

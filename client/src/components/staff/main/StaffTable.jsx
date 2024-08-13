@@ -207,7 +207,7 @@ export default function StaffTable() {
 
 								<td className="align-top text-black">
 									<Link
-										to={`${staff.patient_id}`}
+										to={`${staff.id}`}
 										className="btn btn-outline rounded-full btn-success hover:text-white"
 									>
 										<FontAwesomeIcon icon={faEye} />
