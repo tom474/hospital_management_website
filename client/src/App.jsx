@@ -4,6 +4,7 @@ import Homepage from "./pages/Homepage";
 import PatientDetailPage from "./pages/PatientDetailPage";
 import PatientPage from "./pages/PatientPage";
 import AddPatientPage from "./pages/AddPatientPage";
+import StaffPage from "./pages/StaffPage";
 
 export default function App() {
 	const router = createBrowserRouter([
@@ -30,6 +31,15 @@ export default function App() {
 						{
 							path: ":patientId",
 							element: <PatientDetailPage />
+						}
+					]
+				},
+				{
+					path: "staff",
+					children: [
+						{
+							index: true,
+							element: <StaffPage />
 						}
 					]
 				}
