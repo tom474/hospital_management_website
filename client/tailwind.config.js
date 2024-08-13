@@ -4,10 +4,9 @@ export default {
 	theme: {
 		extend: {
 			width: {
-				1200: "1200px"
-			}
-		}
+				1200: "1200px",
+			},
+		},
 	},
-	// eslint-disable-next-line no-undef
-	plugins: [require("daisyui")]
+	plugins: [require("daisyui")],
 };
