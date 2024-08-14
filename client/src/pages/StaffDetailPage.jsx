@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import StaffSidebar from "../components/staff/detail/StaffSidebar";
+import StaffInformation from "../components/staff/detail/StaffInformation";
 
 const staff = {
 	id: 1,
@@ -7,7 +8,7 @@ const staff = {
 	firstName: "John",
 	lastName: "Doe",
 	email: "JohnDoe@gmail.com",
-	department: "Cardiology",
+	department: "Department 1",
 	salary: 1000000
 };
 
@@ -31,8 +32,10 @@ export default function StaffDetailPage() {
 			<div className="flex flex-row gap-4">
 				<StaffSidebar staff={staff} />
 
-				{option == "staff_information" && <div></div>}
-				{option == null && <div></div>}
+				{option == "staff_information" && (
+					<StaffInformation staff={staff} />
+				)}
+				{option == null && <StaffInformation staff={staff} />}
 				{option == "schedule" && <div></div>}
 				{option == "appointment_history" && <div></div>}
 			</div>

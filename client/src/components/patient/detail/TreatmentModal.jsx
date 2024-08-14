@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import Select from "react-select";
-import FileDisplay from "./FileDisplay";
+import FileDisplay from "../../utils/FileDisplay";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";

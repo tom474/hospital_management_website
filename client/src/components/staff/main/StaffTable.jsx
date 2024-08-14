@@ -2,6 +2,7 @@ import { faEye } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { formatSalary } from "../../../utils/common";
 
 const staffs = [
 	{
@@ -132,15 +133,6 @@ export default function StaffTable() {
 	const currentStaffs = staffs.slice(indexOfFirstStaff, indexOfLastStaff);
 	const totalPages = Math.ceil(staffs.length / staffsPerPage);
 	const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-	const formatSalary = (salary) => {
-		const formattedSalary = new Intl.NumberFormat("vi-VN", {
-			style: "currency",
-			currency: "VND"
-		}).format(salary);
-
-		return formattedSalary;
-	};
 
 	const displayJobType = (jobType) => {
 		let defaultStyle =

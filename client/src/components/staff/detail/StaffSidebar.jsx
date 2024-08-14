@@ -26,6 +26,29 @@ export default function StaffSidebar({ staff }) {
 		}
 	]);
 
+	const displayJobType = (jobType) => {
+		let defaultStyle =
+			"mt-2 py-1 text-xs rounded-full text-center w-fit min-w-20 font-bold justify-self-end";
+
+		if (jobType === "Doctor") {
+			defaultStyle += " bg-blue-400 text-white";
+		}
+
+		if (jobType === "Nurse") {
+			defaultStyle += " bg-green-400 text-white";
+		}
+
+		if (jobType === "Receptionist") {
+			defaultStyle += " bg-yellow-400 text-white";
+		}
+
+		return (
+			<td className="align-top text-black flex justify-center">
+				<p className={`${defaultStyle} `}>{jobType}</p>
+			</td>
+		);
+	};
+
 	const handleSelectOption = (title) => {
 		// Update the selected option in the sidebar.
 		setSidebarOptions((prev) => {
@@ -45,7 +68,10 @@ export default function StaffSidebar({ staff }) {
 
 	return (
 		<div className="w-3/12 flex flex-col justify-center items-center border-solid border-[1px] rounded-xl border-slate-500 h-fit">
-			<div className="flex flex-col items-center mt-4 mb-5">
+			<div className="w-full flex justify-end mr-4 mb-3">
+				{displayJobType(staff.jobType)}
+			</div>
+			<div className="flex flex-col items-center mb-5">
 				<p className="text-2xl text-blue-600 font-semibold">
 					{staff.firstName} {staff.lastName}
 				</p>

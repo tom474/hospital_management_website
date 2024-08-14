@@ -11,7 +11,8 @@ const dummyData = [
 		doctor: "Dr. John Smith",
 		startTime: "10:00",
 		endTime: "11:00",
-		purpose: "General Checkup"
+		status: "Booked",
+		purpose: "Consultation"
 	},
 	{
 		id: 2,
@@ -19,7 +20,8 @@ const dummyData = [
 		doctor: "Dr. Emily Johnson",
 		startTime: "02:00",
 		endTime: "03:00",
-		purpose: "Follow-up on Blood Test Results"
+		status: "Booked",
+		purpose: "Medical Checkup"
 	},
 	{
 		id: 3,
@@ -27,8 +29,8 @@ const dummyData = [
 		doctor: "Dr. Michael Brown",
 		startTime: "09:00",
 		endTime: "10:00",
-		purpose:
-			"Consultation for Allergy Symptoms Consultation for Allergy SymptomsConsultation for Allergy SymptomsConsultation for Allergy Symptoms"
+		status: "Cancelled",
+		purpose: "Lab Test"
 	},
 	{
 		id: 4,
@@ -36,6 +38,7 @@ const dummyData = [
 		doctor: "Dr. Sarah Davis",
 		startTime: "11:30",
 		endTime: "12:30",
+		status: "Cancelled",
 		purpose: "Dermatology Consultation"
 	},
 	{
@@ -44,7 +47,8 @@ const dummyData = [
 		doctor: "Dr. David Wilson",
 		startTime: "01:00",
 		endTime: "02:00",
-		purpose: "Review of Medication Plan"
+		status: "Booked",
+		purpose: "Vaccination"
 	}
 ];
 
@@ -52,7 +56,8 @@ const columns = [
 	{ key: "date", title: "Date", size: "w-[10%]" },
 	{ key: "doctor", title: "Doctor", size: "w-[15%]" },
 	{ key: "time", title: "Time", size: "w-[12%]" },
-	{ key: "purpose", title: "Purpose", size: "w-4/12" },
+	{ key: "status", title: "Status", size: "w-[12%]" },
+	{ key: "purpose", title: "Purpose", size: "w-3/12" },
 	{ key: "action", title: "Action", size: "w-[0%]" }
 ];
 
@@ -70,6 +75,16 @@ export default function Schedule({ patient }) {
 
 	console.log(patient);
 	const fullName = `${patient.firstName} ${patient.lastName}`;
+
+	const displayJobType = (status) => {
+		const defaultStyle = "badge border-none text-white font-semibold";
+		if (status === "Booked") {
+			return <p className={`${defaultStyle}  bg-green-400`}>{status}</p>;
+		} else {
+			return <p className={`${defaultStyle}  bg-red-400`}>{status}</p>;
+		}
+	};
+
 	return (
 		<div className="w-9/12 mb-6">
 			<div className="mb-2 flex justify-between">
@@ -86,7 +101,11 @@ export default function Schedule({ patient }) {
 							{columns.map((column) => (
 								<th
 									key={column.key}
-									className={`${column.size} text-blue-500 text-base`}
+									className={`${
+										column.size
+									} text-blue-500 text-base ${
+										column.key == "status" && "text-center"
+									}`}
 								>
 									{column.title}
 								</th>
@@ -104,6 +123,9 @@ export default function Schedule({ patient }) {
 								</td>
 								<td className="align-top text-black">
 									{data.startTime} - {data.endTime}
+								</td>
+								<td className="align-top text-black flex justify-center">
+									{displayJobType(data.status)}
 								</td>
 								<td className="align-top text-black">
 									{data.purpose}
