@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import StaffSidebar from "../components/staff/detail/StaffSidebar";
 import StaffInformation from "../components/staff/detail/StaffInformation";
+import StaffSchedule from "../components/staff/detail/StaffSchedule";
 
 const staff = {
 	id: 1,
@@ -36,7 +37,7 @@ export default function StaffDetailPage() {
 					<StaffInformation staff={staff} />
 				)}
 				{option == null && <StaffInformation staff={staff} />}
-				{option == "schedule" && <div></div>}
+				{option == "staff_schedule" && <StaffSchedule staff={staff} />}
 				{option == "appointment_history" && <div></div>}
 			</div>
 		</div>

@@ -43,9 +43,9 @@ export default function StaffSidebar({ staff }) {
 		}
 
 		return (
-			<td className="align-top text-black flex justify-center">
+			<div className="align-top text-black flex justify-center">
 				<p className={`${defaultStyle} `}>{jobType}</p>
-			</td>
+			</div>
 		);
 	};
 
