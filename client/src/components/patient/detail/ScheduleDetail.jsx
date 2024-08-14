@@ -84,7 +84,7 @@ export default function ScheduleDetail({ schedule }) {
 								}}
 								className="w-6/12 btn btn-outline btn-error text-white"
 							>
-								Cancel
+								Close
 							</button>
 						</div>
 					</form>

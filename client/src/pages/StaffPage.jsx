@@ -44,10 +44,10 @@ export default function StaffPage() {
 					</select>
 				</div>
 
-				<div>
+				<div className="flex justify-center items-center">
 					<Link
-						to={"/"}
-						className="py-2 px-3 h-full bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300"
+						to={"add-staff"}
+						className="py-2 px-3 h-fit w-36 text-center bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300"
 					>
 						<span>
 							<FontAwesomeIcon icon={faPlus} />
