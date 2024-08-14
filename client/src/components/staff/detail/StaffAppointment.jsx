@@ -1,14 +1,15 @@
 import { faEye } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
-import ScheduleDetail from "./ScheduleDetail";
 import { useState } from "react";
+import ScheduleDetail from "../../patient/detail/ScheduleDetail";
 
 const dummyData = [
 	{
 		id: 1,
 		date: "2024-08-01",
 		doctor: "Dr. John Smith",
+		patient: "John Doe",
 		startTime: "10:00",
 		endTime: "11:00",
 		status: "Booked",
@@ -18,6 +19,7 @@ const dummyData = [
 		id: 2,
 		date: "2024-08-05",
 		doctor: "Dr. Emily Johnson",
+		patient: "John Mice",
 		startTime: "02:00",
 		endTime: "03:00",
 		status: "Booked",
@@ -27,6 +29,7 @@ const dummyData = [
 		id: 3,
 		date: "2024-08-10",
 		doctor: "Dr. Michael Brown",
+		patient: "Sarah Doe",
 		startTime: "09:00",
 		endTime: "10:00",
 		status: "Cancelled",
@@ -36,6 +39,7 @@ const dummyData = [
 		id: 4,
 		date: "2024-08-12",
 		doctor: "Dr. Sarah Davis",
+		patient: "Sarah Mice",
 		startTime: "11:30",
 		endTime: "12:30",
 		status: "Cancelled",
@@ -45,6 +49,7 @@ const dummyData = [
 		id: 5,
 		date: "2024-08-15",
 		doctor: "Dr. David Wilson",
+		patient: "David Doe",
 		startTime: "01:00",
 		endTime: "02:00",
 		status: "Booked",
@@ -62,7 +67,7 @@ const columns = [
 	{ key: "action", title: "Action", size: "w-[0%]" }
 ];
 
-export default function Schedule({ patient }) {
+export default function StaffAppointment({ staff }) {
 	const [currentPage, setCurrentPage] = useState(1);
 	const patientsPerPage = 10;
 	const indexOfLastSchedule = currentPage * patientsPerPage;
@@ -74,9 +79,9 @@ export default function Schedule({ patient }) {
 	const totalPages = Math.ceil(dummyData.length / patientsPerPage);
 	const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-	const fullName = `${patient.firstName} ${patient.lastName}`;
+	console.log(staff);
 
-	const displayJobType = (status) => {
+	const displayStatus = (status) => {
 		const defaultStyle = "badge border-none text-white font-semibold";
 		if (status === "Booked") {
 			return <p className={`${defaultStyle}  bg-green-400`}>{status}</p>;
@@ -89,7 +94,7 @@ export default function Schedule({ patient }) {
 		<div className="w-9/12 mb-6">
 			<div className="mb-2 flex justify-between">
 				<h1 className="font-semibold text-3xl text-blue-600">
-					Patient Schedule
+					Staff appointment
 				</h1>
 			</div>
 
@@ -128,16 +133,13 @@ export default function Schedule({ patient }) {
 									{data.startTime} - {data.endTime}
 								</td>
 								<td className="align-top text-black flex justify-center">
-									{displayJobType(data.status)}
+									{displayStatus(data.status)}
 								</td>
 								<td className="align-top text-black">
 									{data.purpose}
 								</td>
 								<td className="align-top text-black">
-									<ScheduleDetail
-										schedule={data}
-										patient={fullName}
-									/>
+									<ScheduleDetail schedule={data} />
 									<div
 										onClick={() => {
 											document
@@ -175,4 +177,4 @@ export default function Schedule({ patient }) {
 	);
 }
 
-Schedule.propTypes = { patient: PropTypes.object.isRequired };
+StaffAppointment.propTypes = { staff: PropTypes.object.isRequired };
