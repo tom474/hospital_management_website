@@ -80,6 +80,22 @@ export default function AddStaffPage() {
 					</div>
 
 					<div className="mb-4">
+						<label className="block text-gray-700">Salary: </label>
+						<label className="input input-bordered flex items-center gap-2 bg-white">
+							<p>đ</p>
+							<input
+								type="number"
+								placeholder="Enter salary"
+								value={formData.salary}
+								name="salary"
+								id="salary"
+								onChange={handleChange}
+								className=" w-full bg-slate-50 text-black font-medium border-sky-200"
+							/>
+						</label>
+					</div>
+
+					<div className="mb-4">
 						<label className="block text-gray-700">Job:</label>
 						<div>
 							<select
@@ -96,24 +112,6 @@ export default function AddStaffPage() {
 								</option>
 							</select>
 						</div>
-					</div>
-
-					<div className="mb-4">
-						<label className="block text-gray-700">
-							Salary Number:
-						</label>
-						<label className="input input-bordered flex items-center gap-2 bg-white">
-							<p>đ</p>
-							<input
-								type="number"
-								placeholder="Enter salary"
-								value={formData.salary}
-								name="salary"
-								id="salary"
-								onChange={handleChange}
-								className=" w-full bg-slate-50 text-black font-medium border-sky-200"
-							/>
-						</label>
 					</div>
 
 					<div className="mb-4">
