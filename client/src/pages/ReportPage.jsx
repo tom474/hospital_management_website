@@ -88,6 +88,7 @@ export default function ReportPage() {
 				<div className="flex justify-center items-center">
 					{duration && (
 						<DurationModal
+							key={"report_page"}
 							duration={duration}
 							onUpdate={handleUpdateDuration}
 						/>

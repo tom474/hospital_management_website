@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import ScheduleDetail from "../../patient/detail/ScheduleDetail";
+import DurationModal from "../../appointment/main/DurationModal";
 
 const dummyData = [
 	{
@@ -68,6 +69,11 @@ const columns = [
 ];
 
 export default function StaffAppointment({ staff }) {
+	const [duration, setDuration] = useState({
+		date: "",
+		startTime: "",
+		endTime: ""
+	});
 	const [currentPage, setCurrentPage] = useState(1);
 	const patientsPerPage = 10;
 	const indexOfLastSchedule = currentPage * patientsPerPage;
@@ -90,12 +96,39 @@ export default function StaffAppointment({ staff }) {
 		}
 	};
 
+	const handleDuration = (newDuration) => {
+		setDuration(newDuration);
+		document.getElementById("duration_modal").close();
+	};
+
+	const time =
+		duration.date +
+		"- (" +
+		duration.startTime +
+		" - " +
+		duration.endTime +
+		")";
+
 	return (
 		<div className="w-9/12 mb-6">
 			<div className="mb-2 flex justify-between">
+				<DurationModal
+					key={"staff_appointment	"}
+					duration={duration}
+					onUpdate={handleDuration}
+				/>
 				<h1 className="font-semibold text-3xl text-blue-600">
 					Staff appointment
 				</h1>
+
+				<div
+					onClick={() => {
+						document.getElementById("duration_modal").showModal();
+					}}
+					className="p-2 bg-blue-400 w-fit text-center text-white font-semibold rounded transition ease-in-out hover:bg-blue-300 cursor-pointer"
+				>
+					<p>{duration.date === "" ? "Filter" : time}</p>
+				</div>
 			</div>
 
 			<div className="border-[1px] rounded-lg border-solid border-gray-400 p-2">

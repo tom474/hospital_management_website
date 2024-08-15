@@ -58,6 +58,7 @@ export default function AppointmentPage() {
 				<div className="flex justify-center items-center">
 					{duration && (
 						<DurationModal
+							key={"appointment_page"}
 							duration={duration}
 							onUpdate={handleUpdateDuration}
 						/>
