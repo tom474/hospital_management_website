@@ -8,6 +8,7 @@ import StaffPage from "./pages/StaffPage";
 import StaffDetailPage from "./pages/StaffDetailPage";
 import AddStaffPage from "./pages/AddStaffPage";
 import AppointmentPage from "./pages/AppointmentPage";
+import ReportPage from "./pages/ReportPage";
 
 export default function App() {
 	const router = createBrowserRouter([
@@ -60,6 +61,15 @@ export default function App() {
 						{
 							index: true,
 							element: <AppointmentPage />
+						}
+					]
+				},
+				{
+					path: "report",
+					children: [
+						{
+							index: true,
+							element: <ReportPage />
 						}
 					]
 				}
