@@ -78,6 +78,9 @@ async function executeSetupScript(connection, scriptPath) {
       await setValidationPolicy(connection);
     }
 
+    // Disable foreign key checks before executing scripts
+    await connection.query("SET FOREIGN_KEY_CHECKS = 0");
+
     // Execute SQL setup scripts
     let scripts;
     if (process.argv.length === 2) {
@@ -110,6 +113,9 @@ async function executeSetupScript(connection, scriptPath) {
     for (const script of scripts) {
       await executeSetupScript(connection, `${script}`);
     }
+
+    // Re-enable foreign key checks after executing scripts
+    await connection.query("SET FOREIGN_KEY_CHECKS = 1");
 
     await connection.end(); // Close the connection
     console.log(`Database initialized!`);
