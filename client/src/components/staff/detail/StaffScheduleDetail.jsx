@@ -1,18 +1,8 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-export default function StaffScheduleModal({ staff }) {
-	const [scheduleUpdate, setScheduleUpdate] = useState({
-		staff: {
-			id: staff.id,
-			firstName: staff.firstName,
-			lastName: staff.lastName
-		},
-		dayOfWeek: "Monday",
-		shift: "General Shift",
-		startTime: "08:00",
-		endTime: "17:00"
-	});
+export default function StaffScheduleDetail({ schedule }) {
+	const [scheduleUpdate, setScheduleUpdate] = useState(schedule);
 
 	const handleOnChange = (e) => {
 		const { name, value } = e.target;
@@ -34,17 +24,19 @@ export default function StaffScheduleModal({ staff }) {
 		e.preventDefault();
 		console.log(scheduleUpdate);
 
-		document.getElementById(`staff_schedule_modal`).close();
+		document.getElementById(`staff_schedule_${schedule.id}`).close();
 	};
 
+	const role = localStorage.getItem("role");
+
 	return (
-		<dialog id={`staff_schedule_modal`} className="modal">
+		<dialog id={`staff_schedule_${schedule.id}`} className="modal">
 			<div className="modal-box bg-sky-50 max-w-[650px] w-[650px] h-fit max-h-[650px]">
 				<form onSubmit={onSubmit} method="dialog">
 					<button
 						onClick={() => {
 							document
-								.getElementById(`staff_schedule_modal`)
+								.getElementById(`staff_schedule_${schedule.id}`)
 								.close();
 						}}
 						className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -53,28 +45,8 @@ export default function StaffScheduleModal({ staff }) {
 					</button>
 
 					<h1 className="font-bold text-xl text-blue-600 ">
-						Create Schedule
+						Schedule #{schedule.id}
 					</h1>
-
-					<div className="mt-3">
-						<label htmlFor="staff" className="text-black text-sm">
-							Staff
-						</label>
-						<div className="mt-1">
-							<input
-								type="text"
-								value={
-									scheduleUpdate.staff.firstName +
-									" " +
-									scheduleUpdate.staff.lastName
-								}
-								name="staff"
-								id="staff"
-								disabled
-								className="input input-bordered flex-1 h-10 bg-white text-black font-medium border-[1px] border-gray-300 rounded-[4px] w-full"
-							/>
-						</div>
-					</div>
 
 					<div className="mt-3">
 						<label
@@ -180,23 +152,26 @@ export default function StaffScheduleModal({ staff }) {
 								</div>
 							</div>
 						</div>
-
-						<div className="mt-5 flex gap-1">
-							<button className="w-6/12 btn btn-success text-white">
-								Update
-							</button>
-							<button
-								type="reset"
-								onClick={() => {
-									document
-										.getElementById(`staff_schedule_modal`)
-										.close();
-								}}
-								className="w-6/12 btn btn-outline btn-error text-white"
-							>
-								Cancel
-							</button>
-						</div>
+						{role === "Admin" && (
+							<div className="mt-5 flex gap-1">
+								<button className="w-6/12 btn btn-success text-white">
+									Update
+								</button>
+								<button
+									type="reset"
+									onClick={() => {
+										document
+											.getElementById(
+												`staff_schedule_${schedule.id}`
+											)
+											.close();
+									}}
+									className="w-6/12 btn btn-outline btn-error text-white"
+								>
+									Cancel
+								</button>
+							</div>
+						)}
 					</div>
 				</form>
 			</div>
@@ -204,6 +179,6 @@ export default function StaffScheduleModal({ staff }) {
 	);
 }
 
-StaffScheduleModal.propTypes = {
-	staff: PropTypes.object.isRequired
+StaffScheduleDetail.propTypes = {
+	schedule: PropTypes.object.isRequired
 };

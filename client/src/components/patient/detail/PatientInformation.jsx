@@ -20,21 +20,24 @@ export default function PatientInformation({ patient }) {
 		setIsUpdate(false);
 	};
 
+	const role = localStorage.getItem("role");
+
 	return (
 		<form onSubmit={onSubmit} className="w-9/12 mb-6">
 			<div className="mb-2 flex justify-between">
 				<h1 className="font-semibold text-3xl text-blue-600">
 					Personal Information
 				</h1>
-
-				<div
-					onClick={handleIsUpdate}
-					className={`btn btn-outline ${
-						isUpdate ? "btn-error" : "btn-primary"
-					} `}
-				>
-					{isUpdate ? "Cancel" : "Modify"}
-				</div>
+				{(role === "Admin" || role === "Receptionist") && (
+					<div
+						onClick={handleIsUpdate}
+						className={`btn btn-outline ${
+							isUpdate ? "btn-error" : "btn-primary"
+						} `}
+					>
+						{isUpdate ? "Cancel" : "Modify"}
+					</div>
+				)}
 			</div>
 			<div className="border-[1px] rounded-lg border-solid border-gray-400 p-2">
 				<div>

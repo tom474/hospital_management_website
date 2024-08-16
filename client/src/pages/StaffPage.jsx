@@ -7,6 +7,9 @@ export default function StaffPage() {
 	const handleOnChange = (e) => {
 		console.log(e.target.value);
 	};
+
+	const role = localStorage.getItem("role");
+
 	return (
 		<div className="flex flex-col mt-5 gap-5">
 			<h1 className="mt-5 text-center w-full text-blue-400 text-5xl font-bold">
@@ -43,18 +46,19 @@ export default function StaffPage() {
 						<option>Department 6</option>
 					</select>
 				</div>
-
-				<div className="flex justify-center items-center">
-					<Link
-						to={"add-staff"}
-						className="py-2 px-3 h-fit w-36 text-center bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300"
-					>
-						<span>
-							<FontAwesomeIcon icon={faPlus} />
-						</span>{" "}
-						Add Staff
-					</Link>
-				</div>
+				{role === "Admin" && (
+					<div className="flex justify-center items-center">
+						<Link
+							to={"add-staff"}
+							className="py-2 px-3 h-fit w-36 text-center bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300"
+						>
+							<span>
+								<FontAwesomeIcon icon={faPlus} />
+							</span>{" "}
+							Add Staff
+						</Link>
+					</div>
+				)}
 			</div>
 			<StaffTable />
 		</div>

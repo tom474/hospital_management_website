@@ -9,6 +9,7 @@ const dummyData = [
 		id: 1,
 		date: "2024-08-01",
 		doctor: "Dr. John Smith",
+		patient: "John Doe",
 		startTime: "10:00",
 		endTime: "11:00",
 		status: "Booked",
@@ -18,6 +19,7 @@ const dummyData = [
 		id: 2,
 		date: "2024-08-05",
 		doctor: "Dr. Emily Johnson",
+		patient: "John Doe",
 		startTime: "02:00",
 		endTime: "03:00",
 		status: "Booked",
@@ -27,6 +29,7 @@ const dummyData = [
 		id: 3,
 		date: "2024-08-10",
 		doctor: "Dr. Michael Brown",
+		patient: "John Doe",
 		startTime: "09:00",
 		endTime: "10:00",
 		status: "Cancelled",
@@ -36,6 +39,7 @@ const dummyData = [
 		id: 4,
 		date: "2024-08-12",
 		doctor: "Dr. Sarah Davis",
+		patient: "John Doe",
 		startTime: "11:30",
 		endTime: "12:30",
 		status: "Cancelled",
@@ -45,6 +49,7 @@ const dummyData = [
 		id: 5,
 		date: "2024-08-15",
 		doctor: "Dr. David Wilson",
+		patient: "John Doe",
 		startTime: "01:00",
 		endTime: "02:00",
 		status: "Booked",
@@ -74,8 +79,7 @@ export default function Schedule({ patient }) {
 	const totalPages = Math.ceil(dummyData.length / patientsPerPage);
 	const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-	const fullName = `${patient.firstName} ${patient.lastName}`;
-
+	console.log(patient);
 	const displayJobType = (status) => {
 		const defaultStyle = "badge border-none text-white font-semibold";
 		if (status === "Booked") {
@@ -134,10 +138,7 @@ export default function Schedule({ patient }) {
 									{data.purpose}
 								</td>
 								<td className="align-top text-black">
-									<ScheduleDetail
-										schedule={data}
-										patient={fullName}
-									/>
+									<ScheduleDetail schedule={data} />
 									<div
 										onClick={() => {
 											document

@@ -10,6 +10,8 @@ export default function PatientPage() {
 		navigate("/patient/add-patient");
 	};
 
+	const role = localStorage.getItem("role");
+
 	return (
 		<div className="flex flex-col mt-5 gap-5">
 			<h1 className="mt-5 text-center w-full text-blue-400 text-5xl font-bold">
@@ -23,20 +25,22 @@ export default function PatientPage() {
 				<input
 					type="text"
 					placeholder="Search Patient ..."
-					className="w-9/12 h-10 pl-5 bg-white focus:outline-none"
+					className="w-full h-10 pl-5 bg-white focus:outline-none"
 				/>
 				<button className="w-12 h-10 rounded bg-blue-400 text-white transition ease-in-out hover:bg-blue-300">
 					<FontAwesomeIcon icon={faMagnifyingGlass} />
 				</button>
-				<button
-					className="w-2/12 h-10 bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300"
-					onClick={handleAddPatientClick}
-				>
-					<span>
-						<FontAwesomeIcon icon={faPlus} />
-					</span>{" "}
-					Add Patient
-				</button>
+				{(role === "Admin" || role === "Receptionist") && (
+					<button
+						className="w-2/12 h-10 bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300"
+						onClick={handleAddPatientClick}
+					>
+						<span>
+							<FontAwesomeIcon icon={faPlus} />
+						</span>{" "}
+						Add Patient
+					</button>
+				)}
 			</div>
 			<PatientTable />
 		</div>

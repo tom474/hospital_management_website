@@ -9,7 +9,7 @@ export default function ScheduleDetail({ schedule }) {
 		console.log("Cancel Appointment");
 	};
 
-	const displayStatus = (status) => {
+	let displayStatus = (status) => {
 		const defaultStyle = "badge border-none text-white font-semibold";
 		if (status === "Booked") {
 			return <p className={`${defaultStyle}  bg-green-400`}>{status}</p>;
@@ -17,6 +17,8 @@ export default function ScheduleDetail({ schedule }) {
 			return <p className={`${defaultStyle}  bg-red-400`}>{status}</p>;
 		}
 	};
+
+	const role = localStorage.getItem("role");
 
 	return (
 		<dialog id={`schedule_${schedule.id}`} className="modal">
@@ -55,7 +57,7 @@ export default function ScheduleDetail({ schedule }) {
 						</p>
 					</div>
 
-					<p>{displayStatus(schedule.status)}</p>
+					{displayStatus(schedule.status)}
 				</div>
 
 				<div className="mt-4">
@@ -67,28 +69,29 @@ export default function ScheduleDetail({ schedule }) {
 						{schedule.purpose}
 					</p>
 				</div>
-				{schedule.status === "Booked" && (
-					<form onSubmit={onCancelAppointment}>
-						<div className="mt-5 flex gap-1">
-							<button className="w-6/12 btn btn-success text-white">
-								Cancel Appointment
-							</button>
-							<button
-								type="reset"
-								onClick={() => {
-									document
-										.getElementById(
-											`schedule_${schedule.id}`
-										)
-										.close();
-								}}
-								className="w-6/12 btn btn-outline btn-error text-white"
-							>
-								Close
-							</button>
-						</div>
-					</form>
-				)}
+				{(role == "Receptionist" || role == "Admin") &&
+					schedule.status === "Booked" && (
+						<form onSubmit={onCancelAppointment}>
+							<div className="mt-5 flex gap-1">
+								<button className="w-6/12 btn btn-success text-white">
+									Cancel Appointment
+								</button>
+								<button
+									type="reset"
+									onClick={() => {
+										document
+											.getElementById(
+												`schedule_${schedule.id}`
+											)
+											.close();
+									}}
+									className="w-6/12 btn btn-outline btn-error text-white"
+								>
+									Close
+								</button>
+							</div>
+						</form>
+					)}
 			</div>
 		</dialog>
 	);

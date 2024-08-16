@@ -60,6 +60,8 @@ export default function TreatmentHistory({ patient }) {
 		endTime: ""
 	});
 
+	const role = localStorage.getItem("role");
+
 	const [currentPage, setCurrentPage] = useState(1);
 	const patientsPerPage = 10;
 	const indexOfLastTreatment = currentPage * patientsPerPage;
@@ -111,16 +113,18 @@ export default function TreatmentHistory({ patient }) {
 						>
 							<p>{duration.date === "" ? "Filter" : time}</p>
 						</div>
-						<div
-							onClick={() =>
-								document
-									.getElementById("my_modal_1")
-									.showModal()
-							}
-							className="btn btn-primary text-white"
-						>
-							Add Treatment
-						</div>
+						{(role === "Doctor" || role === "Receptionist") && (
+							<div
+								onClick={() =>
+									document
+										.getElementById("my_modal_1")
+										.showModal()
+								}
+								className="btn btn-primary text-white"
+							>
+								Add Treatment
+							</div>
+						)}
 					</div>
 				</div>
 
@@ -140,38 +144,42 @@ export default function TreatmentHistory({ patient }) {
 							</tr>
 						</thead>
 						<tbody>
-							{currentTreatment.map((data, index) => (
-								<tr key={index}>
-									<td className="align-top text-black">
-										{data.date}
-									</td>
-									<td className="align-top text-black">
-										{data.doctor}
-									</td>
+							{currentTreatment.map((data, index) => {
+								console.log(data);
+								return (
+									<tr key={index}>
+										<td className="align-top text-black">
+											{data.date}
+										</td>
+										<td className="align-top text-black">
+											{data.doctor}
+										</td>
 
-									<td className="align-top text-black">
-										{data.patient}
-									</td>
-									<td className="align-top text-black overflow-hidden text-ellipsis whitespace-nowrap max-w-xs">
-										{data.description}
-									</td>
-									<td className="align-top text-black">
-										<TreatmentDetail treatment={data} />
-										<div
-											onClick={() => {
-												document
-													.getElementById(
-														"treatment_" + data.id
-													)
-													.showModal();
-											}}
-											className="btn btn-outline rounded-full btn-success hover:text-white"
-										>
-											<FontAwesomeIcon icon={faEye} />
-										</div>
-									</td>
-								</tr>
-							))}
+										<td className="align-top text-black">
+											{data.patient}
+										</td>
+										<td className="align-top text-black overflow-hidden text-ellipsis whitespace-nowrap max-w-xs">
+											{data.description}
+										</td>
+										<td className="align-top text-black">
+											<TreatmentDetail treatment={data} />
+											<div
+												onClick={() => {
+													document
+														.getElementById(
+															"treatment_" +
+																data.id
+														)
+														.showModal();
+												}}
+												className="btn btn-outline rounded-full btn-success hover:text-white"
+											>
+												<FontAwesomeIcon icon={faEye} />
+											</div>
+										</td>
+									</tr>
+								);
+							})}
 						</tbody>
 					</table>
 				</div>

@@ -2,7 +2,8 @@ import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { useState } from "react";
-import StaffScheduleDetail from "./StaffScheduleModal";
+import StaffScheduleDetail from "./StaffScheduleDetail";
+import StaffScheduleModal from "./StaffScheduleModal";
 
 const mockData = [
 	{
@@ -78,12 +79,30 @@ export default function StaffSchedule({ staff }) {
 		}
 	};
 
+	const role = localStorage.getItem("role");
+
 	return (
 		<div className="w-9/12 mb-6">
+			<StaffScheduleModal staff={staff} />
 			<div className="mb-2 flex justify-between">
 				<h1 className="font-semibold text-3xl text-blue-600">
 					{staff.firstName} {staff.lastName}&rsquo;s Schedule
 				</h1>
+
+				{role === "Admin" && (
+					<div>
+						<button
+							onClick={() => {
+								document
+									.getElementById("staff_schedule_modal")
+									.showModal();
+							}}
+							className="btn btn-outline btn-primary"
+						>
+							Create Schedule
+						</button>
+					</div>
+				)}
 			</div>
 
 			<div className="border-[1px] rounded-lg border-solid border-gray-400 p-2">
