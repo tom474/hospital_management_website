@@ -22,11 +22,11 @@ export default function Login({ loginFunction }) {
 						</div>
 						<div
 							onClick={() => {
-								loginFunction("Patient");
+								loginFunction("Nurse");
 							}}
 							className="btn btn-info text-white"
 						>
-							Patient
+							Nurse
 						</div>
 						<div
 							onClick={() => {
