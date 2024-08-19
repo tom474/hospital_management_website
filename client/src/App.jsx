@@ -9,6 +9,11 @@ import StaffDetailPage from "./pages/StaffDetailPage";
 import AddStaffPage from "./pages/AddStaffPage";
 import AppointmentPage from "./pages/AppointmentPage";
 import ReportPage from "./pages/ReportPage";
+import {
+	verifyAdmin,
+	verifyAdminOrReceptionist,
+	verifyLogin
+} from "./utils/common";
 
 export default function App() {
 	const router = createBrowserRouter([
@@ -18,7 +23,6 @@ export default function App() {
 			children: [
 				{
 					index: true,
-
 					element: <Homepage />
 				},
 				{
@@ -26,15 +30,18 @@ export default function App() {
 					children: [
 						{
 							index: true,
-							element: <PatientPage />
+							element: <PatientPage />,
+							loader: verifyLogin
 						},
 						{
 							path: "add-patient",
-							element: <AddPatientPage />
+							element: <AddPatientPage />,
+							loader: verifyAdminOrReceptionist
 						},
 						{
 							path: ":patientId",
-							element: <PatientDetailPage />
+							element: <PatientDetailPage />,
+							loader: verifyLogin
 						}
 					]
 				},
@@ -43,15 +50,18 @@ export default function App() {
 					children: [
 						{
 							index: true,
-							element: <StaffPage />
+							element: <StaffPage />,
+							loader: verifyLogin
 						},
 						{
 							path: "add-staff",
-							element: <AddStaffPage />
+							element: <AddStaffPage />,
+							loader: verifyAdmin
 						},
 						{
 							path: ":staffId",
-							element: <StaffDetailPage />
+							element: <StaffDetailPage />,
+							loader: verifyLogin
 						}
 					]
 				},
@@ -60,7 +70,8 @@ export default function App() {
 					children: [
 						{
 							index: true,
-							element: <AppointmentPage />
+							element: <AppointmentPage />,
+							loader: verifyAdminOrReceptionist
 						}
 					]
 				},
@@ -69,7 +80,8 @@ export default function App() {
 					children: [
 						{
 							index: true,
-							element: <ReportPage />
+							element: <ReportPage />,
+							loader: verifyAdmin
 						}
 					]
 				}
