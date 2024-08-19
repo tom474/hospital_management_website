@@ -1,9 +1,9 @@
 import PropTypes from "prop-types";
 import Select from "react-select";
-import FileDisplay from "./FileDisplay";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import FileDisplay from "../../utils/FileDisplay";
 
 const dummyDoctors = [
 	{ id: 1, name: "Dr. John Smith" },

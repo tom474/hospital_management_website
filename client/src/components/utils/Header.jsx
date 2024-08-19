@@ -1,7 +1,19 @@
+import PropTypes from "prop-types";
 import { PopoverGroup } from "@headlessui/react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-export default function Header() {
+export default function Header({ role }) {
+	const [mode, setMode] = useState(false);
+	const navigate = useNavigate();
+
+	const onLogout = () => {
+		localStorage.removeItem("role");
+		setMode(false);
+		navigate("/");
+		document.getElementById("login_modal").showModal();
+	};
+
 	return (
 		<header className="bg-sky-50">
 			<nav
@@ -43,36 +55,63 @@ export default function Header() {
 						to={"/staff"}
 						className={({ isActive }) =>
 							isActive
-								? "text-sm font-semibold leading-6 text-blue-400"
-								: "text-sm font-semibold leading-6 text-gray-900"
+								? "text-base font-semibold leading-6 text-blue-400"
+								: "text-base font-semibold leading-6 text-gray-900"
 						}
 					>
 						Staff
 					</NavLink>
 
-					<NavLink
-						to={"/appointment"}
-						className={({ isActive }) =>
-							isActive
-								? "text-base font-semibold leading-6 text-blue-400"
-								: "text-base font-semibold leading-6 text-gray-900"
-						}
-					>
-						Appointment
-					</NavLink>
+					{(role === "Receptionist" || role === "Admin") && (
+						<NavLink
+							to={"/appointment"}
+							className={({ isActive }) =>
+								isActive
+									? "text-base font-semibold leading-6 text-blue-400"
+									: "text-base font-semibold leading-6 text-gray-900"
+							}
+						>
+							Appointment
+						</NavLink>
+					)}
 
-					<NavLink
-						to={"/report"}
-						className={({ isActive }) =>
-							isActive
-								? "text-base font-semibold leading-6 text-blue-300"
-								: "text-base font-semibold leading-6 text-gray-900"
-						}
-					>
-						Report
-					</NavLink>
+					{role === "Admin" && (
+						<NavLink
+							to={"/report"}
+							className={({ isActive }) =>
+								isActive
+									? "text-base font-semibold leading-6 text-blue-300"
+									: "text-base font-semibold leading-6 text-gray-900"
+							}
+						>
+							Report
+						</NavLink>
+					)}
+
+					{role && (
+						<div className="relative">
+							<p
+								onClick={() => setMode(!mode)}
+								className="font-semibold text-blue-400 cursor-pointer"
+							>
+								{role}
+							</p>
+							<div
+								onClick={onLogout}
+								className={`absolute mt-3 cursor-pointer w-20 p-4 rounded right-[3px] bg-blue-400 hover:bg-blue-300 text-white font-semibold ${
+									mode ? "block" : "hidden"
+								}`}
+							>
+								<p>logout</p>
+							</div>
+						</div>
+					)}
 				</PopoverGroup>
 			</nav>
 		</header>
 	);
 }
+
+Header.propTypes = {
+	role: PropTypes.string
+};

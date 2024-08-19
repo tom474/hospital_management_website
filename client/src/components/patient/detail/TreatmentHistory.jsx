@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import TreatmentModal from "./TreatmentModal";
 import TreatmentDetail from "./TreatmentDetail";
 import { useState } from "react";
+import DurationModal from "../../appointment/main/DurationModal";
 
 const dummyData = [
 	{
@@ -53,6 +54,14 @@ const columns = [
 ];
 
 export default function TreatmentHistory({ patient }) {
+	const [duration, setDuration] = useState({
+		date: "",
+		startTime: "",
+		endTime: ""
+	});
+
+	const role = localStorage.getItem("role");
+
 	const [currentPage, setCurrentPage] = useState(1);
 	const patientsPerPage = 10;
 	const indexOfLastTreatment = currentPage * patientsPerPage;
@@ -66,22 +75,56 @@ export default function TreatmentHistory({ patient }) {
 
 	console.log(patient);
 
+	const time =
+		duration.date +
+		"- (" +
+		duration.startTime +
+		" - " +
+		duration.endTime +
+		")";
+
+	const handleDuration = (newDuration) => {
+		setDuration(newDuration);
+		document.getElementById("duration_modal").close();
+	};
+
 	return (
 		<>
 			<TreatmentModal patient={patient} />
 			<div className="w-9/12 mb-6">
 				<div className="mb-2 flex justify-between">
+					<DurationModal
+						key={"treatment_history"}
+						duration={duration}
+						onUpdate={handleDuration}
+					/>
+
 					<h1 className="font-semibold text-3xl text-blue-600">
 						Treatment History
 					</h1>
-
-					<div
-						onClick={() =>
-							document.getElementById("my_modal_1").showModal()
-						}
-						className="btn btn-primary text-white"
-					>
-						Add Treatment
+					<div className="flex gap-2 items-center">
+						<div
+							onClick={() => {
+								document
+									.getElementById("duration_modal")
+									.showModal();
+							}}
+							className="p-2 bg-blue-400 w-fit text-center text-white font-semibold rounded transition ease-in-out hover:bg-blue-300 cursor-pointer"
+						>
+							<p>{duration.date === "" ? "Filter" : time}</p>
+						</div>
+						{(role === "Doctor" || role === "Receptionist") && (
+							<div
+								onClick={() =>
+									document
+										.getElementById("my_modal_1")
+										.showModal()
+								}
+								className="btn btn-primary text-white"
+							>
+								Add Treatment
+							</div>
+						)}
 					</div>
 				</div>
 
@@ -101,38 +144,42 @@ export default function TreatmentHistory({ patient }) {
 							</tr>
 						</thead>
 						<tbody>
-							{currentTreatment.map((data, index) => (
-								<tr key={index}>
-									<td className="align-top text-black">
-										{data.date}
-									</td>
-									<td className="align-top text-black">
-										{data.doctor}
-									</td>
+							{currentTreatment.map((data, index) => {
+								console.log(data);
+								return (
+									<tr key={index}>
+										<td className="align-top text-black">
+											{data.date}
+										</td>
+										<td className="align-top text-black">
+											{data.doctor}
+										</td>
 
-									<td className="align-top text-black">
-										{data.patient}
-									</td>
-									<td className="align-top text-black overflow-hidden text-ellipsis whitespace-nowrap max-w-xs">
-										{data.description}
-									</td>
-									<td className="align-top text-black">
-										<TreatmentDetail treatment={data} />
-										<div
-											onClick={() => {
-												document
-													.getElementById(
-														"treatment_" + data.id
-													)
-													.showModal();
-											}}
-											className="btn btn-outline rounded-full btn-success hover:text-white"
-										>
-											<FontAwesomeIcon icon={faEye} />
-										</div>
-									</td>
-								</tr>
-							))}
+										<td className="align-top text-black">
+											{data.patient}
+										</td>
+										<td className="align-top text-black overflow-hidden text-ellipsis whitespace-nowrap max-w-xs">
+											{data.description}
+										</td>
+										<td className="align-top text-black">
+											<TreatmentDetail treatment={data} />
+											<div
+												onClick={() => {
+													document
+														.getElementById(
+															"treatment_" +
+																data.id
+														)
+														.showModal();
+												}}
+												className="btn btn-outline rounded-full btn-success hover:text-white"
+											>
+												<FontAwesomeIcon icon={faEye} />
+											</div>
+										</td>
+									</tr>
+								);
+							})}
 						</tbody>
 					</table>
 				</div>

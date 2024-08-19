@@ -1,8 +1,9 @@
 import { faEye } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
-import ScheduleDetail from "./ScheduleDetail";
 import { useState } from "react";
+import ScheduleDetail from "../../patient/detail/ScheduleDetail";
+import DurationModal from "../../appointment/main/DurationModal";
 
 const dummyData = [
 	{
@@ -19,7 +20,7 @@ const dummyData = [
 		id: 2,
 		date: "2024-08-05",
 		doctor: "Dr. Emily Johnson",
-		patient: "John Doe",
+		patient: "John Mice",
 		startTime: "02:00",
 		endTime: "03:00",
 		status: "Booked",
@@ -29,7 +30,7 @@ const dummyData = [
 		id: 3,
 		date: "2024-08-10",
 		doctor: "Dr. Michael Brown",
-		patient: "John Doe",
+		patient: "Sarah Doe",
 		startTime: "09:00",
 		endTime: "10:00",
 		status: "Cancelled",
@@ -39,7 +40,7 @@ const dummyData = [
 		id: 4,
 		date: "2024-08-12",
 		doctor: "Dr. Sarah Davis",
-		patient: "John Doe",
+		patient: "Sarah Mice",
 		startTime: "11:30",
 		endTime: "12:30",
 		status: "Cancelled",
@@ -49,7 +50,7 @@ const dummyData = [
 		id: 5,
 		date: "2024-08-15",
 		doctor: "Dr. David Wilson",
-		patient: "John Doe",
+		patient: "David Doe",
 		startTime: "01:00",
 		endTime: "02:00",
 		status: "Booked",
@@ -67,7 +68,12 @@ const columns = [
 	{ key: "action", title: "Action", size: "w-[0%]" }
 ];
 
-export default function Schedule({ patient }) {
+export default function StaffAppointment({ staff }) {
+	const [duration, setDuration] = useState({
+		date: "",
+		startTime: "",
+		endTime: ""
+	});
 	const [currentPage, setCurrentPage] = useState(1);
 	const patientsPerPage = 10;
 	const indexOfLastSchedule = currentPage * patientsPerPage;
@@ -79,8 +85,9 @@ export default function Schedule({ patient }) {
 	const totalPages = Math.ceil(dummyData.length / patientsPerPage);
 	const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-	console.log(patient);
-	const displayJobType = (status) => {
+	console.log(staff);
+
+	const displayStatus = (status) => {
 		const defaultStyle = "badge border-none text-white font-semibold";
 		if (status === "Booked") {
 			return <p className={`${defaultStyle}  bg-green-400`}>{status}</p>;
@@ -89,12 +96,39 @@ export default function Schedule({ patient }) {
 		}
 	};
 
+	const handleDuration = (newDuration) => {
+		setDuration(newDuration);
+		document.getElementById("duration_modal").close();
+	};
+
+	const time =
+		duration.date +
+		"- (" +
+		duration.startTime +
+		" - " +
+		duration.endTime +
+		")";
+
 	return (
 		<div className="w-9/12 mb-6">
 			<div className="mb-2 flex justify-between">
+				<DurationModal
+					key={"staff_appointment	"}
+					duration={duration}
+					onUpdate={handleDuration}
+				/>
 				<h1 className="font-semibold text-3xl text-blue-600">
-					Patient Schedule
+					Staff appointment
 				</h1>
+
+				<div
+					onClick={() => {
+						document.getElementById("duration_modal").showModal();
+					}}
+					className="p-2 bg-blue-400 w-fit text-center text-white font-semibold rounded transition ease-in-out hover:bg-blue-300 cursor-pointer"
+				>
+					<p>{duration.date === "" ? "Filter" : time}</p>
+				</div>
 			</div>
 
 			<div className="border-[1px] rounded-lg border-solid border-gray-400 p-2">
@@ -132,7 +166,7 @@ export default function Schedule({ patient }) {
 									{data.startTime} - {data.endTime}
 								</td>
 								<td className="align-top text-black flex justify-center">
-									{displayJobType(data.status)}
+									{displayStatus(data.status)}
 								</td>
 								<td className="align-top text-black">
 									{data.purpose}
@@ -176,4 +210,4 @@ export default function Schedule({ patient }) {
 	);
 }
 
-Schedule.propTypes = { patient: PropTypes.object.isRequired };
+StaffAppointment.propTypes = { staff: PropTypes.object.isRequired };
