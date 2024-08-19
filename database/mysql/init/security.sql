@@ -1,17 +1,49 @@
 USE HospitalManagementSystem;
 
 -- Creating system_admin role with full access
-CREATE USER 'system_admin'@'localhost' IDENTIFIED BY 'securepassword';
+CREATE USER 'system_admin'@'localhost' IDENTIFIED BY 'UniqueSecurePasswordForAdmin';
 GRANT ALL PRIVILEGES ON HospitalManagementSystem.* TO 'system_admin'@'localhost';
 
--- Creating roles and users
-CREATE USER 'admin'@'localhost' IDENTIFIED BY 'securepassword';
-CREATE USER 'doctor'@'localhost' IDENTIFIED BY 'securepassword';
-CREATE USER 'nurse'@'localhost' IDENTIFIED BY 'securepassword';
-CREATE USER 'receptionist'@'localhost' IDENTIFIED BY 'securepassword';
+-- Creating roles and assigning privileges
+CREATE ROLE doctor_role;
+CREATE ROLE nurse_role;
+CREATE ROLE receptionist_role;
 
--- Granting full access to the admin user
+-- Granting privileges to doctor_role
+GRANT SELECT, INSERT, UPDATE ON Patient_noid TO doctor_role;
+GRANT SELECT, INSERT, UPDATE ON Treatment_noid TO doctor_role;
+GRANT SELECT ON Appointment TO doctor_role;
+GRANT INSERT, UPDATE ON Appointment_noid TO doctor_role;
+GRANT SELECT ON Staff TO doctor_role;
+GRANT SELECT ON DocumentReference TO doctor_role;
+
+-- Granting privileges to nurse_role
+GRANT SELECT, INSERT, UPDATE ON Patient_noid TO nurse_role;
+GRANT SELECT, INSERT ON Treatment_noid TO nurse_role;
+GRANT SELECT ON Appointment TO nurse_role;
+GRANT INSERT ON Appointment_noid TO nurse_role;
+GRANT SELECT ON Staff TO nurse_role;
+GRANT SELECT ON DocumentReference TO nurse_role;
+
+-- Granting privileges to receptionist_role
+GRANT SELECT, INSERT ON Patient_noid TO receptionist_role;
+GRANT SELECT, INSERT ON Appointment_noid TO receptionist_role;
+GRANT SELECT ON Staff TO receptionist_role;
+GRANT SELECT, INSERT, UPDATE ON Schedule TO receptionist_role;
+
+-- Creating users and assigning roles
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'UniqueSecurePasswordForAdmin';
+CREATE USER 'doctor'@'localhost' IDENTIFIED BY 'UniqueSecurePasswordForDoctor';
+CREATE USER 'nurse'@'localhost' IDENTIFIED BY 'UniqueSecurePasswordForNurse';
+CREATE USER 'receptionist'@'localhost' IDENTIFIED BY 'UniqueSecurePasswordForReceptionist';
+
+-- Assigning full access to the admin user
 GRANT ALL PRIVILEGES ON HospitalManagementSystem.* TO 'admin'@'localhost';
+
+-- Assigning roles to the users
+GRANT doctor_role TO 'doctor'@'localhost';
+GRANT nurse_role TO 'nurse'@'localhost';
+GRANT receptionist_role TO 'receptionist'@'localhost';
 
 -- Create _noid views for tables with AUTO_INCREMENT columns
 
@@ -61,31 +93,7 @@ SELECT
     description 
 FROM Treatment;
 
--- Assigning realistic privileges
-
--- Doctors
-GRANT SELECT, INSERT, UPDATE ON Patient_noid TO 'doctor'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON Treatment_noid TO 'doctor'@'localhost';
-GRANT SELECT ON Appointment TO 'doctor'@'localhost';
-GRANT INSERT, UPDATE ON Appointment_noid TO 'doctor'@'localhost';
-GRANT SELECT ON Staff TO 'doctor'@'localhost';
-GRANT SELECT ON DocumentReference TO 'doctor'@'localhost';
-
--- Nurses
-GRANT SELECT, INSERT, UPDATE ON Patient_noid TO 'nurse'@'localhost';
-GRANT SELECT, INSERT ON Treatment_noid TO 'nurse'@'localhost';
-GRANT SELECT ON Appointment TO 'nurse'@'localhost';
-GRANT INSERT ON Appointment_noid TO 'nurse'@'localhost';
-GRANT SELECT ON Staff TO 'nurse'@'localhost';
-GRANT SELECT ON DocumentReference TO 'nurse'@'localhost';
-
--- Receptionists
-GRANT SELECT, INSERT ON Patient_noid TO 'receptionist'@'localhost';
-GRANT SELECT, INSERT ON Appointment_noid TO 'receptionist'@'localhost';
-GRANT SELECT ON Staff TO 'receptionist'@'localhost';
-GRANT SELECT, INSERT, UPDATE ON Schedule TO 'receptionist'@'localhost';
-
--- Restricting INSERT privileges to views only
+-- Restricting INSERT privileges directly on the tables (if not using roles, or as a backup)
 REVOKE INSERT ON Patient FROM 'doctor'@'localhost', 'nurse'@'localhost', 'receptionist'@'localhost';
 REVOKE INSERT ON Staff FROM 'receptionist'@'localhost';
 REVOKE INSERT ON Appointment FROM 'doctor'@'localhost', 'nurse'@'localhost', 'receptionist'@'localhost';

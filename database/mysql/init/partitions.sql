@@ -33,21 +33,20 @@ PARTITION BY RANGE (YEAR(change_date)) (
     PARTITION p_future VALUES LESS THAN MAXVALUE
 );
 
--- Partition the Schedule table by day of the week
+-- Partition the Schedule table by week using date
 ALTER TABLE Schedule 
-PARTITION BY LIST (day_of_week) (
-    PARTITION p_monday VALUES IN ('Monday'),
-    PARTITION p_tuesday VALUES IN ('Tuesday'),
-    PARTITION p_wednesday VALUES IN ('Wednesday'),
-    PARTITION p_thursday VALUES IN ('Thursday'),
-    PARTITION p_friday VALUES IN ('Friday'),
-    PARTITION p_saturday VALUES IN ('Saturday'),
-    PARTITION p_sunday VALUES IN ('Sunday')
+PARTITION BY RANGE (TO_DAYS(date)) (
+    PARTITION p_before_2023 VALUES LESS THAN (TO_DAYS('2023-01-01')),
+    PARTITION p_2023 VALUES LESS THAN (TO_DAYS('2024-01-01')),
+    PARTITION p_2024 VALUES LESS THAN (TO_DAYS('2025-01-01')),
+    PARTITION p_2025 VALUES LESS THAN (TO_DAYS('2026-01-01')),
+    PARTITION p_2026 VALUES LESS THAN (TO_DAYS('2027-01-01')),
+    PARTITION p_future VALUES LESS THAN MAXVALUE
 );
 
 -- Partition the DocumentReference table by entity type
 ALTER TABLE DocumentReference 
-PARTITION BY LIST (entity_type) (
+PARTITION BY LIST COLUMNS (entity_type) (
     PARTITION p_patient VALUES IN ('Patient'),
     PARTITION p_staff VALUES IN ('Staff'),
     PARTITION p_appointment VALUES IN ('Appointment')

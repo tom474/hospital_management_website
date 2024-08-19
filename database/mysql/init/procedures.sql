@@ -169,7 +169,7 @@ CREATE PROCEDURE UpdateStaffSchedule(
     IN schedule_id INT,
     IN new_start_time TIME,
     IN new_end_time TIME,
-    IN new_day_of_week ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday')
+    IN new_date DATE
 )
 BEGIN
     -- Check for conflicts with existing appointments
@@ -178,16 +178,15 @@ BEGIN
     SELECT COUNT(*) INTO conflict_count
     FROM Appointment
     WHERE staff_id = (SELECT staff_id FROM Schedule WHERE schedule_id = schedule_id)
-      AND date = CURDATE()
-      AND ((start_time BETWEEN new_start_time AND new_end_time)
-      OR (end_time BETWEEN new_start_time AND new_end_time));
+      AND date = new_date
+      AND ((start_time < new_end_time AND end_time > new_start_time));
 
     -- If no conflicts, update the schedule
     IF conflict_count = 0 THEN
         UPDATE Schedule
         SET start_time = new_start_time,
             end_time = new_end_time,
-            day_of_week = new_day_of_week
+            date = new_date
         WHERE schedule_id = schedule_id;
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Schedule conflict detected with an existing appointment.';
@@ -202,11 +201,11 @@ CREATE PROCEDURE ViewDoctorsSchedule(
     IN end_date DATE
 )
 BEGIN
-    SELECT s.staff_id, CONCAT(s.first_name, ' ', s.last_name) AS doctor_name, sc.day_of_week, sc.start_time, sc.end_time,
+    SELECT s.staff_id, CONCAT(s.first_name, ' ', s.last_name) AS doctor_name, sc.date, sc.start_time, sc.end_time,
            IF(EXISTS(SELECT 1 FROM Appointment a WHERE a.staff_id = s.staff_id AND a.date BETWEEN start_date AND end_date), 'Busy', 'Available') AS status
     FROM Staff s
     JOIN Schedule sc ON s.staff_id = sc.staff_id
-    WHERE s.job_type = 'Doctor' AND sc.day_of_week BETWEEN DAYNAME(start_date) AND DAYNAME(end_date);
+    WHERE s.job_type = 'Doctor' AND sc.date BETWEEN start_date AND end_date;
 END $$
 DELIMITER ;
 
@@ -228,13 +227,12 @@ BEGIN
     FROM Appointment
     WHERE staff_id = staff_id
       AND date = appointment_date
-      AND ((start_time BETWEEN start_time AND end_time)
-      OR (end_time BETWEEN start_time AND end_time));
+      AND ((start_time < end_time AND end_time > start_time));
 
     -- If no conflicts, insert the appointment
     IF conflict_count = 0 THEN
-        INSERT INTO Appointment (patient_id, staff_id, date, start_time, end_time, purpose)
-        VALUES (patient_id, staff_id, appointment_date, start_time, end_time, purpose);
+        INSERT INTO Appointment (patient_id, staff_id, date, start_time, end_time, purpose, status)
+        VALUES (patient_id, staff_id, appointment_date, start_time, end_time, purpose, 'Scheduled');
     ELSE
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Appointment conflict detected.';
     END IF;

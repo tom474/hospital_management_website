@@ -26,27 +26,27 @@ DELIMITER $$
 CREATE PROCEDURE RebuildIndexes()
 BEGIN
     -- Drop and recreate indexes for the Patient table
-    ALTER TABLE Patient DROP INDEX idx_patient_name;
-    ALTER TABLE Patient DROP INDEX idx_patient_email;
+    ALTER TABLE Patient DROP INDEX IF EXISTS idx_patient_name;
+    ALTER TABLE Patient DROP INDEX IF EXISTS idx_patient_email;
     ALTER TABLE Patient ADD INDEX idx_patient_name (last_name, first_name);
     ALTER TABLE Patient ADD INDEX idx_patient_email (email);
 
     -- Drop and recreate indexes for the Staff table
-    ALTER TABLE Staff DROP INDEX idx_staff_name;
-    ALTER TABLE Staff DROP INDEX idx_staff_email;
-    ALTER TABLE Staff DROP INDEX idx_staff_job_type;
-    ALTER TABLE Staff DROP INDEX idx_staff_department;
+    ALTER TABLE Staff DROP INDEX IF EXISTS idx_staff_name;
+    ALTER TABLE Staff DROP INDEX IF EXISTS idx_staff_email;
+    ALTER TABLE Staff DROP INDEX IF EXISTS idx_staff_job_type;
+    ALTER TABLE Staff DROP INDEX IF EXISTS idx_staff_department;
     ALTER TABLE Staff ADD INDEX idx_staff_name (last_name, first_name);
     ALTER TABLE Staff ADD INDEX idx_staff_email (email);
     ALTER TABLE Staff ADD INDEX idx_staff_job_type (job_type);
     ALTER TABLE Staff ADD INDEX idx_staff_department (department_id);
 
     -- Drop and recreate indexes for the Appointment table
-    ALTER TABLE Appointment DROP INDEX idx_appointment_patient;
-    ALTER TABLE Appointment DROP INDEX idx_appointment_staff;
-    ALTER TABLE Appointment DROP INDEX idx_appointment_date;
-    ALTER TABLE Appointment DROP INDEX idx_appointment_time;
-    ALTER TABLE Appointment DROP INDEX idx_appointment_status;
+    ALTER TABLE Appointment DROP INDEX IF EXISTS idx_appointment_patient;
+    ALTER TABLE Appointment DROP INDEX IF EXISTS idx_appointment_staff;
+    ALTER TABLE Appointment DROP INDEX IF EXISTS idx_appointment_date;
+    ALTER TABLE Appointment DROP INDEX IF EXISTS idx_appointment_time;
+    ALTER TABLE Appointment DROP INDEX IF EXISTS idx_appointment_status;
     ALTER TABLE Appointment ADD INDEX idx_appointment_patient (patient_id);
     ALTER TABLE Appointment ADD INDEX idx_appointment_staff (staff_id);
     ALTER TABLE Appointment ADD INDEX idx_appointment_date (date);
@@ -54,17 +54,17 @@ BEGIN
     ALTER TABLE Appointment ADD INDEX idx_appointment_status (status);
 
     -- Drop and recreate indexes for the Treatment table
-    ALTER TABLE Treatment DROP INDEX idx_treatment_patient;
-    ALTER TABLE Treatment DROP INDEX idx_treatment_staff;
-    ALTER TABLE Treatment DROP INDEX idx_treatment_date;
+    ALTER TABLE Treatment DROP INDEX IF EXISTS idx_treatment_patient;
+    ALTER TABLE Treatment DROP INDEX IF EXISTS idx_treatment_staff;
+    ALTER TABLE Treatment DROP INDEX IF EXISTS idx_treatment_date;
     ALTER TABLE Treatment ADD INDEX idx_treatment_patient (patient_id);
     ALTER TABLE Treatment ADD INDEX idx_treatment_staff (staff_id);
     ALTER TABLE Treatment ADD INDEX idx_treatment_date (date);
 
     -- Drop and recreate indexes for the DocumentReference table
-    ALTER TABLE DocumentReference DROP INDEX idx_document_reference_entity;
-    ALTER TABLE DocumentReference DROP INDEX idx_document_reference_type;
-    ALTER TABLE DocumentReference DROP INDEX idx_document_reference_id;
+    ALTER TABLE DocumentReference DROP INDEX IF EXISTS idx_document_reference_entity;
+    ALTER TABLE DocumentReference DROP INDEX IF EXISTS idx_document_reference_type;
+    ALTER TABLE DocumentReference DROP INDEX IF EXISTS idx_document_reference_id;
     ALTER TABLE DocumentReference ADD INDEX idx_document_reference_entity (entity_type, entity_id);
     ALTER TABLE DocumentReference ADD INDEX idx_document_reference_type (document_type);
     ALTER TABLE DocumentReference ADD INDEX idx_document_reference_id (document_id);
@@ -96,15 +96,33 @@ DELIMITER ;
 DELIMITER $$
 CREATE PROCEDURE OptimizeTables()
 BEGIN
-    OPTIMIZE TABLE Patient;
-    OPTIMIZE TABLE Staff;
-    OPTIMIZE TABLE Department;
-    OPTIMIZE TABLE JobHistory;
-    OPTIMIZE TABLE Schedule;
-    OPTIMIZE TABLE Appointment;
-    OPTIMIZE TABLE Treatment;
-    OPTIMIZE TABLE DocumentReference;
-    OPTIMIZE TABLE AppointmentArchive;
+    -- List of tables to optimize
+    DECLARE finished INT DEFAULT 0;
+    DECLARE table_name VARCHAR(255);
+
+    -- Cursor to iterate over table names
+    DECLARE table_cursor CURSOR FOR
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = DATABASE();
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET finished = 1;
+
+    OPEN table_cursor;
+
+    read_loop: LOOP
+        FETCH table_cursor INTO table_name;
+        IF finished THEN
+            LEAVE read_loop;
+        END IF;
+
+        SET @sql = CONCAT('OPTIMIZE TABLE ', table_name);
+        PREPARE stmt FROM @sql;
+        EXECUTE stmt;
+        DEALLOCATE PREPARE stmt;
+    END LOOP;
+
+    CLOSE table_cursor;
 END $$
 DELIMITER ;
 
@@ -115,13 +133,11 @@ BEGIN
     DECLARE cutoff_date DATE;
     SET cutoff_date = DATE_SUB(CURDATE(), INTERVAL 6 MONTH);
 
-    -- Delete schedules older than 6 months
+    -- Delete schedules older than 6 months without future related appointments
     DELETE FROM Schedule
-    WHERE CONCAT(CURDATE(), ' ', end_time) < NOW()
-    AND EXISTS (
-        SELECT 1 FROM Appointment
-        WHERE Appointment.staff_id = Schedule.staff_id
-        AND Appointment.date <= cutoff_date
+    WHERE date < cutoff_date
+    AND staff_id NOT IN (
+        SELECT staff_id FROM Appointment WHERE date >= CURDATE()
     );
 END $$
 DELIMITER ;

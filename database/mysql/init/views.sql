@@ -109,10 +109,16 @@ SELECT
     s.staff_id,
     CONCAT(s.first_name, ' ', s.last_name) AS doctor_name,
     d.department_name,
-    sc.day_of_week,
+    sc.date,
     sc.start_time,
     sc.end_time,
-    IF(sc.is_booked, 'Busy', 'Available') AS status
+    IF(EXISTS(
+        SELECT 1 
+        FROM Appointment a 
+        WHERE a.staff_id = s.staff_id 
+        AND a.date = sc.date 
+        AND a.start_time = sc.start_time
+    ), 'Busy', 'Available') AS status
 FROM 
     Staff s
 JOIN 

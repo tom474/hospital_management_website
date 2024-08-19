@@ -58,8 +58,7 @@ CREATE TABLE IF NOT EXISTS Schedule (
     staff_id INT NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL CHECK (end_time > start_time),
-    day_of_week ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
-    is_booked BOOLEAN DEFAULT FALSE,
+    date DATE NOT NULL,
     FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

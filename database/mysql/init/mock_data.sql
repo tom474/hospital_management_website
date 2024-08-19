@@ -29,14 +29,14 @@ INSERT INTO JobHistory (staff_id, change_date, previous_job, new_job, previous_s
 (3, '2023-03-10', 'Nurse', 'Head Nurse', 85000.00, 90000.00, NULL, 1),
 (6, '2020-09-01', 'Pediatrician', 'Chief Pediatrician', 110000.00, 130000.00, 3, 3);
 
--- Insert mock data into the Schedule table
-INSERT INTO Schedule (staff_id, start_time, end_time, day_of_week, is_booked) VALUES
-(1, '08:00:00', '16:00:00', 'Monday', FALSE),
-(1, '08:00:00', '16:00:00', 'Wednesday', FALSE),
-(2, '10:00:00', '18:00:00', 'Tuesday', FALSE),
-(3, '08:00:00', '14:00:00', 'Friday', FALSE),
-(4, '09:00:00', '17:00:00', 'Monday', TRUE),
-(6, '07:00:00', '15:00:00', 'Thursday', FALSE);
+-- Insert mock data into the Schedule table (using dates instead of day_of_week)
+INSERT INTO Schedule (staff_id, start_time, end_time, date) VALUES
+(1, '08:00:00', '16:00:00', '2023-08-14'),  -- Monday
+(1, '08:00:00', '16:00:00', '2023-08-16'),  -- Wednesday
+(2, '10:00:00', '18:00:00', '2023-08-15'),  -- Tuesday
+(3, '08:00:00', '14:00:00', '2023-08-18'),  -- Friday
+(4, '09:00:00', '17:00:00', '2023-08-14'),  -- Monday
+(6, '07:00:00', '15:00:00', '2023-08-17');  -- Thursday
 
 -- Insert mock data into the Patient table
 INSERT INTO Patient (first_name, last_name, birth_date, address, phone, email, allergies) VALUES
@@ -69,4 +69,3 @@ INSERT INTO DocumentReference (entity_type, entity_id, document_type, document_i
 ('Appointment', 3, 'Doctor Note', 'doc_003', 'Follow-up visit note.'),
 ('Staff', 4, 'Certificate', 'doc_004', 'Pediatric Advanced Life Support certification.'),
 ('Patient', 5, 'Diagnostic Image', 'doc_005', 'ECG image.');
-
