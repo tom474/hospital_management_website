@@ -5,8 +5,8 @@ const database = require("../models/database");
 const getSchedulesByStaffId = async (req, res) => {
 	try {
 		const staff_id = req.params.id;
-		const [rows] = await database.poolAdmin.query("SELECT * FROM schedule WHERE staff_id = ?", [staff_id]);
-		res.json(rows);
+		const [rows] = await database.poolAdmin.query("CALL GetSchedulesByStaffId(?)", [staff_id]);
+		res.json(rows[0]); // The result from a CALL to a procedure is nested in an array
 	} catch (err) {
 		res.status(400).json(err);
 	}
@@ -16,28 +16,27 @@ const getSchedulesByStaffId = async (req, res) => {
 const addSchedule = async (req, res) => {
 	try {
 		const { staff_id, start_time, end_time, day_of_week } = req.body;
-
 		const [rows] = await database.poolAdmin.query(
-			"INSERT INTO schedule (staff_id, start_time, end_time, day_of_week, is_booked) VALUES (?, ?, ?, ?, ?)",
-			[staff_id, start_time, end_time, day_of_week, false]
+			"CALL AddSchedule(?, ?, ?, ?)", 
+			[staff_id, start_time, end_time, day_of_week]
 		);
-		res.json(rows);
+		res.json({ message: "Schedule added successfully", schedule: rows[0] });
 	} catch (err) {
 		res.status(400).json(err);
 	}
 };
 
-// Update a schedule (NOT IMPLEMENTED YET)
+// Update a schedule
 const updateSchedule = async (req, res) => {
 	try {
 		const schedule_id = req.params.id;
 		const { staff_id, start_time, end_time, day_of_week } = req.body;
 
 		const [rows] = await database.poolAdmin.query(
-			"UPDATE schedule SET staff_id = ?, start_time = ?, end_time = ?, day_of_week = ? WHERE schedule_id = ?",
-			[staff_id, start_time, end_time, day_of_week, schedule_id]
+			"CALL UpdateSchedule(?, ?, ?, ?, ?)", 
+			[schedule_id, staff_id, start_time, end_time, day_of_week]
 		);
-		res.json(rows);
+		res.json({ message: "Schedule updated successfully", schedule: rows[0] });
 	} catch (err) {
 		res.status(400).json(err);
 	}

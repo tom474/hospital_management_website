@@ -4,8 +4,8 @@ const database = require("../models/database");
 // Get all departments
 const getAllDepartments = async (req, res) => {
 	try {
-		const [rows] = await database.poolAdmin.query("SELECT * FROM department");
-		res.json(rows);
+		const [rows] = await database.poolAdmin.query("CALL GetAllDepartments()");
+		res.json(rows[0]); // The result from a CALL to a procedure is nested in an array
 	} catch (err) {
 		res.status(400).json(err);
 	}
@@ -15,10 +15,10 @@ const getAllDepartments = async (req, res) => {
 const getDepartmentById = async (req, res) => {
 	try {
 		const department_id = req.params.id;
-		const [rows] = await database.poolAdmin.query("SELECT * FROM department WHERE department_id = ?", [
+		const [rows] = await database.poolAdmin.query("CALL GetDepartmentById(?)", [
 			department_id,
 		]);
-		res.json(rows);
+		res.json(rows[0]); // Assuming only one department is returned
 	} catch (err) {
 		res.status(400).json(err);
 	}

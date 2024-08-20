@@ -1,7 +1,11 @@
+-- Drop the existing database and recreate it
+DROP DATABASE IF EXISTS HospitalManagementSystem;
+
+-- Create the database
 CREATE DATABASE IF NOT EXISTS HospitalManagementSystem;
 USE HospitalManagementSystem;
 
--- Create the Patient table
+-- Create tables
 CREATE TABLE IF NOT EXISTS Patient (
     patient_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
@@ -13,7 +17,12 @@ CREATE TABLE IF NOT EXISTS Patient (
     allergies VARCHAR(255)
 ) ENGINE=InnoDB;
 
--- Create the Staff table
+CREATE TABLE IF NOT EXISTS Department (
+    department_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL UNIQUE,
+    manager_id INT
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS Staff (
     staff_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
@@ -28,15 +37,6 @@ CREATE TABLE IF NOT EXISTS Staff (
     FOREIGN KEY (department_id) REFERENCES Department(department_id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
--- Create the Department table
-CREATE TABLE IF NOT EXISTS Department (
-    department_id INT AUTO_INCREMENT PRIMARY KEY,
-    department_name VARCHAR(100) NOT NULL UNIQUE,
-    manager_id INT,
-    FOREIGN KEY (manager_id) REFERENCES Staff(staff_id) ON DELETE SET NULL
-) ENGINE=InnoDB;
-
--- Create the JobHistory table
 CREATE TABLE IF NOT EXISTS JobHistory (
     job_history_id INT AUTO_INCREMENT PRIMARY KEY,
     staff_id INT NOT NULL,
@@ -52,32 +52,29 @@ CREATE TABLE IF NOT EXISTS JobHistory (
     FOREIGN KEY (new_dept_id) REFERENCES Department(department_id)
 ) ENGINE=InnoDB;
 
--- Create the Schedule table
 CREATE TABLE IF NOT EXISTS Schedule (
     schedule_id INT AUTO_INCREMENT PRIMARY KEY,
     staff_id INT NOT NULL,
     start_time TIME NOT NULL,
-    end_time TIME NOT NULL CHECK (end_time > start_time),
+    end_time TIME NOT NULL,
     date DATE NOT NULL,
     FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- Create the Appointment table
 CREATE TABLE IF NOT EXISTS Appointment (
     appointment_id INT AUTO_INCREMENT PRIMARY KEY,
     patient_id INT NOT NULL,
     staff_id INT NOT NULL,
     date DATE NOT NULL,
     start_time TIME NOT NULL,
-    end_time TIME NOT NULL CHECK (end_time > start_time),
+    end_time TIME NOT NULL,
     purpose VARCHAR(255) NOT NULL,
     status ENUM('Scheduled', 'Completed', 'Cancelled') NOT NULL DEFAULT 'Scheduled',
+    UNIQUE (staff_id, date, start_time, end_time),
     FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
-    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE,
-    CONSTRAINT unique_appointment UNIQUE (staff_id, date, start_time, end_time)
+    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- Create the Treatment table
 CREATE TABLE IF NOT EXISTS Treatment (
     treatment_id INT AUTO_INCREMENT PRIMARY KEY,
     patient_id INT NOT NULL,
@@ -88,15 +85,12 @@ CREATE TABLE IF NOT EXISTS Treatment (
     FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- Create the DocumentReference table to link with MongoDB
 CREATE TABLE IF NOT EXISTS DocumentReference (
     doc_ref_id INT AUTO_INCREMENT PRIMARY KEY,
     entity_type ENUM('Patient', 'Staff', 'Appointment') NOT NULL,
     entity_id INT NOT NULL,
     document_type VARCHAR(50) NOT NULL,
-    document_id VARCHAR(255) NOT NULL, -- This stores the unique identifier of the document in MongoDB
+    document_id VARCHAR(255) NOT NULL,
     description TEXT,
-    FOREIGN KEY (entity_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
-    FOREIGN KEY (entity_id) REFERENCES Staff(staff_id) ON DELETE CASCADE,
-    FOREIGN KEY (entity_id) REFERENCES Appointment(appointment_id) ON DELETE CASCADE
+    FOREIGN KEY (entity_id) REFERENCES Patient(patient_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;

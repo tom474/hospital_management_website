@@ -92,8 +92,8 @@ SELECT
     j.new_job,
     j.previous_salary,
     j.new_salary,
-    d1.department_name AS previous_department,
-    d2.department_name AS new_department
+    COALESCE(d1.department_name, 'N/A') AS previous_department,
+    COALESCE(d2.department_name, 'N/A') AS new_department
 FROM 
     JobHistory j
 JOIN 

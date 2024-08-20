@@ -1,7 +1,6 @@
 USE HospitalManagementSystem;
 
 -- Trigger to automatically log job changes in the JobHistory table
-DELIMITER $$
 CREATE TRIGGER trg_after_staff_update
 AFTER UPDATE ON Staff
 FOR EACH ROW
@@ -11,11 +10,9 @@ BEGIN
         INSERT INTO JobHistory (staff_id, change_date, previous_job, new_job, previous_salary, new_salary, previous_dept_id, new_dept_id)
         VALUES (OLD.staff_id, CURDATE(), OLD.job_type, NEW.job_type, OLD.salary, NEW.salary, OLD.department_id, NEW.department_id);
     END IF;
-END $$
-DELIMITER ;
+END;
 
 -- Trigger to automatically update the appointment status to 'Completed' after the end time has passed
-DELIMITER $$
 CREATE TRIGGER trg_after_appointment_update
 AFTER UPDATE ON Appointment
 FOR EACH ROW
@@ -25,11 +22,9 @@ BEGIN
         SET status = 'Completed'
         WHERE appointment_id = NEW.appointment_id;
     END IF;
-END $$
-DELIMITER ;
+END;
 
--- Trigger to ensure no overlapping schedules for the same staff member (using the `date` column)
-DELIMITER $$
+-- Trigger to prevent overlapping schedules for the same staff member on insert
 CREATE TRIGGER trg_before_schedule_insert
 BEFORE INSERT ON Schedule
 FOR EACH ROW
@@ -40,16 +35,14 @@ BEGIN
     FROM Schedule
     WHERE staff_id = NEW.staff_id
       AND date = NEW.date
-      AND ((start_time < NEW.end_time AND end_time > NEW.start_time));
+      AND (start_time < NEW.end_time AND end_time > NEW.start_time);
 
     IF conflict_count > 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Schedule conflict detected with an existing schedule.';
     END IF;
-END $$
-DELIMITER ;
+END;
 
--- Trigger to ensure no overlapping schedules for the same staff member on update (using the `date` column)
-DELIMITER $$
+-- Trigger to prevent overlapping schedules for the same staff member on update
 CREATE TRIGGER trg_before_schedule_update
 BEFORE UPDATE ON Schedule
 FOR EACH ROW
@@ -61,16 +54,14 @@ BEGIN
     WHERE staff_id = NEW.staff_id
       AND date = NEW.date
       AND schedule_id <> OLD.schedule_id
-      AND ((start_time < NEW.end_time AND end_time > NEW.start_time));
+      AND (start_time < NEW.end_time AND end_time > NEW.start_time);
 
     IF conflict_count > 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Schedule conflict detected with an existing schedule.';
     END IF;
-END $$
-DELIMITER ;
+END;
 
 -- Trigger to prevent deletion of a staff member if they have future appointments
-DELIMITER $$
 CREATE TRIGGER trg_before_staff_delete
 BEFORE DELETE ON Staff
 FOR EACH ROW
@@ -86,11 +77,9 @@ BEGIN
     IF future_appointments_count > 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot delete staff member with future scheduled appointments.';
     END IF;
-END $$
-DELIMITER ;
+END;
 
 -- Trigger to prevent deletion of a patient if they have future appointments
-DELIMITER $$
 CREATE TRIGGER trg_before_patient_delete
 BEFORE DELETE ON Patient
 FOR EACH ROW
@@ -106,11 +95,9 @@ BEGIN
     IF future_appointments_count > 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Cannot delete patient with future scheduled appointments.';
     END IF;
-END $$
-DELIMITER ;
+END;
 
 -- Trigger to automatically update the appointment status to 'Completed' after the end time has passed upon insertion
-DELIMITER $$
 CREATE TRIGGER trg_after_appointment_insert
 AFTER INSERT ON Appointment
 FOR EACH ROW
@@ -120,23 +107,9 @@ BEGIN
         SET status = 'Completed'
         WHERE appointment_id = NEW.appointment_id;
     END IF;
-END $$
-DELIMITER ;
-
--- Trigger to automatically create a document reference entry when a new document is added
-DELIMITER $$
-CREATE TRIGGER trg_after_document_reference_insert
-AFTER INSERT ON DocumentReference
-FOR EACH ROW
-BEGIN
-    -- Here, we're avoiding redundant insertion; the original description implies duplicative action.
-    INSERT INTO DocumentReference (entity_type, entity_id, document_type, document_id, description)
-    VALUES (NEW.entity_type, NEW.entity_id, NEW.document_type, NEW.document_id, NEW.description);
-END $$
-DELIMITER ;
+END;
 
 -- Trigger to automatically cancel appointments when a staff member is updated and is no longer available
-DELIMITER $$
 CREATE TRIGGER trg_after_staff_update_for_appointments
 AFTER UPDATE ON Staff
 FOR EACH ROW
@@ -148,5 +121,4 @@ BEGIN
           AND status = 'Scheduled'
           AND date >= CURDATE();
     END IF;
-END $$
-DELIMITER ;
+END;
