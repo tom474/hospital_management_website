@@ -55,9 +55,7 @@ const columns = [
 
 export default function TreatmentHistory({ patient }) {
 	const [duration, setDuration] = useState({
-		date: "",
-		startTime: "",
-		endTime: ""
+		date: ""
 	});
 
 	const role = localStorage.getItem("role");
@@ -75,13 +73,7 @@ export default function TreatmentHistory({ patient }) {
 
 	console.log(patient);
 
-	const time =
-		duration.date +
-		"- (" +
-		duration.startTime +
-		" - " +
-		duration.endTime +
-		")";
+	const time = duration.date;
 
 	const handleDuration = (newDuration) => {
 		setDuration(newDuration);
@@ -97,6 +89,7 @@ export default function TreatmentHistory({ patient }) {
 						key={"treatment_history"}
 						duration={duration}
 						onUpdate={handleDuration}
+						isTreatment={true}
 					/>
 
 					<h1 className="font-semibold text-3xl text-blue-600">

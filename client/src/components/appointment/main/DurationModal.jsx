@@ -1,7 +1,11 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 
-export default function DurationModal({ duration, onUpdate }) {
+export default function DurationModal({
+	duration,
+	onUpdate,
+	isTreatment = false
+}) {
 	const [durationUpdate, setDurationUpdate] = useState(duration);
 
 	// Handle input change
@@ -50,48 +54,49 @@ export default function DurationModal({ duration, onUpdate }) {
 							/>
 						</div>
 					</div>
+					{!isTreatment && (
+						<div className="mt-3 flex gap-2">
+							<div className="w-6/12">
+								<label
+									htmlFor="startTime"
+									className="text-black text-sm"
+								>
+									Start Time:
+								</label>
+								<div className="flex items-center gap-3 mt-2">
+									<input
+										type="time"
+										value={durationUpdate.startTime}
+										onChange={handleOnChange}
+										placeholder="Enter start time"
+										name="startTime"
+										id="startTime"
+										className="input input-bordered flex-1 h-10 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
+									/>
+								</div>
+							</div>
 
-					<div className="mt-3 flex gap-2">
-						<div className="w-6/12">
-							<label
-								htmlFor="startTime"
-								className="text-black text-sm"
-							>
-								Start Time:
-							</label>
-							<div className="flex items-center gap-3 mt-2">
-								<input
-									type="time"
-									value={durationUpdate.startTime}
-									onChange={handleOnChange}
-									placeholder="Enter start time"
-									name="startTime"
-									id="startTime"
-									className="input input-bordered flex-1 h-10 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
-								/>
+							<div className="w-6/12">
+								<label
+									htmlFor="endTime"
+									className="text-black text-sm"
+								>
+									End Time:
+								</label>
+								<div className="flex items-center gap-3 mt-2">
+									<input
+										type="time"
+										value={durationUpdate.endTime}
+										onChange={handleOnChange}
+										placeholder="Enter end time"
+										name="endTime"
+										id="endTime"
+										className="input input-bordered flex-1 h-10 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
+									/>
+								</div>
 							</div>
 						</div>
-
-						<div className="w-6/12">
-							<label
-								htmlFor="endTime"
-								className="text-black text-sm"
-							>
-								End Time:
-							</label>
-							<div className="flex items-center gap-3 mt-2">
-								<input
-									type="time"
-									value={durationUpdate.endTime}
-									onChange={handleOnChange}
-									placeholder="Enter end time"
-									name="endTime"
-									id="endTime"
-									className="input input-bordered flex-1 h-10 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
-								/>
-							</div>
-						</div>
-					</div>
+					)}
 
 					<div className="mt-5 flex gap-1">
 						<button className="w-6/12 btn btn-success text-white">
@@ -106,7 +111,7 @@ export default function DurationModal({ duration, onUpdate }) {
 							}}
 							className="w-6/12 btn btn-outline btn-error text-white"
 						>
-							cancel
+							Cancel
 						</button>
 					</div>
 				</form>
@@ -117,5 +122,6 @@ export default function DurationModal({ duration, onUpdate }) {
 
 DurationModal.propTypes = {
 	duration: PropTypes.object.isRequired,
-	onUpdate: PropTypes.func.isRequired
+	onUpdate: PropTypes.func.isRequired,
+	isTreatment: PropTypes.bool
 };
