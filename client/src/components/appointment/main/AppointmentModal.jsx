@@ -212,7 +212,7 @@ export default function AppointmentModal({ date, doctor }) {
 							}}
 							className="w-6/12 btn btn-outline btn-error text-white"
 						>
-							cancel
+							Cancel
 						</button>
 					</div>
 				</form>
