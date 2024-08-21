@@ -150,7 +150,7 @@ export default function AppointmentReport() {
 					</tbody>
 				</table>
 			</div>
-			<div className="flex justify-end mb-5 mt-2">
+			<div className="flex justify-center mb-5 mt-2">
 				{Array.from({ length: totalPages }, (_, i) => (
 					<button
 						key={i + 1}
