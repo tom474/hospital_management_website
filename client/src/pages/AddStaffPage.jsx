@@ -82,7 +82,7 @@ export default function AddStaffPage() {
 					<div className="mb-4">
 						<label className="block text-gray-700">Salary: </label>
 						<label className="input input-bordered flex items-center gap-2 bg-white">
-							<p>đ</p>
+							<p>$</p>
 							<input
 								type="number"
 								placeholder="Enter salary"

@@ -122,7 +122,7 @@ export default function StaffInformation({ staff }) {
 						</label>
 						{isUpdate ? (
 							<label className="input input-bordered flex items-center gap-2 bg-slate-50 border-sky-200">
-								<p>đ</p>
+								<p>$</p>
 								<input
 									type="number"
 									placeholder="Enter salary name"
@@ -208,7 +208,7 @@ export default function StaffInformation({ staff }) {
 							onClick={() => setIsUpdate(false)}
 							className="w-6/12 btn btn-outline btn-error text-white"
 						>
-							cancel
+							Cancel
 						</button>
 					</div>
 				)}

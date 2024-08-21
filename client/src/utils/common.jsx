@@ -1,7 +1,9 @@
 export const formatSalary = (salary) => {
-	const formattedSalary = new Intl.NumberFormat("vi-VN", {
+	const formattedSalary = new Intl.NumberFormat("en-US", {
 		style: "currency",
-		currency: "VND"
+		currency: "USD",
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0
 	}).format(salary);
 
 	return formattedSalary;

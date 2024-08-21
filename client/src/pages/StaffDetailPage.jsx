@@ -3,6 +3,7 @@ import StaffSidebar from "../components/staff/detail/StaffSidebar";
 import StaffInformation from "../components/staff/detail/StaffInformation";
 import StaffSchedule from "../components/staff/detail/StaffSchedule";
 import StaffAppointment from "../components/staff/detail/StaffAppointment";
+import JobHistory from "../components/staff/detail/JobHistory";
 
 const staff = {
 	id: 1,
@@ -11,7 +12,7 @@ const staff = {
 	lastName: "Doe",
 	email: "JohnDoe@gmail.com",
 	department: "Department 1",
-	salary: 1000000
+	salary: 1000
 };
 
 export default function StaffDetailPage() {
@@ -42,6 +43,7 @@ export default function StaffDetailPage() {
 				{option == "appointment_history" && (
 					<StaffAppointment staff={staff} />
 				)}
+				{option === "job_history" && <JobHistory staff={staff} />}
 			</div>
 		</div>
 	);

@@ -103,7 +103,7 @@ export default function StaffAppointment({ staff }) {
 
 	const time =
 		duration.date +
-		"- (" +
+		" - (" +
 		duration.startTime +
 		" - " +
 		duration.endTime +

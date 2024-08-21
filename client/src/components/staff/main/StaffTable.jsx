@@ -12,7 +12,7 @@ const staffs = [
 		lastName: "Doe",
 		email: "JohnDoe@gmail.com",
 		department: "Cardiology",
-		salary: 1000000
+		salary: 1000
 	},
 	{
 		id: 2,
@@ -21,7 +21,7 @@ const staffs = [
 		lastName: "Smith",
 		email: "JaneSmith@gmail.com",
 		department: "Pediatrics",
-		salary: 800000
+		salary: 8000
 	},
 	{
 		id: 3,
@@ -30,7 +30,7 @@ const staffs = [
 		lastName: "Jones",
 		email: "EmilyJones@gmail.com",
 		department: "Surgery",
-		salary: 1200000
+		salary: 12000
 	},
 	{
 		id: 4,
@@ -39,7 +39,7 @@ const staffs = [
 		lastName: "Brown",
 		email: "MichaelBrown@gmail.com",
 		department: "Pharmacy",
-		salary: 900000
+		salary: 900
 	},
 	{
 		id: 5,
@@ -48,7 +48,7 @@ const staffs = [
 		lastName: "Taylor",
 		email: "JessicaTaylor@gmail.com",
 		department: "Rehabilitation",
-		salary: 950000
+		salary: 9500
 	},
 	{
 		id: 6,
@@ -57,7 +57,7 @@ const staffs = [
 		lastName: "Wilson",
 		email: "DavidWilson@gmail.com",
 		department: "Radiology",
-		salary: 850000
+		salary: 850
 	},
 	{
 		id: 7,
@@ -66,7 +66,7 @@ const staffs = [
 		lastName: "Davis",
 		email: "EmmaDavis@gmail.com",
 		department: "Administration",
-		salary: 500000
+		salary: 500
 	},
 	{
 		id: 8,
@@ -75,7 +75,7 @@ const staffs = [
 		lastName: "Martinez",
 		email: "ChristopherMartinez@gmail.com",
 		department: "Neurology",
-		salary: 1100000
+		salary: 1100
 	},
 	{
 		id: 9,
@@ -84,7 +84,7 @@ const staffs = [
 		lastName: "Anderson",
 		email: "SophiaAnderson@gmail.com",
 		department: "Emergency",
-		salary: 820000
+		salary: 8200
 	},
 	{
 		id: 10,
@@ -93,7 +93,7 @@ const staffs = [
 		lastName: "Lee",
 		email: "MatthewLee@gmail.com",
 		department: "Orthopedics",
-		salary: 1250000
+		salary: 1250
 	},
 	{
 		id: 11,
@@ -102,7 +102,7 @@ const staffs = [
 		lastName: "Harris",
 		email: "OliviaHarris@gmail.com",
 		department: "Pathology",
-		salary: 780000
+		salary: 7800
 	},
 	{
 		id: 12,
@@ -111,7 +111,7 @@ const staffs = [
 		lastName: "Clark",
 		email: "DanielClark@gmail.com",
 		department: "Oncology",
-		salary: 1150000
+		salary: 1150
 	}
 ];
 

@@ -53,25 +53,18 @@ export default function StaffScheduleDetail({ schedule }) {
 							htmlFor="dayOfWeek"
 							className="text-black text-sm"
 						>
-							Day of week
+							Date
 						</label>
 
 						<div className="mt-2">
-							<select
-								name="dayOfWeek"
-								value={scheduleUpdate.dayOfWeek}
+							<input
+								type="date"
+								value={scheduleUpdate.date}
 								onChange={handleOnChange}
-								className="select select-bordered w-full gap-2 bg-slate-50 border-sky-200 font-semibold"
-							>
-								<option disabled>Choose working day</option>
-								<option value="Monday">Monday</option>
-								<option value="Tuesday">Tuesday</option>
-								<option value="Wednesday">Wednesday</option>
-								<option value="Thursday">Thursday</option>
-								<option value="Friday">Friday</option>
-								<option value="Saturday">Saturday</option>
-								<option value="Sunday">Sunday</option>
-							</select>
+								name="date"
+								id="date"
+								className="input input-bordered bg-white flex-1 h-10 text-black font-medium border-[1px] border-gray-300 rounded-[4px] w-full"
+							/>
 						</div>
 					</div>
 
