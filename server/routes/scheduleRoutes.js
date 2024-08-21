@@ -1,9 +1,13 @@
 const express = require("express");
-const router = express.Router();
+const scheduleRouter = express.Router();
 const scheduleController = require("../controllers/scheduleController");
+const assignDatabasePool = require("../middleware/assignDatabasePool");
 
-router.get("/staff/:id", scheduleController.getSchedulesByStaffId);
-router.post("/", scheduleController.addSchedule);
-router.put("/:id", scheduleController.updateSchedule);
+// Apply the role-based database pool assignment middleware
+scheduleRouter.use(assignDatabasePool);
 
-module.exports = router;
+scheduleRouter.get("/staff/:id", scheduleController.getSchedulesByStaffId);
+scheduleRouter.post("/", scheduleController.addSchedule);
+scheduleRouter.put("/:id", scheduleController.updateSchedule);
+
+module.exports = scheduleRouter;

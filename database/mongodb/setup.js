@@ -4,7 +4,7 @@ const { createCollections } = require("./collections");
 const { insertMockData } = require("./mockData");
 
 const mongoUri = "mongodb+srv://admin:admin1234@cluster0.w4wxs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-const mongoDatabaseName = "isys2099_group9_app";
+const mongoDatabaseName = "HospitalManagementSystem";
 const mongoClient = new MongoClient(mongoUri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -20,12 +20,15 @@ const mongoClient = new MongoClient(mongoUri, {
     await mongoClient.db("admin").command({ ping: 1 });
     console.log("Successfully connected to MongoDB!");
 
+    // Drop existing database if it exists
     await mongoClient.db(mongoDatabaseName).dropDatabase();
-    console.log("MongoDB database cleared!");
+    console.log(`Database "${mongoDatabaseName}" cleared!`);
 
+    // Initialize collections and insert mock data if requested
     const mongoDb = mongoClient.db(mongoDatabaseName);
     await createCollections(mongoDb);
-    if (process.argv.length > 2 && process.argv[2] === "--mock") {
+    
+    if (process.argv.includes("--mock")) {
       await insertMockData(mongoDb);
     }
 
@@ -33,7 +36,7 @@ const mongoClient = new MongoClient(mongoUri, {
   } catch (error) {
     console.error("Error during MongoDB setup:", error);
   } finally {
-    if (mongoClient) await mongoClient.close();
-    console.log("MongoDB setup complete!");
+    await mongoClient.close();
+    console.log("MongoDB connection closed. Setup complete!");
   }
 })();

@@ -1,28 +1,27 @@
 const express = require("express");
-const database = require("../models/database");
 
 // Get schedules by staff id
 const getSchedulesByStaffId = async (req, res) => {
 	try {
 		const staff_id = req.params.id;
-		const [rows] = await database.poolAdmin.query("CALL GetSchedulesByStaffId(?)", [staff_id]);
+		const [rows] = await req.db.query("CALL getAllSchedulesByStaffId(?)", [staff_id]);
 		res.json(rows[0]); // The result from a CALL to a procedure is nested in an array
 	} catch (err) {
-		res.status(400).json(err);
+		res.status(400).json({ error: err.message });
 	}
 };
 
 // Add a new schedule
 const addSchedule = async (req, res) => {
 	try {
-		const { staff_id, start_time, end_time, day_of_week } = req.body;
-		const [rows] = await database.poolAdmin.query(
-			"CALL AddSchedule(?, ?, ?, ?)", 
-			[staff_id, start_time, end_time, day_of_week]
+		const { staff_id, start_time, end_time, day_of_week, shift } = req.body;
+		const [rows] = await req.db.query(
+			"CALL addSchedule(?, ?, ?, ?, ?)", 
+			[day_of_week, shift, start_time, end_time, staff_id]
 		);
 		res.json({ message: "Schedule added successfully", schedule: rows[0] });
 	} catch (err) {
-		res.status(400).json(err);
+		res.status(400).json({ error: err.message });
 	}
 };
 
@@ -30,15 +29,15 @@ const addSchedule = async (req, res) => {
 const updateSchedule = async (req, res) => {
 	try {
 		const schedule_id = req.params.id;
-		const { staff_id, start_time, end_time, day_of_week } = req.body;
+		const { staff_id, start_time, end_time, day_of_week, shift } = req.body;
 
-		const [rows] = await database.poolAdmin.query(
-			"CALL UpdateSchedule(?, ?, ?, ?, ?)", 
-			[schedule_id, staff_id, start_time, end_time, day_of_week]
+		const [rows] = await req.db.query(
+			"CALL updateSchedule(?, ?, ?, ?, ?, ?)", 
+			[schedule_id, day_of_week, shift, start_time, end_time, staff_id]
 		);
 		res.json({ message: "Schedule updated successfully", schedule: rows[0] });
 	} catch (err) {
-		res.status(400).json(err);
+		res.status(400).json({ error: err.message });
 	}
 };
 

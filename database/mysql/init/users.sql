@@ -52,12 +52,11 @@ SELECT
     description 
 FROM Treatment;
 
--- Creating system_admin role with full access
-DROP USER IF EXISTS 'system_admin'@'localhost';
-CREATE USER 'system_admin'@'localhost' IDENTIFIED BY '1';
-GRANT ALL PRIVILEGES ON HospitalManagementSystem.* TO 'system_admin'@'localhost';
-
 -- Creating roles and assigning privileges
+DROP ROLE IF EXISTS doctor_role;
+DROP ROLE IF EXISTS nurse_role;
+DROP ROLE IF EXISTS receptionist_role;
+
 CREATE ROLE doctor_role;
 CREATE ROLE nurse_role;
 CREATE ROLE receptionist_role;
@@ -75,6 +74,7 @@ CREATE ROLE receptionist_role;
 
  Summary: The Admin has unlimited CRUD privileges across the entire database, including user management, security management, database operations, and system configuration.
  */
+DROP USER IF EXISTS 'admin'@'localhost';
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin123';
 GRANT ALL PRIVILEGES ON HospitalManagementSystem.* TO 'admin'@'localhost';
 
@@ -91,6 +91,7 @@ GRANT ALL PRIVILEGES ON HospitalManagementSystem.* TO 'admin'@'localhost';
 
  Summary: The Doctor has CRUD privileges on patients, treatments, and appointments. They can view schedules and collaborate with other staff, and generate reports related to their work and patient care.
  */
+DROP USER IF EXISTS 'doctor'@'localhost';
 CREATE USER 'doctor'@'localhost' IDENTIFIED BY 'doctor123';
 GRANT doctor_role TO 'doctor'@'localhost';
 
@@ -114,6 +115,7 @@ GRANT SELECT, INSERT, UPDATE ON DocumentReference TO doctor_role; -- Access and 
 
  Summary: The Nurse has privileges to view and update patient treatments, manage appointments, and assist in patient care documentation. They can view relevant schedules and coordinate with other healthcare providers.
  */
+DROP USER IF EXISTS 'nurse'@'localhost';
 CREATE USER 'nurse'@'localhost' IDENTIFIED BY 'nurse123';
 GRANT nurse_role TO 'nurse'@'localhost';
 
@@ -137,6 +139,7 @@ GRANT SELECT, INSERT, UPDATE ON DocumentReference TO nurse_role; -- Manage nursi
 
  Summary: The Receptionist has CRUD privileges on patients and appointments. They can view schedules, manage appointments, and assist in basic reporting.
  */
+DROP USER IF EXISTS 'receptionist'@'localhost';
 CREATE USER 'receptionist'@'localhost' IDENTIFIED BY 'receptionist123';
 GRANT receptionist_role TO 'receptionist'@'localhost';
 
@@ -145,12 +148,6 @@ GRANT SELECT, INSERT, UPDATE ON Patient_noid TO receptionist_role; -- Register n
 GRANT SELECT, INSERT, UPDATE, DELETE ON Appointment_noid TO receptionist_role; -- Manage appointments, ensure no double-booking
 GRANT SELECT ON Staff TO receptionist_role; -- View staff schedules
 GRANT SELECT, INSERT, UPDATE ON Schedule TO receptionist_role; -- Manage own schedule and appointment details
-
--- Restricting INSERT privileges directly on the tables (if not using roles, or as a backup)
-REVOKE INSERT ON Patient FROM 'doctor'@'localhost', 'nurse'@'localhost', 'receptionist'@'localhost';
-REVOKE INSERT ON Staff FROM 'receptionist'@'localhost';
-REVOKE INSERT ON Appointment FROM 'doctor'@'localhost', 'nurse'@'localhost', 'receptionist'@'localhost';
-REVOKE INSERT ON Treatment FROM 'doctor'@'localhost', 'nurse'@'localhost';
 
 -- Ensure privileges are properly assigned
 FLUSH PRIVILEGES;

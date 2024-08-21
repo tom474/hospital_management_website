@@ -7,28 +7,31 @@ const stdin = readline.createInterface({
   output: process.stdout,
 });
 
+// Function to prompt the user for input
 async function promptUser(promptMessage) {
   return new Promise(resolve => {
     stdin.question(promptMessage, answer => {
-      resolve(answer);
+      resolve(answer.trim());
     });
   });
 }
 
+// Function to set the validation policy to a lower level if possible
 async function setValidationPolicy(connection) {
   try {
     await connection.query("SET GLOBAL validate_password.policy = 0");
     console.log("Validation policy set to 0");
   } catch (err) {
-    console.error("Failed to set validation policy:", err);
+    console.error("Failed to set validation policy:", err.message);
   }
 }
 
+// Function to execute SQL scripts
 async function executeSetupScript(connection, scriptPath) {
   try {
     let script = await fs.readFile(scriptPath, "utf-8");
 
-    // Clean up the script for execution
+    // Clean up the script for execution by handling DELIMITER changes
     script = script.replace(/DELIMITER \$\$/g, "")
                    .replace(/END \$\$/g, "END;")
                    .replace(/DELIMITER ;/g, "");
@@ -36,15 +39,18 @@ async function executeSetupScript(connection, scriptPath) {
     await connection.query(script);
     console.log(`Script executed successfully: ${scriptPath}`);
   } catch (err) {
-    console.error(`Error executing script ${scriptPath}:`, err);
+    console.error(`Error executing script ${scriptPath}:`, err.message);
   }
 }
 
+// Main setup function
 (async () => {
   try {
+    // Prompt the user for MySQL credentials
     const user = await promptUser("Enter MySQL root username: ");
     const password = await promptUser(`Enter MySQL password for "${user}": `);
 
+    // Establish a connection to the MySQL server
     const connection = await mysql.createConnection({
       user: user,
       host: "localhost",
@@ -54,7 +60,7 @@ async function executeSetupScript(connection, scriptPath) {
 
     console.log("Connected to MySQL database as ID " + connection.threadId);
 
-    // Check if validate_password.policy exists
+    // Check if the validate_password.policy variable exists
     const [rows] = await connection.query("SHOW VARIABLES LIKE 'validate_password.policy'");
     if (rows.length === 0) {
       console.log("validate_password.policy not found. Skipping policy setting.");
@@ -62,10 +68,10 @@ async function executeSetupScript(connection, scriptPath) {
       await setValidationPolicy(connection);
     }
 
-    // Disable foreign key checks before executing scripts
+    // Disable foreign key checks before executing scripts to avoid FK constraint errors
     await connection.query("SET FOREIGN_KEY_CHECKS = 0");
 
-    // Determine which scripts to run based on command-line arguments
+    // List of scripts to execute, conditionally including mock data
     const scripts = [
       "reset.sql",
       "init/tables.sql",
@@ -85,7 +91,7 @@ async function executeSetupScript(connection, scriptPath) {
     // Re-enable foreign key checks after executing scripts
     await connection.query("SET FOREIGN_KEY_CHECKS = 1");
 
-    await connection.end(); // Close the connection
+    await connection.end(); // Close the MySQL connection
     console.log("Database initialized successfully!");
   } catch (err) {
     console.error("Error during database setup:", err.stack);

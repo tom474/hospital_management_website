@@ -1,550 +1,355 @@
 USE HospitalManagementSystem;
 
--- ======================================
--- 1. Admin Procedures
--- ======================================
+DELIMITER $$
 
--- 1.1 Create a New User
-CREATE PROCEDURE CreateUser(
-    IN p_username VARCHAR(50),
-    IN p_password VARCHAR(100),
-    IN p_role VARCHAR(20)
-)
-BEGIN
-    DECLARE role_assigned BOOLEAN DEFAULT FALSE;
-    DECLARE stmt VARCHAR(255);
+-- Patient Procedures
 
-    IF p_role = 'admin' THEN
-        SET stmt = CONCAT("CREATE USER '", p_username, "'@'localhost' IDENTIFIED BY '", p_password, "';");
-        PREPARE userStmt FROM stmt;
-        EXECUTE userStmt;
-        DEALLOCATE PREPARE userStmt;
-        
-        SET stmt = CONCAT("GRANT ALL PRIVILEGES ON HospitalManagementSystem.* TO '", p_username, "'@'localhost';");
-        PREPARE grantStmt FROM stmt;
-        EXECUTE grantStmt;
-        DEALLOCATE PREPARE grantStmt;
-        
-        SET role_assigned = TRUE;
-
-    ELSEIF p_role = 'doctor' THEN
-        SET stmt = CONCAT("CREATE USER '", p_username, "'@'localhost' IDENTIFIED BY '", p_password, "';");
-        PREPARE userStmt FROM stmt;
-        EXECUTE userStmt;
-        DEALLOCATE PREPARE userStmt;
-        
-        SET stmt = CONCAT("GRANT doctor_role TO '", p_username, "'@'localhost';");
-        PREPARE grantStmt FROM stmt;
-        EXECUTE grantStmt;
-        DEALLOCATE PREPARE grantStmt;
-        
-        SET role_assigned = TRUE;
-
-    ELSEIF p_role = 'nurse' THEN
-        SET stmt = CONCAT("CREATE USER '", p_username, "'@'localhost' IDENTIFIED BY '", p_password, "';");
-        PREPARE userStmt FROM stmt;
-        EXECUTE userStmt;
-        DEALLOCATE PREPARE userStmt;
-        
-        SET stmt = CONCAT("GRANT nurse_role TO '", p_username, "'@'localhost';");
-        PREPARE grantStmt FROM stmt;
-        EXECUTE grantStmt;
-        DEALLOCATE PREPARE grantStmt;
-        
-        SET role_assigned = TRUE;
-
-    ELSEIF p_role = 'receptionist' THEN
-        SET stmt = CONCAT("CREATE USER '", p_username, "'@'localhost' IDENTIFIED BY '", p_password, "';");
-        PREPARE userStmt FROM stmt;
-        EXECUTE userStmt;
-        DEALLOCATE PREPARE userStmt;
-        
-        SET stmt = CONCAT("GRANT receptionist_role TO '", p_username, "'@'localhost';");
-        PREPARE grantStmt FROM stmt;
-        EXECUTE grantStmt;
-        DEALLOCATE PREPARE grantStmt;
-        
-        SET role_assigned = TRUE;
-
-    ELSE
-        SET role_assigned = FALSE;
-    END IF;
-
-    IF role_assigned = FALSE THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid role specified';
-    END IF;
-
-    FLUSH PRIVILEGES;
-END;
-
--- 1.2 Update Staff Job Information
-CREATE PROCEDURE UpdateStaffJobInfo(
-    IN p_staff_id INT,
-    IN p_new_job VARCHAR(100),
-    IN p_new_salary DECIMAL(10, 2),
-    IN p_new_department_id INT
-)
-BEGIN
-    DECLARE v_previous_job VARCHAR(100);
-    DECLARE v_previous_salary DECIMAL(10, 2);
-    DECLARE v_previous_dept_id INT;
-
-    SELECT job_type, salary, department_id INTO v_previous_job, v_previous_salary, v_previous_dept_id
-    FROM Staff
-    WHERE staff_id = p_staff_id;
-
-    -- Insert job history record
-    INSERT INTO JobHistory (
-        staff_id, 
-        change_date, 
-        previous_job, 
-        new_job, 
-        previous_salary, 
-        new_salary, 
-        previous_dept_id, 
-        new_dept_id
-    ) 
-    VALUES (
-        p_staff_id, 
-        CURDATE(), 
-        v_previous_job, 
-        p_new_job, 
-        v_previous_salary, 
-        p_new_salary, 
-        v_previous_dept_id, 
-        p_new_department_id
-    );
-
-    -- Update the Staff table with new job information
-    UPDATE Staff 
-    SET job_type = p_new_job, salary = p_new_salary, department_id = p_new_department_id
-    WHERE staff_id = p_staff_id;
-END;
-
--- ======================================
--- 2. Doctor Procedures
--- ======================================
-
--- 2.1 Add a New Patient Treatment
-CREATE PROCEDURE AddPatientTreatment(
-    IN p_patient_id INT,
-    IN p_staff_id INT,
-    IN p_description TEXT
-)
-BEGIN
-    INSERT INTO Treatment (patient_id, staff_id, date, description)
-    VALUES (p_patient_id, p_staff_id, CURDATE(), p_description);
-END;
-
--- 2.2 Book an Appointment with Transaction
-CREATE PROCEDURE BookAppointment(
-    IN p_patient_id INT,
-    IN p_staff_id INT,
-    IN p_date DATE,
-    IN p_start_time TIME,
-    IN p_end_time TIME,
-    IN p_purpose VARCHAR(255)
-)
-BEGIN
-    DECLARE conflict_count INT DEFAULT 0;
-
-    START TRANSACTION;
-
-    -- Check for scheduling conflicts
-    SELECT COUNT(*) INTO conflict_count
-    FROM Appointment
-    WHERE staff_id = p_staff_id 
-    AND date = p_date 
-    AND (
-        (start_time < p_end_time AND start_time >= p_start_time) OR
-        (end_time > p_start_time AND end_time <= p_end_time)
-    );
-
-    IF conflict_count > 0 THEN
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Scheduling conflict detected';
-    ELSE
-        -- Insert the new appointment
-        INSERT INTO Appointment (patient_id, staff_id, date, start_time, end_time, purpose)
-        VALUES (p_patient_id, p_staff_id, p_date, p_start_time, p_end_time, p_purpose);
-
-        COMMIT;
-    END IF;
-END;
-
--- ======================================
--- 3. Nurse Procedures
--- ======================================
-
--- 3.1 Add Nursing Notes
-CREATE PROCEDURE AddNursingNote(
-    IN p_treatment_id INT,
-    IN p_nurse_id INT,
-    IN p_note TEXT
-)
-BEGIN
-    INSERT INTO DocumentReference (entity_type, entity_id, document_type, document_id, description)
-    VALUES ('Treatment', p_treatment_id, 'NursingNote', CONCAT('Note_', UUID()), p_note);
-END;
-
--- ======================================
--- 4. Receptionist Procedures
--- ======================================
-
--- 4.1 Register a New Patient
-CREATE PROCEDURE RegisterPatient(
-    IN p_first_name VARCHAR(50),
-    IN p_last_name VARCHAR(50),
-    IN p_birth_date DATE,
-    IN p_address VARCHAR(255),
-    IN p_phone VARCHAR(20),
-    IN p_email VARCHAR(100),
-    IN p_allergies VARCHAR(255)
-)
-BEGIN
-    INSERT INTO Patient (first_name, last_name, birth_date, address, phone, email, allergies)
-    VALUES (p_first_name, p_last_name, p_birth_date, p_address, p_phone, p_email, p_allergies);
-END;
-
--- 4.2 Manage Appointments (Update or Cancel)
-CREATE PROCEDURE UpdateAppointment(
-    IN p_appointment_id INT,
-    IN p_new_date DATE,
-    IN p_new_start_time TIME,
-    IN p_new_end_time TIME,
-    IN p_new_purpose VARCHAR(255),
-    IN p_status VARCHAR(20)
-)
-BEGIN
-    UPDATE Appointment 
-    SET date = p_new_date, start_time = p_new_start_time, end_time = p_new_end_time, purpose = p_new_purpose, status = p_status
-    WHERE appointment_id = p_appointment_id;
-END;
-
--- ======================================
--- 5. General Procedures for Appointments
--- ======================================
-
--- Get All Appointments
-CREATE PROCEDURE GetAllAppointments()
-BEGIN
-    SELECT * FROM Appointment;
-END;
-
--- Get Appointment by ID
-CREATE PROCEDURE GetAppointmentById(IN p_appointment_id INT)
-BEGIN
-    SELECT * FROM Appointment WHERE appointment_id = p_appointment_id;
-END;
-
--- Get All Appointments for a Specific Patient
-CREATE PROCEDURE GetPatientAppointments(IN p_patient_id INT)
-BEGIN
-    SELECT * FROM Appointment WHERE patient_id = p_patient_id;
-END;
-
--- Get All Appointments for a Specific Staff
-CREATE PROCEDURE GetStaffAppointments(IN p_staff_id INT)
-BEGIN
-    SELECT * FROM Appointment WHERE staff_id = p_staff_id;
-END;
-
--- Get Appointments in a Specific Duration
-CREATE PROCEDURE GetAppointmentsInDuration(
-    IN p_date DATE, 
-    IN p_start_time TIME, 
-    IN p_end_time TIME
-)
-BEGIN
-    SELECT * FROM Appointment 
-    WHERE date = p_date 
-      AND start_time >= p_start_time 
-      AND end_time <= p_end_time;
-END;
-
--- Cancel an Appointment
-CREATE PROCEDURE CancelAppointment(IN p_appointment_id INT)
-BEGIN
-    UPDATE Appointment 
-    SET status = 'Cancelled' 
-    WHERE appointment_id = p_appointment_id;
-END;
-
--- ======================================
--- 6. Department Procedures
--- ======================================
-
--- Procedure to get all departments
-CREATE PROCEDURE GetAllDepartments()
-BEGIN
-    SELECT * FROM Department;
-END;
-
--- Procedure to get a department by ID
-CREATE PROCEDURE GetDepartmentById(IN p_department_id INT)
-BEGIN
-    SELECT * FROM Department WHERE department_id = p_department_id;
-END;
-
--- ======================================
--- 7. Job History Procedures
--- ======================================
-
--- Procedure to get all job histories by staff id
-CREATE PROCEDURE GetJobHistoriesByStaffId(IN p_staff_id INT)
-BEGIN
-    SELECT * FROM JobHistory WHERE staff_id = p_staff_id;
-END;
-
--- ======================================
--- 8. Patient Procedures
--- ======================================
-
--- Procedure to get all patients
-CREATE PROCEDURE GetAllPatients()
+CREATE PROCEDURE getAllPatients()
 BEGIN
     SELECT * FROM Patient;
-END;
+END $$
 
--- Procedure to get a patient by ID
-CREATE PROCEDURE GetPatientById(IN p_patient_id INT)
+CREATE PROCEDURE getPatientByPatientId(IN p_patientId INT)
 BEGIN
-    SELECT * FROM Patient WHERE patient_id = p_patient_id;
-END;
+    SELECT * FROM Patient WHERE patient_id = p_patientId;
+END $$
 
--- Procedure to get patients by name (search by first or last name)
-CREATE PROCEDURE GetPatientByName(IN p_search_name VARCHAR(50))
+CREATE PROCEDURE searchPatientsById(IN p_id VARCHAR(255))
 BEGIN
-    SELECT * FROM Patient 
-    WHERE first_name LIKE p_search_name OR last_name LIKE p_search_name;
-END;
+    SELECT * FROM Patient WHERE CAST(patient_id AS CHAR) LIKE CONCAT('%', p_id, '%');
+END $$
 
--- Procedure to create a new patient
-CREATE PROCEDURE CreatePatient(
-    IN p_first_name VARCHAR(50),
-    IN p_last_name VARCHAR(50),
-    IN p_birth_date DATE,
+CREATE PROCEDURE searchPatientsByName(IN p_name VARCHAR(255))
+BEGIN
+    SELECT * FROM Patient WHERE first_name LIKE CONCAT('%', p_name, '%') OR last_name LIKE CONCAT('%', p_name, '%');
+END $$
+
+CREATE PROCEDURE updatePatientInformation(
+    IN p_patientId INT,
+    IN p_firstName VARCHAR(50),
+    IN p_lastName VARCHAR(50),
+    IN p_birthDate DATE,
     IN p_address VARCHAR(255),
     IN p_email VARCHAR(100),
-    IN p_phone VARCHAR(20),
+    IN p_phoneNumber VARCHAR(20),
     IN p_allergies VARCHAR(255)
 )
 BEGIN
-    INSERT INTO Patient (first_name, last_name, birth_date, address, email, phone, allergies)
-    VALUES (p_first_name, p_last_name, p_birth_date, p_address, p_email, p_phone, p_allergies);
-END;
+    START TRANSACTION;
+    UPDATE Patient
+    SET
+        first_name = p_firstName,
+        last_name = p_lastName,
+        birth_date = p_birthDate,
+        address = p_address,
+        email = p_email,
+        phone = p_phoneNumber,
+        allergies = p_allergies
+    WHERE
+        patient_id = p_patientId;
+    COMMIT;
+END $$
 
--- Procedure to update a patient's information
-CREATE PROCEDURE UpdatePatient(
-    IN p_first_name VARCHAR(50),
-    IN p_last_name VARCHAR(50),
-    IN p_birth_date DATE,
+CREATE PROCEDURE createPatient(
+    IN p_firstName VARCHAR(50),
+    IN p_lastName VARCHAR(50),
+    IN p_birthDate DATE,
     IN p_address VARCHAR(255),
     IN p_email VARCHAR(100),
-    IN p_phone VARCHAR(20),
-    IN p_allergies VARCHAR(255),
-    IN p_patient_id INT
+    IN p_phoneNumber VARCHAR(20),
+    IN p_allergies VARCHAR(255)
 )
 BEGIN
-    UPDATE Patient 
-    SET first_name = p_first_name, 
-        last_name = p_last_name, 
-        birth_date = p_birth_date, 
-        address = p_address, 
-        email = p_email, 
-        phone = p_phone, 
-        allergies = p_allergies
-    WHERE patient_id = p_patient_id;
-END;
+    START TRANSACTION;
+    INSERT INTO Patient (first_name, last_name, birth_date, address, email, phone, allergies)
+    VALUES (p_firstName, p_lastName, p_birthDate, p_address, p_email, p_phoneNumber, p_allergies);
+    COMMIT;
+END $$
 
--- Procedure to delete a patient
-CREATE PROCEDURE DeletePatient(IN p_patient_id INT)
+CREATE PROCEDURE deletePatient(IN p_patientId INT)
 BEGIN
-    DELETE FROM Patient WHERE patient_id = p_patient_id;
-END;
+    -- Start transaction to ensure data integrity
+    START TRANSACTION;
+    
+    -- Delete any related records from other tables first, if necessary
+    DELETE FROM Appointment WHERE patient_id = p_patientId;
+    DELETE FROM Treatment WHERE patient_id = p_patientId;
 
--- ======================================
--- 9. Schedule Procedures
--- ======================================
+    -- Finally, delete the patient record
+    DELETE FROM Patient WHERE patient_id = p_patientId;
 
--- Procedure to get schedules by staff id
-CREATE PROCEDURE GetSchedulesByStaffId(IN p_staff_id INT)
+    -- Commit the transaction
+    COMMIT;
+END $$ 
+
+-- Appointment Procedures
+
+CREATE PROCEDURE getAllAppointmentsByPatientId(IN p_patientId INT)
 BEGIN
-    SELECT * FROM Schedule WHERE staff_id = p_staff_id;
-END;
+    SELECT * FROM Appointment WHERE patient_id = p_patientId;
+END $$
 
--- Procedure to add a new schedule
-CREATE PROCEDURE AddSchedule(
-    IN p_staff_id INT, 
-    IN p_start_time TIME, 
-    IN p_end_time TIME, 
-    IN p_day_of_week VARCHAR(20)
+CREATE PROCEDURE getAppointmentByAppointmentId(IN p_appointmentId INT)
+BEGIN
+    SELECT * FROM Appointment WHERE appointment_id = p_appointmentId;
+END $$
+
+CREATE PROCEDURE getAllAppointmentsByStaffId(IN p_staffId INT, IN p_date DATE, IN p_startTime TIME, IN p_endTime TIME)
+BEGIN
+    IF p_date IS NOT NULL THEN
+        SELECT * FROM Appointment 
+        WHERE staff_id = p_staffId AND date = p_date
+        AND (start_time >= p_startTime OR p_startTime IS NULL)
+        AND (end_time <= p_endTime OR p_endTime IS NULL);
+    ELSE
+        SELECT * FROM Appointment WHERE staff_id = p_staffId;
+    END IF;
+END $$
+
+CREATE PROCEDURE getWorkingScheduleOfAllDoctorsInDuration(
+    IN p_date DATE, 
+    IN p_startTime TIME, 
+    IN p_endTime TIME, 
+    IN p_mode ENUM('available', 'busy')
 )
 BEGIN
-    INSERT INTO Schedule (staff_id, start_time, end_time, day_of_week, is_booked)
-    VALUES (p_staff_id, p_start_time, p_end_time, p_day_of_week, FALSE);
-END;
+    IF p_mode = 'available' THEN
+        SELECT s.staff_id, s.first_name, s.last_name, sch.start_time, sch.end_time 
+        FROM Staff s 
+        JOIN Schedule sch ON s.staff_id = sch.staff_id 
+        WHERE s.job_type = 'Doctor'
+        AND sch.date = p_date
+        AND sch.start_time >= p_startTime 
+        AND sch.end_time <= p_endTime
+        AND NOT EXISTS (
+            SELECT 1 FROM Appointment a 
+            WHERE a.staff_id = s.staff_id 
+            AND a.date = p_date
+            AND a.start_time >= p_startTime 
+            AND a.end_time <= p_endTime
+        );
+    ELSE
+        SELECT s.staff_id, s.first_name, s.last_name, sch.start_time, sch.end_time 
+        FROM Staff s 
+        JOIN Schedule sch ON s.staff_id = sch.staff_id 
+        WHERE s.job_type = 'Doctor'
+        AND sch.date = p_date
+        AND sch.start_time >= p_startTime 
+        AND sch.end_time <= p_endTime
+        AND EXISTS (
+            SELECT 1 FROM Appointment a 
+            WHERE a.staff_id = s.staff_id 
+            AND a.date = p_date
+            AND a.start_time >= p_startTime 
+            AND a.end_time <= p_endTime
+        );
+    END IF;
+END $$
 
--- Procedure to update a schedule
-CREATE PROCEDURE UpdateSchedule(
-    IN p_schedule_id INT,
-    IN p_staff_id INT, 
-    IN p_start_time TIME, 
-    IN p_end_time TIME, 
-    IN p_day_of_week VARCHAR(20)
+CREATE PROCEDURE getAllAppointmentsInDuration(
+    IN p_date DATE, 
+    IN p_startTime TIME, 
+    IN p_endTime TIME, 
+    IN p_mode ENUM('available', 'busy')
 )
 BEGIN
-    UPDATE Schedule 
-    SET staff_id = p_staff_id, 
-        start_time = p_start_time, 
-        end_time = p_end_time, 
-        day_of_week = p_day_of_week 
-    WHERE schedule_id = p_schedule_id;
-END;
+    IF p_mode = 'available' THEN
+        SELECT * FROM Appointment 
+        WHERE date = p_date
+        AND start_time >= p_startTime 
+        AND end_time <= p_endTime
+        AND status = 'Scheduled';
+    ELSE
+        SELECT * FROM Appointment 
+        WHERE date = p_date
+        AND start_time >= p_startTime 
+        AND end_time <= p_endTime
+        AND status IN ('Completed', 'Cancelled');
+    END IF;
+END $$
 
--- Procedure to get staff available time based on their schedule and appointments
-CREATE PROCEDURE GetStaffAvailableTime(
-    IN p_staff_id INT,
-    IN p_date DATE
+CREATE PROCEDURE cancelAppointment(IN p_appointmentId INT)
+BEGIN
+    START TRANSACTION;
+    UPDATE Appointment SET status = 'Cancelled' WHERE appointment_id = p_appointmentId;
+    COMMIT;
+END $$
+
+CREATE PROCEDURE createAppointment(
+    IN p_staffId INT,
+    IN p_patientId INT,
+    IN p_purpose VARCHAR(255),
+    IN p_date DATE,
+    IN p_startTime TIME,
+    IN p_endTime TIME
 )
 BEGIN
-    DECLARE v_start_time TIME;
-    DECLARE v_end_time TIME;
+    START TRANSACTION;
+    INSERT INTO Appointment (staff_id, patient_id, date, start_time, end_time, purpose)
+    VALUES (p_staffId, p_patientId, p_date, p_startTime, p_endTime, p_purpose);
+    COMMIT;
+END $$
 
-    -- Temporary table to hold available time slots
-    CREATE TEMPORARY TABLE AvailableTimes (
-        start_time TIME,
-        end_time TIME
-    );
+-- JobHistory Procedures
 
-    -- Get the working schedule for the staff member on the specified date
-    SELECT start_time, end_time INTO v_start_time, v_end_time
-    FROM Schedule
-    WHERE staff_id = p_staff_id
-    AND date = p_date;
-
-    -- Insert the entire working period initially as an available slot
-    INSERT INTO AvailableTimes (start_time, end_time)
-    VALUES (v_start_time, v_end_time);
-
-    -- Iterate over the appointments for the day and adjust available times
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE cur_start_time, cur_end_time TIME;
-    DECLARE appointment_cursor CURSOR FOR
-        SELECT start_time, end_time
-        FROM Appointment
-        WHERE staff_id = p_staff_id
-        AND date = p_date;
-
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN appointment_cursor;
-    read_loop: LOOP
-        FETCH appointment_cursor INTO cur_start_time, cur_end_time;
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        -- Remove the time occupied by this appointment
-        DELETE FROM AvailableTimes
-        WHERE start_time < cur_end_time AND end_time > cur_start_time;
-
-        -- Add available time before the appointment
-        IF cur_start_time > v_start_time THEN
-            INSERT INTO AvailableTimes (start_time, end_time)
-            VALUES (v_start_time, cur_start_time);
-        END IF;
-
-        -- Update start time to the end of the current appointment
-        SET v_start_time = cur_end_time;
-    END LOOP;
-
-    CLOSE appointment_cursor;
-
-    -- Select and return the available time slots
-    SELECT * FROM AvailableTimes;
-
-    -- Drop the temporary table
-    DROP TEMPORARY TABLE AvailableTimes;
-END;
-
--- ======================================
--- 10. Treatment Procedures
--- ======================================
-
--- Procedure to get treatment by patient id
-CREATE PROCEDURE GetTreatmentByPatientId(IN p_patient_id INT)
+CREATE PROCEDURE getAllJobHistoryByStaffId(IN p_staffId INT)
 BEGIN
-    SELECT * FROM Treatment WHERE patient_id = p_patient_id;
-END;
+    SELECT * FROM JobHistory WHERE staff_id = p_staffId;
+END $$
 
--- Procedure to get treatments by date
-CREATE PROCEDURE GetTreatmentByDate(IN p_date DATE)
+-- Schedule Procedures
+
+CREATE PROCEDURE getAllSchedulesByStaffId(IN p_staffId INT)
+BEGIN
+    SELECT * FROM Schedule WHERE staff_id = p_staffId;
+END $$
+
+CREATE PROCEDURE updateSchedule(
+    IN p_scheduleId INT,
+    IN p_dayOfWeek VARCHAR(20),	
+    IN p_shift VARCHAR(20),
+    IN p_startTime TIME, 
+    IN p_endTime TIME,
+    IN p_staffId INT
+)
+BEGIN
+    START TRANSACTION;
+    UPDATE Schedule
+    SET 
+        start_time = p_startTime, 
+        end_time = p_endTime, 
+        staff_id = p_staffId
+    WHERE 
+        schedule_id = p_scheduleId;
+    COMMIT;
+END $$
+
+CREATE PROCEDURE addSchedule(
+    IN p_dayOfWeek VARCHAR(20),	
+    IN p_shift VARCHAR(20),
+    IN p_startTime TIME, 
+    IN p_endTime TIME,
+    IN p_staffId INT
+)
+BEGIN
+    START TRANSACTION;
+    INSERT INTO Schedule (staff_id, start_time, end_time, date)
+    VALUES (p_staffId, p_startTime, p_endTime, CURDATE());
+    COMMIT;
+END $$
+
+-- Treatment Procedures
+
+CREATE PROCEDURE getAllTreatmentByPatientId(IN p_patientId INT)
+BEGIN
+    SELECT * FROM Treatment WHERE patient_id = p_patientId;
+END $$
+
+CREATE PROCEDURE getAllTreatmentByPatientIdInDuration(IN p_patientId INT, IN p_date DATE)
+BEGIN
+    SELECT * FROM Treatment WHERE patient_id = p_patientId AND date = p_date;
+END $$
+
+CREATE PROCEDURE getAllTreatmentInDuration(IN p_date DATE)
 BEGIN
     SELECT * FROM Treatment WHERE date = p_date;
-END;
+END $$
 
--- Procedure to get treatment by patient id and date
-CREATE PROCEDURE GetTreatmentByPatientIdAndDate(IN p_patient_id INT, IN p_date DATE)
-BEGIN
-    SELECT * FROM Treatment WHERE patient_id = p_patient_id AND date = p_date;
-END;
-
--- Procedure to create a new treatment
-CREATE PROCEDURE CreateTreatment(
-    IN p_patient_id INT,
-    IN p_staff_id INT,
+CREATE PROCEDURE createTreatment(
+    IN p_staffId INT,
+    IN p_patientId INT,
     IN p_date DATE,
     IN p_description TEXT
 )
 BEGIN
-    INSERT INTO Treatment (patient_id, staff_id, date, description)
-    VALUES (p_patient_id, p_staff_id, p_date, p_description);
-END;
+    START TRANSACTION;
+    INSERT INTO Treatment (staff_id, patient_id, date, description)
+    VALUES (p_staffId, p_patientId, p_date, p_description);
+    COMMIT;
+END $$
 
--- ======================================
--- 11. Report Functions
--- ======================================
+-- Department Procedures
 
--- 11.1 View Patient Treatment History
-CREATE FUNCTION GetPatientTreatmentHistory(
-    p_patient_id INT,
-    p_start_date DATE,
-    p_end_date DATE
+CREATE PROCEDURE getAllDepartments()
+BEGIN
+    SELECT * FROM Department;
+END $$
+
+CREATE PROCEDURE getDepartmentById(IN p_departmentId INT)
+BEGIN
+    SELECT * FROM Department WHERE department_id = p_departmentId;
+END $$
+
+-- Staff Procedures
+
+CREATE PROCEDURE getAllStaffs(IN p_order VARCHAR(4), IN p_departmentId INT)
+BEGIN
+    IF p_departmentId IS NOT NULL THEN
+        SELECT * FROM Staff WHERE department_id = p_departmentId ORDER BY last_name, first_name p_order;
+    ELSE
+        SELECT * FROM Staff ORDER BY last_name, first_name p_order;
+    END IF;
+END $$
+
+CREATE PROCEDURE getStaffByStaffId(IN p_staffId INT)
+BEGIN
+    SELECT * FROM Staff WHERE staff_id = p_staffId;
+END $$
+
+CREATE PROCEDURE createStaff(
+    IN p_firstName VARCHAR(50),
+    IN p_lastName VARCHAR(50),
+    IN p_email VARCHAR(100),
+    IN p_salary DECIMAL(10, 2),
+    IN p_jobType VARCHAR(50),
+    IN p_managerId INT,
+    IN p_departmentId INT
 )
-RETURNS TABLE
-RETURN
-    SELECT * 
-    FROM Treatment
-    WHERE patient_id = p_patient_id 
-    AND date BETWEEN p_start_date AND p_end_date;
+BEGIN
+    START TRANSACTION;
+    INSERT INTO Staff (first_name, last_name, email, salary, job_type, manager_id, department_id)
+    VALUES (p_firstName, p_lastName, p_email, p_salary, p_jobType, p_managerId, p_departmentId);
+    COMMIT;
+END $$
 
--- 11.2 View Doctor Work History
-CREATE FUNCTION GetDoctorWorkHistory(
-    p_staff_id INT,
-    p_start_date DATE,
-    p_end_date DATE
+CREATE PROCEDURE updateStaff(
+    IN p_staffId INT,
+    IN p_firstName VARCHAR(50),
+    IN p_lastName VARCHAR(50),
+    IN p_email VARCHAR(100),
+    IN p_salary DECIMAL(10, 2),
+    IN p_jobType VARCHAR(50),
+    IN p_managerId INT,
+    IN p_departmentId INT
 )
-RETURNS TABLE
-RETURN
-    SELECT 
-        'Appointment' AS type, 
-        patient_id, 
-        date, 
-        start_time, 
-        end_time, 
-        purpose 
-    FROM Appointment 
-    WHERE staff_id = p_staff_id 
-    AND date BETWEEN p_start_date AND p_end_date
-    UNION
-    SELECT 
-        'Treatment' AS type, 
-        patient_id, 
-        date, 
-        NULL AS start_time, 
-        NULL AS end_time, 
-        description AS purpose 
-    FROM Treatment 
-    WHERE staff_id = p_staff_id 
-    AND date BETWEEN p_start_date AND p_end_date;
+BEGIN
+    START TRANSACTION;
+    UPDATE Staff
+    SET 
+        first_name = p_firstName,
+        last_name = p_lastName,
+        email = p_email,
+        salary = p_salary,
+        job_type = p_jobType,
+        manager_id = p_managerId,
+        department_id = p_departmentId
+    WHERE 
+        staff_id = p_staffId;
+    COMMIT;
+END $$
+
+CREATE PROCEDURE createDocumentReference(
+    IN p_entity_type ENUM('Patient', 'Staff', 'Appointment'),
+    IN p_entity_id INT,
+    IN p_document_type VARCHAR(50),
+    IN p_document_id VARCHAR(255),
+    IN p_description TEXT
+)
+BEGIN
+    START TRANSACTION;
+    INSERT INTO DocumentReference (entity_type, entity_id, document_type, document_id, description)
+    VALUES (p_entity_type, p_entity_id, p_document_type, p_document_id, p_description);
+    COMMIT;
+END $$
+
+DELIMITER ;

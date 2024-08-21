@@ -11,6 +11,9 @@ const scheduleRouter = require("./routes/scheduleRoutes");
 const jobHistoryRouter = require("./routes/jobHistoryRoutes");
 const appointmentRouter = require("./routes/appointmentRoutes");
 
+const mysqlSetup = require("../database/mysql/setup"); // Import the MySQL setup script
+const mongoSetup = require("../database/mysql/setup"); // Import the MongoDB setup script
+
 const app = express();
 const port = 4000;
 
@@ -30,6 +33,20 @@ app.get("/", (req, res) => {
 	return res.json({ message: "The server is running!" });
 });
 
-app.listen(port, () => {
-	console.log(`Server running on http://localhost:${port}/`);
+async function initializeDatabases() {
+	try {
+		await mysqlSetup(); // Initialize MySQL database
+		await mongoSetup(); // Initialize MongoDB database
+		console.log("Databases initialized successfully!");
+	} catch (error) {
+		console.error("Failed to initialize databases:", error);
+		process.exit(1); // Exit the process with an error
+	}
+}
+
+// Start the server and initialize databases
+initializeDatabases().then(() => {
+	app.listen(port, () => {
+		console.log(`Server running on http://localhost:${port}/`);
+	});
 });

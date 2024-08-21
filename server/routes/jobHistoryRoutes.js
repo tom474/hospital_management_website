@@ -1,7 +1,11 @@
 const express = require("express");
-const router = express.Router();
+const jobHistoryRouter = express.Router();
 const jobHistoryController = require("../controllers/jobHistoryController");
+const assignDatabasePool = require("../middleware/assignDatabasePool");
 
-router.get("/staff/:id", jobHistoryController.getJobHistoriesByStaffId);
+// Apply the role-based database pool assignment middleware
+jobHistoryRouter.use(assignDatabasePool);
 
-module.exports = router;
+jobHistoryRouter.get("/staff/:id", jobHistoryController.getJobHistoriesByStaffId);
+
+module.exports = jobHistoryRouter;

@@ -1,16 +1,19 @@
 const express = require("express");
 const staffRouter = express.Router();
 const staffController = require("../controllers/staffController");
+const assignDatabasePool = require("../middleware/assignDatabasePool");
 
+// Apply the role-based database pool assignment middleware
+staffRouter.use(assignDatabasePool);
+
+// Routes for staff operations
 staffRouter.get("/", staffController.getAllStaffs);
-staffRouter.get("/name-asc", staffController.getAllStaffsByNameASC);
-staffRouter.get("/name-desc", staffController.getAllStaffsByNameDESC);
-staffRouter.get("/department/:id", staffController.getAllStaffsByDepartment);
-staffRouter.get("/department/:id/name-asc", staffController.getAllStaffsByDepartmentNameASC);
-staffRouter.get("/department/:id/name-desc", staffController.getAllStaffsByDepartmentNameDESC);
 staffRouter.get("/:id", staffController.getStaffById);
-staffRouter.post("/:id/available-time", staffController.getStaffAvailableTime);
+staffRouter.post("/availability", staffController.getStaffAvailableTime);
 staffRouter.post("/", staffController.createStaff);
 staffRouter.put("/:id", staffController.updateStaff);
+
+// New route to add staff documents
+staffRouter.post("/add-document", staffController.addStaffDocument);
 
 module.exports = staffRouter;

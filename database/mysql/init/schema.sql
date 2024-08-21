@@ -1,6 +1,3 @@
--- Drop the existing database and recreate it
-DROP DATABASE IF EXISTS HospitalManagementSystem;
-
 -- Create the database
 CREATE DATABASE IF NOT EXISTS HospitalManagementSystem;
 USE HospitalManagementSystem;
@@ -32,9 +29,7 @@ CREATE TABLE IF NOT EXISTS Staff (
     job_type VARCHAR(50) NOT NULL,
     qualifications VARCHAR(255),
     manager_id INT,
-    department_id INT,
-    FOREIGN KEY (manager_id) REFERENCES Staff(staff_id) ON DELETE SET NULL,
-    FOREIGN KEY (department_id) REFERENCES Department(department_id) ON DELETE SET NULL
+    department_id INT
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS JobHistory (
@@ -46,10 +41,7 @@ CREATE TABLE IF NOT EXISTS JobHistory (
     previous_salary DECIMAL(10, 2) NOT NULL CHECK (previous_salary >= 0),
     new_salary DECIMAL(10, 2) NOT NULL CHECK (new_salary >= 0),
     previous_dept_id INT,
-    new_dept_id INT,
-    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE,
-    FOREIGN KEY (previous_dept_id) REFERENCES Department(department_id),
-    FOREIGN KEY (new_dept_id) REFERENCES Department(department_id)
+    new_dept_id INT
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS Schedule (
@@ -57,8 +49,7 @@ CREATE TABLE IF NOT EXISTS Schedule (
     staff_id INT NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-    date DATE NOT NULL,
-    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
+    date DATE NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS Appointment (
@@ -70,9 +61,7 @@ CREATE TABLE IF NOT EXISTS Appointment (
     end_time TIME NOT NULL,
     purpose VARCHAR(255) NOT NULL,
     status ENUM('Scheduled', 'Completed', 'Cancelled') NOT NULL DEFAULT 'Scheduled',
-    UNIQUE (staff_id, date, start_time, end_time),
-    FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
-    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
+    UNIQUE (staff_id, date, start_time, end_time)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS Treatment (
@@ -80,9 +69,7 @@ CREATE TABLE IF NOT EXISTS Treatment (
     patient_id INT NOT NULL,
     staff_id INT NOT NULL,
     date DATE NOT NULL,
-    description TEXT NOT NULL,
-    FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
-    FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE
+    description TEXT NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS DocumentReference (
@@ -91,6 +78,43 @@ CREATE TABLE IF NOT EXISTS DocumentReference (
     entity_id INT NOT NULL,
     document_type VARCHAR(50) NOT NULL,
     document_id VARCHAR(255) NOT NULL,
-    description TEXT,
-    FOREIGN KEY (entity_id) REFERENCES Patient(patient_id) ON DELETE CASCADE
+    description TEXT
 ) ENGINE=InnoDB;
+
+-- Add foreign keys after table creation
+
+ALTER TABLE Staff
+ADD CONSTRAINT fk_staff_manager
+FOREIGN KEY (manager_id) REFERENCES Staff(staff_id) ON DELETE SET NULL,
+ADD CONSTRAINT fk_staff_department
+FOREIGN KEY (department_id) REFERENCES Department(department_id) ON DELETE SET NULL;
+
+ALTER TABLE JobHistory
+ADD CONSTRAINT fk_jobhistory_staff
+FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_jobhistory_prev_dept
+FOREIGN KEY (previous_dept_id) REFERENCES Department(department_id),
+ADD CONSTRAINT fk_jobhistory_new_dept
+FOREIGN KEY (new_dept_id) REFERENCES Department(department_id);
+
+ALTER TABLE Schedule
+ADD CONSTRAINT fk_schedule_staff
+FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE;
+
+ALTER TABLE Appointment
+ADD CONSTRAINT fk_appointment_patient
+FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_appointment_staff
+FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE;
+
+ALTER TABLE Treatment
+ADD CONSTRAINT fk_treatment_patient
+FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_treatment_staff
+FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE;
+
+ALTER TABLE DocumentReference
+ADD CONSTRAINT fk_docref_entity_patient
+FOREIGN KEY (entity_id) REFERENCES Patient(patient_id) ON DELETE CASCADE;
+
+-- Note: Foreign key constraints for other entity types in DocumentReference table can be handled similarly based on your data model.
