@@ -4,24 +4,17 @@ import AppointmentTable from "../components/appointment/main/AppointmentTable";
 
 export default function AppointmentPage() {
 	const [duration, setDuration] = useState({
-		date: "",
-		startTime: "",
-		endTime: ""
+		startDate: "",
+		endDate: ""
 	});
 
 	const [mode, setMode] = useState(true);
 
 	const checkDuration = (duration) => {
-		if (
-			duration &&
-			duration.date &&
-			duration.startTime &&
-			duration.endTime
-		) {
+		if (duration && duration.startDate && duration.endDate) {
 			setDuration({
-				date: duration.date,
-				startTime: duration.startTime,
-				endTime: duration.endTime
+				startDate: duration.startDate,
+				endDate: duration.endDate
 			});
 		} else {
 			document.getElementById("duration_modal").showModal();
@@ -70,8 +63,7 @@ export default function AppointmentPage() {
 				<div className="flex gap-1">
 					<div className="p-2 flex items-center bg-blue-400 rounded text-white font-semibold text-lg">
 						<p>
-							{duration.date} {"("} {duration.startTime} -{" "}
-							{duration.endTime} {")"}
+							{duration.startDate} {"-> "} {duration.endDate}
 						</p>
 					</div>
 
@@ -80,6 +72,7 @@ export default function AppointmentPage() {
 							key={"appointment_page"}
 							duration={duration}
 							onUpdate={handleUpdateDuration}
+							type="duration"
 						/>
 					)}
 

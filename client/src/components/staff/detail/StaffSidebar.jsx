@@ -18,12 +18,12 @@ export default function StaffSidebar({ staff }) {
 			selected: true
 		},
 		{
-			title: "Staff Schedule",
+			title: "Schedule",
 			icon: <FontAwesomeIcon icon={faClock} />,
 			selected: false
 		},
 		{
-			title: "Appointment History",
+			title: "Appointment",
 			icon: <FontAwesomeIcon icon={faNotesMedical} />,
 			selected: false
 		},

@@ -10,6 +10,7 @@ const staffs = [
 		jobType: "Doctor",
 		firstName: "John",
 		lastName: "Doe",
+		manager: "John Doe",
 		email: "JohnDoe@gmail.com",
 		department: "Cardiology",
 		salary: 1000
@@ -19,6 +20,7 @@ const staffs = [
 		jobType: "Nurse",
 		firstName: "Jane",
 		lastName: "Smith",
+		manager: "John Doe",
 		email: "JaneSmith@gmail.com",
 		department: "Pediatrics",
 		salary: 8000
@@ -28,6 +30,7 @@ const staffs = [
 		jobType: "Doctor",
 		firstName: "Emily",
 		lastName: "Jones",
+		manager: "John Doe",
 		email: "EmilyJones@gmail.com",
 		department: "Surgery",
 		salary: 12000
@@ -38,6 +41,7 @@ const staffs = [
 		firstName: "Michael",
 		lastName: "Brown",
 		email: "MichaelBrown@gmail.com",
+		manager: "John Doe",
 		department: "Pharmacy",
 		salary: 900
 	},
@@ -46,6 +50,7 @@ const staffs = [
 		jobType: "Nurse",
 		firstName: "Jessica",
 		lastName: "Taylor",
+		manager: "John Doe",
 		email: "JessicaTaylor@gmail.com",
 		department: "Rehabilitation",
 		salary: 9500
@@ -55,6 +60,7 @@ const staffs = [
 		jobType: "Nurse",
 		firstName: "David",
 		lastName: "Wilson",
+		manager: "John Doe",
 		email: "DavidWilson@gmail.com",
 		department: "Radiology",
 		salary: 850
@@ -65,6 +71,7 @@ const staffs = [
 		firstName: "Emma",
 		lastName: "Davis",
 		email: "EmmaDavis@gmail.com",
+		manager: "John Doe",
 		department: "Administration",
 		salary: 500
 	},
@@ -74,6 +81,7 @@ const staffs = [
 		firstName: "Christopher",
 		lastName: "Martinez",
 		email: "ChristopherMartinez@gmail.com",
+		manager: "John Doe",
 		department: "Neurology",
 		salary: 1100
 	},
@@ -83,6 +91,7 @@ const staffs = [
 		firstName: "Sophia",
 		lastName: "Anderson",
 		email: "SophiaAnderson@gmail.com",
+		manager: "John Doe",
 		department: "Emergency",
 		salary: 8200
 	},
@@ -92,6 +101,7 @@ const staffs = [
 		firstName: "Matthew",
 		lastName: "Lee",
 		email: "MatthewLee@gmail.com",
+		manager: "John Doe",
 		department: "Orthopedics",
 		salary: 1250
 	},
@@ -101,6 +111,7 @@ const staffs = [
 		firstName: "Olivia",
 		lastName: "Harris",
 		email: "OliviaHarris@gmail.com",
+		manager: "John Doe",
 		department: "Pathology",
 		salary: 7800
 	},
@@ -109,6 +120,7 @@ const staffs = [
 		jobType: "Doctor",
 		firstName: "Daniel",
 		lastName: "Clark",
+		manager: "John Doe",
 		email: "DanielClark@gmail.com",
 		department: "Oncology",
 		salary: 1150
@@ -117,10 +129,11 @@ const staffs = [
 
 const columns = [
 	{ key: "ID", title: "ID", size: "w-[2%]" },
-	{ key: "Name", title: "Name", size: "w-[13%]" },
-	{ key: "Email", title: "Email", size: "w-[8%]" },
+	{ key: "Name", title: "Name", size: "w-[10%]" },
+	{ key: "Email", title: "Email", size: "w-[7%]" },
 	{ key: "JobType", title: "Job Type", size: "w-1/12" },
 	{ key: "Department", title: "Department", size: "w-1/12" },
+	{ key: "Manager", title: "Manager", size: "w-1/12" },
 	{ key: "Salary", title: "Salary", size: "w-1/12" },
 	{ key: "Action", title: "Action", size: "w-[0%]" }
 ];
@@ -192,6 +205,9 @@ export default function StaffTable() {
 								{displayJobType(staff.jobType)}
 								<td className="align-top text-black">
 									{staff.department}
+								</td>
+								<td className="align-top text-black">
+									{staff.manager}
 								</td>
 								<td className="align-top text-black">
 									{formatSalary(staff.salary)}

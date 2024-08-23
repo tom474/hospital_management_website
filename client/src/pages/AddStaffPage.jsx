@@ -1,5 +1,29 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import Select from "react-select";
+
+const dummyDoctors = [
+	{ id: 1, name: "Dr. John Smith" },
+	{ id: 2, name: "Dr. Emily Johnson" },
+	{ id: 3, name: "Dr. Michael Brown" },
+	{ id: 4, name: "Dr. Sarah Davis" },
+	{ id: 5, name: "Dr. David Wilson" },
+	{ id: 6, name: "Dr. Sarah Davis" },
+	{ id: 7, name: "Dr. David Wilson" },
+	{ id: 8, name: "Dr. Sarah Davis" },
+	{ id: 9, name: "Dr. David Wilson" },
+	{ id: 10, name: "Dr. Sarah Davis" },
+	{ id: 11, name: "Dr. David Wilson" },
+	{ id: 12, name: "Dr. Sarah Davis" },
+	{ id: 13, name: "Dr. David Wilson" },
+	{ id: 14, name: "Dr. Sarah Davis" },
+	{ id: 15, name: "Dr. David Wilson" },
+	{ id: 16, name: "Dr. Sarah Davis" },
+	{ id: 17, name: "Dr. David Wilson" },
+	{ id: 18, name: "Dr. Sarah Davis" },
+	{ id: 19, name: "Dr. David Wilson" },
+	{ id: 20, name: "Dr. Sarah Davis" }
+];
 
 export default function AddStaffPage() {
 	const [formData, setFormData] = useState({
@@ -7,6 +31,7 @@ export default function AddStaffPage() {
 		lastName: "",
 		jobType: "",
 		email: "",
+		manager: null,
 		department: "",
 		salary: 0
 	});
@@ -18,6 +43,14 @@ export default function AddStaffPage() {
 			[name]: value
 		});
 	};
+
+	const options = dummyDoctors.map((doctor) => ({
+		value: {
+			id: doctor.id,
+			name: doctor.name
+		},
+		label: doctor.name
+	}));
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -141,11 +174,35 @@ export default function AddStaffPage() {
 							</select>
 						</div>
 					</div>
+
+					<div className="mb-4">
+						<label
+							htmlFor="doctor"
+							className="text-black text-sm mb-2"
+						>
+							Manager:
+						</label>
+						<Select
+							value={formData.manager}
+							name="manager"
+							onChange={(selectedOption) =>
+								setFormData((prev) => ({
+									...prev,
+									manager: selectedOption
+								}))
+							}
+							options={options}
+							placeholder="Select a doctor..."
+							isSearchable
+							className="text-black font-medium border-sky-200 "
+						/>
+					</div>
+
 					<button
 						type="submit"
 						className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
 					>
-						Add Patient
+						Add Staff
 					</button>
 				</form>
 			</div>

@@ -10,6 +10,7 @@ const staff = {
 	jobType: "Doctor",
 	firstName: "John",
 	lastName: "Doe",
+	manager: "Dr. Jane Smith",
 	email: "JohnDoe@gmail.com",
 	department: "Department 1",
 	salary: 1000
@@ -39,10 +40,8 @@ export default function StaffDetailPage() {
 					<StaffInformation staff={staff} />
 				)}
 				{option == null && <StaffInformation staff={staff} />}
-				{option == "staff_schedule" && <StaffSchedule staff={staff} />}
-				{option == "appointment_history" && (
-					<StaffAppointment staff={staff} />
-				)}
+				{option == "schedule" && <StaffSchedule staff={staff} />}
+				{option == "appointment" && <StaffAppointment staff={staff} />}
 				{option === "job_history" && <JobHistory staff={staff} />}
 			</div>
 		</div>

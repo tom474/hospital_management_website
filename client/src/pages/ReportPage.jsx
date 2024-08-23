@@ -12,22 +12,15 @@ export default function ReportPage() {
 	const option = queryParams.get("option");
 
 	const [duration, setDuration] = useState({
-		date: "",
-		startTime: "",
-		endTime: ""
+		startDate: "",
+		endDate: ""
 	});
 
 	const checkDuration = (duration) => {
-		if (
-			duration &&
-			duration.date &&
-			duration.startTime &&
-			duration.endTime
-		) {
+		if (duration && duration.startDate && duration.endDate) {
 			setDuration({
-				date: duration.date,
-				startTime: duration.startTime,
-				endTime: duration.endTime
+				startDate: duration.startDate,
+				endDate: duration.endDate
 			});
 		} else {
 			document.getElementById("duration_modal").showModal();
@@ -36,6 +29,7 @@ export default function ReportPage() {
 
 	useEffect(() => {
 		const fetch = JSON.parse(localStorage.getItem("report_duration"));
+		console.log(fetch);
 		checkDuration(fetch);
 	}, []);
 
@@ -81,16 +75,18 @@ export default function ReportPage() {
 				<div className="flex gap-1">
 					<div className="p-2 flex items-center bg-blue-400 rounded text-white font-semibold text-lg">
 						<p>
-							{duration.date} {"("} {duration.startTime} -{" "}
-							{duration.endTime} {")"}
+							{duration.startDate} {" -> "} {duration.endDate}
 						</p>
 					</div>
 
 					{duration && (
 						<DurationModal
 							key={"report_page"}
+							isTreatment={true}
 							duration={duration}
 							onUpdate={handleUpdateDuration}
+							type="report_duration"
+							mode={"date"}
 						/>
 					)}
 
