@@ -11,9 +11,6 @@ const {
     deletePatient,
     addPatientDocument
 } = require("../controllers/patientController");
-const assignDatabasePool = require("../middlewares/assignDatabasePool");
-
-patientRouter.use(assignDatabasePool);
 
 patientRouter.get("/", getAllPatients);
 patientRouter.get("/id/:id", getPatientById);

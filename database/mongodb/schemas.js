@@ -7,7 +7,7 @@ const documentSchema = new Schema({
   entityId: { type: String, required: true }, // Reference to the MySQL entity ID
   documentType: { type: String, required: true },
   documentId: { type: String, required: true }, // Could be an S3 URL, GridFS ID, etc.
-  description: { type: String }
+  description: { type: String },
 });
 
 module.exports = { documentSchema };

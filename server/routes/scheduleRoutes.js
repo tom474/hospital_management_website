@@ -5,9 +5,6 @@ const {
     addSchedule,
     updateSchedule
 } = require("../controllers/scheduleController");
-const assignDatabasePool = require("../middlewares/assignDatabasePool");
-
-scheduleRouter.use(assignDatabasePool);
 
 scheduleRouter.get("/staff/:id", getSchedulesByStaffId);
 scheduleRouter.post("/", addSchedule);

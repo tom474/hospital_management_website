@@ -12,7 +12,7 @@ const jobHistoryRouter = require("./routes/jobHistoryRoutes");
 const appointmentRouter = require("./routes/appointmentRoutes");
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = 4000;
 
 // Middleware setup
 app.use(cors());

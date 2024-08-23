@@ -2,17 +2,10 @@ const { MongoClient } = require("mongodb");
 const { v4: uuidv4 } = require("uuid");
 const database = require("../models/database");
 
-// Helper function to get a connection from the admin pool
-async function getAdminConnection() {
-    return await database.getAdminConnection();
-}
-
 // Get all patients
 const getAllPatients = async (req, res) => {
     try {
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL getAllPatients()");
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL getAllPatients()");
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -23,9 +16,7 @@ const getAllPatients = async (req, res) => {
 const getPatientById = async (req, res) => {
     try {
         const patient_id = req.params.id;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL getPatientByPatientId(?)", [patient_id]);
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL getPatientByPatientId(?)", [patient_id]);
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -36,9 +27,7 @@ const getPatientById = async (req, res) => {
 const getPatientByName = async (req, res) => {
     try {
         const search_name = req.params.name;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL searchPatientsByName(?)", [`%${search_name}%`]);
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL searchPatientsByName(?)", [`%${search_name}%`]);
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -49,9 +38,7 @@ const getPatientByName = async (req, res) => {
 const searchPatientsById = async (req, res) => {
     try {
         const id_search = req.params.id;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL searchPatientsById(?)", [`%${id_search}%`]);
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL searchPatientsById(?)", [`%${id_search}%`]);
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -62,9 +49,7 @@ const searchPatientsById = async (req, res) => {
 const searchPatientsByName = async (req, res) => {
     try {
         const name_search = req.params.name;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL searchPatientsByName(?)", [`%${name_search}%`]);
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL searchPatientsByName(?)", [`%${name_search}%`]);
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -75,12 +60,10 @@ const searchPatientsByName = async (req, res) => {
 const createPatient = async (req, res) => {
     try {
         const { first_name, last_name, birth_date, address, email, phone, allergies } = req.body;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query(
+        const [rows] = await database.poolAdmin.query(
             "CALL createPatient(?, ?, ?, ?, ?, ?, ?)",
             [first_name, last_name, birth_date, address, email, phone, allergies]
         );
-        connection.release();
         res.json({ message: "Patient created successfully", patient: rows[0] });
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -92,12 +75,10 @@ const updatePatient = async (req, res) => {
     try {
         const patient_id = req.params.id;
         const { first_name, last_name, birth_date, address, email, phone, allergies } = req.body;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query(
+        const [rows] = await database.poolAdmin.query(
             "CALL updatePatientInformation(?, ?, ?, ?, ?, ?, ?, ?)",
             [patient_id, first_name, last_name, birth_date, address, email, phone, allergies]
         );
-        connection.release();
         res.json({ message: "Patient updated successfully", patient: rows[0] });
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -108,9 +89,7 @@ const updatePatient = async (req, res) => {
 const deletePatient = async (req, res) => {
     try {
         const patient_id = req.params.id;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL deletePatient(?)", [patient_id]);
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL deletePatient(?)", [patient_id]);
         res.json({ message: "Patient deleted successfully", result: rows[0] });
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -144,12 +123,10 @@ const addPatientDocument = async (req, res) => {
         await Document.insertOne(document);
 
         // Insert the reference into MySQL
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query(
+        const [rows] = await database.poolAdmin.query(
             "CALL createDocumentReference(?, ?, ?, ?, ?)",
             [entity_type, patient_id, document_type, documentId, description]
         );
-        connection.release();
 
         // Close MongoDB connection
         await mongoClient.close();

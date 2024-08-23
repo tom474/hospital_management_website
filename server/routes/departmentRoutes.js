@@ -4,9 +4,6 @@ const {
     getAllDepartments,
     getDepartmentById
 } = require("../controllers/departmentController");
-const assignDatabasePool = require("../middlewares/assignDatabasePool");
-
-departmentRouter.use(assignDatabasePool);
 
 departmentRouter.get("/", getAllDepartments);
 departmentRouter.get("/:id", getDepartmentById);

@@ -10,9 +10,6 @@ const {
     cancelAppointment,
     addNoteToAppointment
 } = require("../controllers/appointmentController");
-const assignDatabasePool = require("../middlewares/assignDatabasePool");
-
-appointmentRouter.use(assignDatabasePool);
 
 appointmentRouter.get("/", getAllAppointments);
 appointmentRouter.get("/:id", getAppointmentById);
