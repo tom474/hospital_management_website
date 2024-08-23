@@ -20,15 +20,12 @@ const mongoClient = new MongoClient(mongoUri, {
     await mongoClient.db("admin").command({ ping: 1 });
     console.log("Successfully connected to MongoDB!");
 
-    // Drop existing database if it exists
     await mongoClient.db(mongoDatabaseName).dropDatabase();
-    console.log(`Database "${mongoDatabaseName}" cleared!`);
+    console.log("MongoDB database cleared!");
 
-    // Initialize collections and insert mock data if requested
     const mongoDb = mongoClient.db(mongoDatabaseName);
     await createCollections(mongoDb);
-    
-    if (process.argv.includes("--mock")) {
+    if (process.argv.length > 2 && process.argv[2] === "--mock") {
       await insertMockData(mongoDb);
     }
 
@@ -36,7 +33,7 @@ const mongoClient = new MongoClient(mongoUri, {
   } catch (error) {
     console.error("Error during MongoDB setup:", error);
   } finally {
-    await mongoClient.close();
-    console.log("MongoDB connection closed. Setup complete!");
+    if (mongoClient) await mongoClient.close();
+    console.log("MongoDB setup complete!");
   }
 })();
