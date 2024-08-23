@@ -94,7 +94,12 @@ BEGIN
     SELECT * FROM Appointment WHERE appointment_id = p_appointmentId;
 END $$
 
-CREATE PROCEDURE getAllAppointmentsByStaffId(IN p_staffId INT, IN p_date DATE, IN p_startTime TIME, IN p_endTime TIME)
+CREATE PROCEDURE getAllAppointmentsByStaffId(
+    IN p_staffId INT, 
+    IN p_date DATE, 
+    IN p_startTime TIME, 
+    IN p_endTime TIME
+)
 BEGIN
     IF p_date IS NOT NULL THEN
         SELECT * FROM Appointment 
@@ -285,10 +290,16 @@ END $$
 CREATE PROCEDURE getAllStaffs(IN p_order VARCHAR(4), IN p_departmentId INT)
 BEGIN
     IF p_departmentId IS NOT NULL THEN
-        SELECT * FROM Staff WHERE department_id = p_departmentId ORDER BY last_name, first_name p_order;
+        SET @query = CONCAT(
+            'SELECT * FROM Staff WHERE department_id = ', p_departmentId, ' ORDER BY last_name, first_name ', p_order
+        );
     ELSE
-        SELECT * FROM Staff ORDER BY last_name, first_name p_order;
+        SET @query = CONCAT('SELECT * FROM Staff ORDER BY last_name, first_name ', p_order);
     END IF;
+
+    PREPARE stmt FROM @query;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
 END $$
 
 CREATE PROCEDURE getStaffByStaffId(IN p_staffId INT)

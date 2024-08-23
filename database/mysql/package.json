@@ -1,0 +1,14 @@
+{
+    "name": "hospital-management-system",
+    "private": true,
+    "version": "1.0.0",
+    "type": "commonjs",
+    "scripts": {
+      "setup": "node setup.js",
+      "setup-with-mock-data": "node setup.js --mock"
+    },
+    "dependencies": {
+      "mysql2": "^3.6.0"
+    }
+  }
+  
