@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 const { createCollections } = require("./collections");
 const { insertMockData } = require("./mockData");
 
-const mongoUri = "mongodb+srv://admin:admin1234@cluster0.w4wxs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-const mongoDatabaseName = "HospitalManagementSystem";
-const mongoClient = new MongoClient(mongoUri, {
+const connectionUri = "mongodb+srv://admin:admin1234@cluster0.w4wxs.mongodb.net/"; // MongoDB connection string
+const databaseName = "HospitalManagementSystem";
+const client = new MongoClient(connectionUri, {
   serverApi: {
     version: ServerApiVersion.v1,
     strict: true,
@@ -15,25 +15,22 @@ const mongoClient = new MongoClient(mongoUri, {
 
 (async () => {
   try {
-    console.log(`Connecting to MongoDB at "${mongoUri}"...`);
-    await mongoClient.connect();
-    await mongoClient.db("admin").command({ ping: 1 });
+    console.log(`Connecting to MongoDB at "${connectionUri}"...`);
+    await client.connect();
+    await client.db("admin").command({ ping: 1 });
     console.log("Successfully connected to MongoDB!");
 
-    await mongoClient.db(mongoDatabaseName).dropDatabase();
-    console.log("MongoDB database cleared!");
+    await client.db(databaseName).dropDatabase();
+    console.log("Database cleared!");
 
-    const mongoDb = mongoClient.db(mongoDatabaseName);
-    await createCollections(mongoDb);
+    const dbUri = connectionUri + databaseName;
+    await createCollections(dbUri);
     if (process.argv.length > 2 && process.argv[2] === "--mock") {
-      await insertMockData(mongoDb);
+      await insertMockData(dbUri);
     }
 
-    console.log("MongoDB database initialized!");
-  } catch (error) {
-    console.error("Error during MongoDB setup:", error);
+    console.log("Database initialized!");
   } finally {
-    if (mongoClient) await mongoClient.close();
-    console.log("MongoDB setup complete!");
+    await client.close();
   }
-})();
+})().catch(console.dir);
