@@ -1,16 +1,9 @@
 const database = require("../models/database");
 
-// Helper function to get a connection from the admin pool
-async function getAdminConnection() {
-    return await database.getAdminConnection();
-}
-
 // Get all departments
 const getAllDepartments = async (req, res) => {
     try {
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL getAllDepartments()");
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL getAllDepartments()");
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -21,9 +14,7 @@ const getAllDepartments = async (req, res) => {
 const getDepartmentById = async (req, res) => {
     try {
         const department_id = req.params.id;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL getDepartmentById(?)", [department_id]);
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL getDepartmentById(?)", [department_id]);
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });

@@ -6,9 +6,6 @@ const {
     getAllTreatmentByPatientIdInDuration,
     createTreatment
 } = require("../controllers/treatmentController");
-const assignDatabasePool = require("../middlewares/assignDatabasePool");
-
-treatmentRouter.use(assignDatabasePool);
 
 treatmentRouter.get("/patient/:id", getTreatmentByPatientId);
 treatmentRouter.get("/date/:date", getAllTreatmentInDuration);

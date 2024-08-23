@@ -7,10 +7,7 @@ const {
     createStaff,
     updateStaff,
     addStaffDocument
-} = require("../controllers/staffController");
-const assignDatabasePool = require("../middlewares/assignDatabasePool");
-
-staffRouter.use(assignDatabasePool);
+} = require("../controllers/staffController")
 
 staffRouter.get("/", getAllStaffs);
 staffRouter.get("/:id", getStaffById);

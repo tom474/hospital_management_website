@@ -2,18 +2,11 @@ const { MongoClient } = require("mongodb");
 const { v4: uuidv4 } = require("uuid");
 const database = require("../models/database");
 
-// Helper function to get a connection from the admin pool
-async function getAdminConnection() {
-    return await database.getAdminConnection();
-}
-
 // Get all staffs with optional sorting order and department filter
 const getAllStaffs = async (req, res) => {
     try {
         const { order = 'ASC', department_id = null } = req.query;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL getAllStaffs(?, ?)", [order, department_id]);
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL getAllStaffs(?, ?)", [order, department_id]);
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -24,9 +17,7 @@ const getAllStaffs = async (req, res) => {
 const getStaffById = async (req, res) => {
     try {
         const staff_id = req.params.id;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL getStaffByStaffId(?)", [staff_id]);
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL getStaffByStaffId(?)", [staff_id]);
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -37,12 +28,10 @@ const getStaffById = async (req, res) => {
 const createStaff = async (req, res) => {
     try {
         const { first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id } = req.body;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query(
+        const [rows] = await database.poolAdmin.query(
             "CALL createStaff(?, ?, ?, ?, ?, ?, ?, ?)",
             [first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id]
         );
-        connection.release();
         res.json({ message: "Staff created successfully", staff: rows[0] });
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -54,12 +43,10 @@ const updateStaff = async (req, res) => {
     try {
         const staff_id = req.params.id;
         const { first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id } = req.body;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query(
+        const [rows] = await database.poolAdmin.query(
             "CALL updateStaff(?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [staff_id, first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id]
         );
-        connection.release();
         res.json({ message: "Staff updated successfully", staff: rows[0] });
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -70,9 +57,7 @@ const updateStaff = async (req, res) => {
 const getStaffAvailableTime = async (req, res) => {
     try {
         const { staff_id, date } = req.body;
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query("CALL GetStaffAvailableTime(?, ?)", [staff_id, date]);
-        connection.release();
+        const [rows] = await database.poolAdmin.query("CALL GetStaffAvailableTime(?, ?)", [staff_id, date]);
         res.json(rows[0]);
     } catch (err) {
         res.status(400).json({ error: err.message });
@@ -106,12 +91,10 @@ const addStaffDocument = async (req, res) => {
         await Document.insertOne(document);
 
         // Insert the reference into MySQL
-        const connection = await getAdminConnection();
-        const [rows] = await connection.query(
+        const [rows] = await database.poolAdmin.query(
             "CALL createDocumentReference(?, ?, ?, ?, ?)",
             ['Staff', staff_id, document_type, documentId, description]
         );
-        connection.release();
 
         // Close MongoDB connection
         await mongoClient.close();
