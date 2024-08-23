@@ -1,59 +1,71 @@
-const express = require("express");
 const database = require("../models/database");
 
-// Get treatment by patient id
+// Helper function to get a connection from the admin pool
+async function getAdminConnection() {
+    return await database.getAdminConnection();
+}
+
+// Get all treatments by patient id
 const getTreatmentByPatientId = async (req, res) => {
-	try {
-		const patient_id = req.params.id;
-		const [rows] = await database.poolAdmin.query("SELECT * FROM treatment WHERE patient_id = ?", [patient_id]);
-		res.json(rows);
-	} catch (err) {
-		res.status(400).json(err);
-	}
+    try {
+        const patient_id = req.params.id;
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query("CALL getAllTreatmentByPatientId(?)", [patient_id]);
+        connection.release();
+        res.json(rows[0]);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
 };
 
-// Get treatments by date
-const getTreatmentByDate = async (req, res) => {
-	try {
-		const date = req.params.date;
-		const [rows] = await database.poolAdmin.query("SELECT * FROM treatment WHERE date = ?", [date]);
-		res.json(rows);
-	} catch (err) {
-		res.status(400).json(err);
-	}
+// Get all treatments on a specific date
+const getAllTreatmentInDuration = async (req, res) => {
+    try {
+        const date = req.params.date;
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query("CALL getAllTreatmentInDuration(?)", [date]);
+        connection.release();
+        res.json(rows[0]);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
 };
 
-// Get treatment by patient id and date (yyyy-mm-dd)
-const getTreatmentByPatientIdAndDate = async (req, res) => {
-	try {
-		const { patient_id, date } = req.body;
-		const [rows] = await database.poolAdmin.query("SELECT * FROM treatment WHERE patient_id = ? AND date = ?", [
-			patient_id,
-			date,
-		]);
-		res.json(rows);
-	} catch (err) {
-		res.status(400).json(err);
-	}
+// Get all treatments for a patient on a specific date
+const getAllTreatmentByPatientIdInDuration = async (req, res) => {
+    try {
+        const { patient_id, date } = req.body;
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query("CALL getAllTreatmentByPatientIdInDuration(?, ?)", [
+            patient_id,
+            date,
+        ]);
+        connection.release();
+        res.json(rows[0]);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
 };
 
 // Create a new treatment
 const createTreatment = async (req, res) => {
-	try {
-		const { patient_id, staff_id, date, description } = req.body;
-		const [rows] = await database.poolAdmin.query(
-			"INSERT INTO treatment (patient_id, staff_id, date, description) VALUES (?, ?, ?, ?)",
-			[patient_id, staff_id, date, description]
-		);
-		res.json(rows);
-	} catch (err) {
-		res.status(400).json(err);
-	}
+    try {
+        const { patient_id, staff_id, date, description } = req.body;
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query(
+            "CALL createTreatment(?, ?, ?, ?)",
+            [staff_id, patient_id, date, description]
+        );
+        connection.release();
+        res.json({ message: "Treatment created successfully", treatment: rows[0] });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
 };
 
 module.exports = {
-	getTreatmentByPatientId,
-	getTreatmentByDate,
-	getTreatmentByPatientIdAndDate,
-	createTreatment,
+    getTreatmentByPatientId,
+    getAllTreatmentInDuration,
+    getAllTreatmentByPatientIdInDuration,
+    createTreatment,
 };

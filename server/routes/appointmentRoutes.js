@@ -1,13 +1,26 @@
 const express = require("express");
 const appointmentRouter = express.Router();
-const appointmentController = require("../controllers/appointmentController");
+const {
+    getAllAppointments,
+    getAppointmentById,
+    getPatientAppointments,
+    getStaffAppointments,
+    getAppointmentsInDuration,
+    createAppointment,
+    cancelAppointment,
+    addNoteToAppointment
+} = require("../controllers/appointmentController");
+const assignDatabasePool = require("../middlewares/assignDatabasePool");
 
-appointmentRouter.get("/", appointmentController.getAllAppointments);
-appointmentRouter.get("/:id", appointmentController.getAppointmentById);
-appointmentRouter.get("/patient/:id", appointmentController.getPatientAppointments);
-appointmentRouter.get("/staff/:id", appointmentController.getStaffAppointments);
-appointmentRouter.post("/duration", appointmentController.getAppointmentsInDuration);
-appointmentRouter.post("/", appointmentController.createAppointment);
-appointmentRouter.put("/:id", appointmentController.cancelAppointment);
+appointmentRouter.use(assignDatabasePool);
+
+appointmentRouter.get("/", getAllAppointments);
+appointmentRouter.get("/:id", getAppointmentById);
+appointmentRouter.get("/patient/:id", getPatientAppointments);
+appointmentRouter.get("/staff/:id", getStaffAppointments);
+appointmentRouter.post("/duration", getAppointmentsInDuration);
+appointmentRouter.post("/", createAppointment);
+appointmentRouter.put("/:id", cancelAppointment);
+appointmentRouter.post("/add-note", addNoteToAppointment);
 
 module.exports = appointmentRouter;

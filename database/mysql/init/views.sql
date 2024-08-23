@@ -7,7 +7,6 @@ SELECT
     first_name,
     last_name,
     birth_date,
-    address,
     allergies
 FROM Patient;
 
@@ -23,7 +22,7 @@ SELECT
     manager_id
 FROM Staff;
 
--- View to show staff information with department names instead of IDs
+-- View to show staff information with department names instead of IDs and manager's name
 CREATE VIEW StaffWithDepartment AS
 SELECT 
     s.staff_id,
@@ -32,11 +31,13 @@ SELECT
     s.job_type,
     s.qualifications,
     d.department_name,
-    s.manager_id
+    CONCAT(m.first_name, ' ', m.last_name) AS manager_name
 FROM 
     Staff s
 JOIN 
-    Department d ON s.department_id = d.department_id;
+    Department d ON s.department_id = d.department_id
+LEFT JOIN 
+    Staff m ON s.manager_id = m.staff_id;
 
 -- View to show department details along with manager names
 CREATE VIEW DepartmentWithManager AS
@@ -92,8 +93,8 @@ SELECT
     j.new_job,
     j.previous_salary,
     j.new_salary,
-    d1.department_name AS previous_department,
-    d2.department_name AS new_department
+    COALESCE(d1.department_name, 'N/A') AS previous_department,
+    COALESCE(d2.department_name, 'N/A') AS new_department
 FROM 
     JobHistory j
 JOIN 
@@ -103,7 +104,7 @@ LEFT JOIN
 LEFT JOIN 
     Department d2 ON j.new_dept_id = d2.department_id;
 
--- View to display the schedule of all doctors with department and availability status
+-- View to display the schedule of all doctors with department and availability status, limited to 30 days from today
 CREATE VIEW DoctorScheduleWithStatus AS
 SELECT 
     s.staff_id,
@@ -126,7 +127,8 @@ JOIN
 JOIN 
     Department d ON s.department_id = d.department_id
 WHERE 
-    s.job_type = 'Doctor';
+    s.job_type = 'Doctor'
+    AND sc.date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY);
 
 -- View to summarize staff workload based on appointments
 CREATE VIEW StaffWorkloadSummary AS
@@ -159,6 +161,7 @@ GROUP BY
     s.staff_id;
 
 -- View to show a detailed report of all patient treatments within a specific duration
+-- This view should be filtered by date when queried, as SQL views do not support parameters
 CREATE VIEW PatientTreatmentReport AS
 SELECT 
     t.treatment_id,
@@ -171,6 +174,63 @@ FROM
 JOIN 
     Patient p ON t.patient_id = p.patient_id
 JOIN 
-    Staff s ON t.staff_id = s.staff_id
+    Staff s ON t.staff_id = s.staff_id;
+
+-- Additional Views
+
+-- View to provide a summary of doctor workload (scheduled, completed, canceled)
+CREATE VIEW DoctorWorkloadSummary AS
+SELECT 
+    s.staff_id,
+    CONCAT(s.first_name, ' ', s.last_name) AS doctor_name,
+    COUNT(CASE WHEN a.status = 'Scheduled' THEN 1 END) AS scheduled_appointments,
+    COUNT(CASE WHEN a.status = 'Completed' THEN 1 END) AS completed_appointments,
+    COUNT(CASE WHEN a.status = 'Cancelled' THEN 1 END) AS cancelled_appointments
+FROM 
+    Staff s
+LEFT JOIN 
+    Appointment a ON s.staff_id = a.staff_id
 WHERE 
-    t.date BETWEEN '2023-01-01' AND '2023-12-31';  -- Adjust the date range as needed
+    s.job_type = 'Doctor'
+GROUP BY 
+    s.staff_id;
+
+-- View to log changes to staff job titles, departments, and salaries over time
+CREATE VIEW StaffActivityLog AS
+SELECT 
+    s.staff_id,
+    CONCAT(s.first_name, ' ', s.last_name) AS staff_name,
+    j.change_date,
+    j.previous_job,
+    j.new_job,
+    j.previous_salary,
+    j.new_salary,
+    COALESCE(d1.department_name, 'N/A') AS previous_department,
+    COALESCE(d2.department_name, 'N/A') AS new_department
+FROM 
+    JobHistory j
+JOIN 
+    Staff s ON j.staff_id = s.staff_id
+LEFT JOIN 
+    Department d1 ON j.previous_dept_id = d1.department_id
+LEFT JOIN 
+    Department d2 ON j.new_dept_id = d2.department_id;
+
+-- View to provide a comprehensive view of patient data along with their latest appointment and treatment details
+CREATE VIEW PatientDetailedInfo AS
+SELECT 
+    p.patient_id,
+    CONCAT(p.first_name, ' ', p.last_name) AS patient_name,
+    p.birth_date,
+    p.address,
+    p.allergies,
+    a.date AS last_appointment_date,
+    a.purpose AS last_appointment_purpose,
+    t.date AS last_treatment_date,
+    t.description AS last_treatment_description
+FROM 
+    Patient p
+LEFT JOIN 
+    Appointment a ON p.patient_id = a.patient_id AND a.date = (SELECT MAX(date) FROM Appointment WHERE patient_id = p.patient_id)
+LEFT JOIN 
+    Treatment t ON p.patient_id = t.patient_id AND t.date = (SELECT MAX(date) FROM Treatment WHERE patient_id = p.patient_id);

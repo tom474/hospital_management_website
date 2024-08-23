@@ -4,7 +4,7 @@ const { createCollections } = require("./collections");
 const { insertMockData } = require("./mockData");
 
 const mongoUri = "mongodb+srv://admin:admin1234@cluster0.w4wxs.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-const mongoDatabaseName = "isys2099_group9_app";
+const mongoDatabaseName = "HospitalManagementSystem";
 const mongoClient = new MongoClient(mongoUri, {
   serverApi: {
     version: ServerApiVersion.v1,

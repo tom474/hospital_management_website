@@ -1,7 +1,10 @@
 const express = require("express");
-const router = express.Router();
-const jobHistoryController = require("../controllers/jobHistoryController");
+const jobHistoryRouter = express.Router();
+const { getJobHistoriesByStaffId } = require("../controllers/jobHistoryController");
+const assignDatabasePool = require("../middlewares/assignDatabasePool");
 
-router.get("/staff/:id", jobHistoryController.getJobHistoriesByStaffId);
+jobHistoryRouter.use(assignDatabasePool);
 
-module.exports = router;
+jobHistoryRouter.get("/staff/:id", getJobHistoriesByStaffId);
+
+module.exports = jobHistoryRouter;

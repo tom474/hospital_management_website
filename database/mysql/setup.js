@@ -7,44 +7,31 @@ const stdin = readline.createInterface({
   output: process.stdout,
 });
 
-async function promptPassword(user) {
+async function promptUser(promptMessage) {
   return new Promise(resolve => {
-    stdin.question(`Enter MySQL password for "${user}": `, password => {
-      resolve(password);
-    });
-  });
-}
-
-async function promptUser() {
-  return new Promise(resolve => {
-    stdin.question("Enter MySQL root username: ", user => {
-      resolve(user);
+    stdin.question(promptMessage, answer => {
+      resolve(answer);
     });
   });
 }
 
 async function setValidationPolicy(connection) {
   try {
-    await connection.query(`SET GLOBAL validate_password.policy = 0`);
+    await connection.query("SET GLOBAL validate_password.policy = 0");
     console.log("Validation policy set to 0");
   } catch (err) {
-    console.error("Failed to set validation policy: ", err);
+    console.error("Failed to set validation policy:", err);
   }
 }
 
 async function executeSetupScript(connection, scriptPath) {
   try {
-    let script = await fs
-      .readFile(scriptPath, "utf-8")
-      .then(res => {
-        return res.replaceAll("DELIMITER $$", "");
-      })
-      .then(res => {
-        return res.replaceAll("END $$", "END;");
-      })
-      .then(res => {
-        return res.replaceAll("DELIMITER ;", "");
-      });
+    let script = await fs.readFile(scriptPath, "utf-8");
+
+    // Clean up the script for execution
+    script = script.replace(/DELIMITER \$\$/g, "")
+                   .replace(/END \$\$/g, "END;")
+                   .replace(/DELIMITER ;/g, "");
 
     await connection.query(script);
     console.log(`Script executed successfully: ${scriptPath}`);
@@ -55,8 +42,8 @@ async function executeSetupScript(connection, scriptPath) {
 
 (async () => {
   try {
-    const user = await promptUser();
-    const password = await promptPassword(user);
+    const user = await promptUser("Enter MySQL root username: ");
+    const password = await promptUser(`Enter MySQL password for "${user}": `);
 
     const connection = await mysql.createConnection({
       user: user,
@@ -65,15 +52,12 @@ async function executeSetupScript(connection, scriptPath) {
       multipleStatements: true,
     });
 
-    console.log("Connected to MySQL database as id " + connection.threadId);
+    console.log("Connected to MySQL database as ID " + connection.threadId);
 
     // Check if validate_password.policy exists
-    const checkPolicyQuery = "SHOW VARIABLES LIKE 'validate_password.policy'";
-    const [rows] = await connection.query(checkPolicyQuery);
+    const [rows] = await connection.query("SHOW VARIABLES LIKE 'validate_password.policy'");
     if (rows.length === 0) {
-      console.log(
-        "validate_password.policy not found. Skipping policy setting.",
-      );
+      console.log("validate_password.policy not found. Skipping policy setting.");
     } else {
       await setValidationPolicy(connection);
     }
@@ -81,47 +65,31 @@ async function executeSetupScript(connection, scriptPath) {
     // Disable foreign key checks before executing scripts
     await connection.query("SET FOREIGN_KEY_CHECKS = 0");
 
-    // Execute SQL setup scripts
-    let scripts;
-    if (process.argv.length === 2) {
-      scripts = [
-        "reset.sql",
-        "init/tables.sql",
-        "init/indexing.sql",
-        "init/partitions.sql",
-        "init/security.sql",
-        "init/procedures.sql",
-        "init/triggers.sql",
-        "init/views.sql",
-        "init/maintenance.sql"
-      ];
-    } else if (process.argv[2] === "--mock") {
-      scripts = [
-        "reset.sql",
-        "init/tables.sql",
-        "init/indexing.sql",
-        "init/partitions.sql",
-        "init/security.sql",
-        "init/procedures.sql",
-        "init/triggers.sql",
-        "init/views.sql",
-        "init/maintenance.sql",
-        "init/mock_data.sql"
-      ];
-    }
+    // Determine which scripts to run based on command-line arguments
+    const scripts = [
+      "reset.sql",
+      "./init/schema.sql",
+      "./init/indexing.sql",
+      "./init/users.sql",
+      "./init/procedures.sql",
+      "./init/triggers.sql",
+      "./init/views.sql",
+      ...(process.argv.includes("--mock") ? ["./init/mockData.sql"] : [])
+    ];
 
+    // Execute all the setup scripts in sequence
     for (const script of scripts) {
-      await executeSetupScript(connection, `${script}`);
+      await executeSetupScript(connection, script);
     }
 
     // Re-enable foreign key checks after executing scripts
     await connection.query("SET FOREIGN_KEY_CHECKS = 1");
 
     await connection.end(); // Close the connection
-    console.log(`Database initialized!`);
+    console.log("Database initialized successfully!");
   } catch (err) {
-    console.error("Error connecting to MySQL database: " + err.stack);
+    console.error("Error during database setup:", err.stack);
   } finally {
     stdin.close(); // Close the readline interface
   }
-})().then(() => {});
+})();

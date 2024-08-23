@@ -1,16 +1,22 @@
 const express = require("express");
 const staffRouter = express.Router();
-const staffController = require("../controllers/staffController");
+const {
+    getAllStaffs,
+    getStaffById,
+    getStaffAvailableTime,
+    createStaff,
+    updateStaff,
+    addStaffDocument
+} = require("../controllers/staffController");
+const assignDatabasePool = require("../middlewares/assignDatabasePool");
 
-staffRouter.get("/", staffController.getAllStaffs);
-staffRouter.get("/name-asc", staffController.getAllStaffsByNameASC);
-staffRouter.get("/name-desc", staffController.getAllStaffsByNameDESC);
-staffRouter.get("/department/:id", staffController.getAllStaffsByDepartment);
-staffRouter.get("/department/:id/name-asc", staffController.getAllStaffsByDepartmentNameASC);
-staffRouter.get("/department/:id/name-desc", staffController.getAllStaffsByDepartmentNameDESC);
-staffRouter.get("/:id", staffController.getStaffById);
-staffRouter.post("/:id/available-time", staffController.getStaffAvailableTime);
-staffRouter.post("/", staffController.createStaff);
-staffRouter.put("/:id", staffController.updateStaff);
+staffRouter.use(assignDatabasePool);
+
+staffRouter.get("/", getAllStaffs);
+staffRouter.get("/:id", getStaffById);
+staffRouter.post("/availability", getStaffAvailableTime);
+staffRouter.post("/", createStaff);
+staffRouter.put("/:id", updateStaff);
+staffRouter.post("/add-document", addStaffDocument);
 
 module.exports = staffRouter;

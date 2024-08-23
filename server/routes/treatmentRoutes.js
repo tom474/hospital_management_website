@@ -1,12 +1,18 @@
 const express = require("express");
-const database = require("../models/database");
-const treatmentController = require("../controllers/treatmentController");
+const treatmentRouter = express.Router();
+const {
+    getTreatmentByPatientId,
+    getAllTreatmentInDuration,
+    getAllTreatmentByPatientIdInDuration,
+    createTreatment
+} = require("../controllers/treatmentController");
+const assignDatabasePool = require("../middlewares/assignDatabasePool");
 
-const router = express.Router();
+treatmentRouter.use(assignDatabasePool);
 
-router.get("/patient/:id", treatmentController.getTreatmentByPatientId);
-router.get("/date/:date", treatmentController.getTreatmentByDate);
-router.post("/", treatmentController.createTreatment);
-router.post("/patient-date", treatmentController.getTreatmentByPatientIdAndDate);
+treatmentRouter.get("/patient/:id", getTreatmentByPatientId);
+treatmentRouter.get("/date/:date", getAllTreatmentInDuration);
+treatmentRouter.post("/patient-date", getAllTreatmentByPatientIdInDuration);
+treatmentRouter.post("/", createTreatment);
 
-module.exports = router;
+module.exports = treatmentRouter;

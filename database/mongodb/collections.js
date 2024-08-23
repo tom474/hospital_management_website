@@ -2,11 +2,14 @@ const mongoose = require("mongoose");
 const { documentSchema } = require("./schemas");
 
 async function createCollections(db) {
-  const Document = db.model("Document", documentSchema);
+  try {
+    // Initialize the Document model with the schema
+    db.model("Document", documentSchema);
 
-  console.log("Collections created!");
-
-  return { Document };
+    console.log("Collections created successfully!");
+  } catch (error) {
+    console.error("Error creating collections:", error);
+  }
 }
 
 module.exports = { createCollections };

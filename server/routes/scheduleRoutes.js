@@ -1,9 +1,16 @@
 const express = require("express");
-const router = express.Router();
-const scheduleController = require("../controllers/scheduleController");
+const scheduleRouter = express.Router();
+const {
+    getSchedulesByStaffId,
+    addSchedule,
+    updateSchedule
+} = require("../controllers/scheduleController");
+const assignDatabasePool = require("../middlewares/assignDatabasePool");
 
-router.get("/staff/:id", scheduleController.getSchedulesByStaffId);
-router.post("/", scheduleController.addSchedule);
-router.put("/:id", scheduleController.updateSchedule);
+scheduleRouter.use(assignDatabasePool);
 
-module.exports = router;
+scheduleRouter.get("/staff/:id", getSchedulesByStaffId);
+scheduleRouter.post("/", addSchedule);
+scheduleRouter.put("/:id", updateSchedule);
+
+module.exports = scheduleRouter;

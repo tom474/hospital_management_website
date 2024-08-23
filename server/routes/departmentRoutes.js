@@ -1,8 +1,14 @@
 const express = require("express");
 const departmentRouter = express.Router();
-const departmentController = require("../controllers/departmentController");
+const {
+    getAllDepartments,
+    getDepartmentById
+} = require("../controllers/departmentController");
+const assignDatabasePool = require("../middlewares/assignDatabasePool");
 
-departmentRouter.get("/", departmentController.getAllDepartments);
-departmentRouter.get("/:id", departmentController.getDepartmentById);
+departmentRouter.use(assignDatabasePool);
+
+departmentRouter.get("/", getAllDepartments);
+departmentRouter.get("/:id", getDepartmentById);
 
 module.exports = departmentRouter;
