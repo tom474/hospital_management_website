@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "nodemon server.js",
+    "start:mock": "nodemon server.js --mock"
   },
   "author": "",
   "license": "ISC",
@@ -13,9 +14,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "mongodb": "^5.3.0",
+    "mongoose": "^7.8.1",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.0",
-    "mongodb": "^5.3.0",
-    "mongoose": "^7.2.0"
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }
