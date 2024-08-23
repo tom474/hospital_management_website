@@ -1,84 +1,62 @@
 const mysql = require("mysql2/promise");
-require("dotenv").config(); // Load environment variables from .env file
+require("dotenv").config();
 
 class Database {
-    constructor() {
-        if (Database.instance) {
-            return Database.instance;
-        }
-
-        // Initialize database pools
-        this.initDatabase();
-
-        // Set the singleton instance
-        Database.instance = this;
+  constructor() {
+    if (Database.instance) {
+      return Database.instance;
     }
 
-    initDatabase() {
-        try {
-            this.poolAdmin = mysql.createPool({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER_ADMIN,
-                password: process.env.DB_PASS_ADMIN,
-                database: process.env.DB_DATABASE,
-                waitForConnections: true,
-                connectionLimit: 10,
-                queueLimit: 0
-            });
+    this.initDatabase();
 
-            this.poolReceptionist = mysql.createPool({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER_RECEPTIONIST,
-                password: process.env.DB_PASS_RECEPTIONIST,
-                database: process.env.DB_DATABASE,
-                waitForConnections: true,
-                connectionLimit: 10,
-                queueLimit: 0
-            });
+    Database.instance = this;
+  }
 
-            this.poolDoctor = mysql.createPool({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER_DOCTOR,
-                password: process.env.DB_PASS_DOCTOR,
-                database: process.env.DB_DATABASE,
-                waitForConnections: true,
-                connectionLimit: 10,
-                queueLimit: 0
-            });
+  initDatabase() {
+    try {
+      this.poolAdmin = mysql.createPool(this.getDatabaseConfig("DB_USER_ADMIN", "DB_PASS_ADMIN"));
+      this.poolReceptionist = mysql.createPool(this.getDatabaseConfig("DB_USER_RECEPTIONIST", "DB_PASS_RECEPTIONIST"));
+      this.poolDoctor = mysql.createPool(this.getDatabaseConfig("DB_USER_DOCTOR", "DB_PASS_DOCTOR"));
+      this.poolNurse = mysql.createPool(this.getDatabaseConfig("DB_USER_NURSE", "DB_PASS_NURSE"));
 
-            this.poolNurse = mysql.createPool({
-                host: process.env.DB_HOST,
-                user: process.env.DB_USER_NURSE,
-                password: process.env.DB_PASS_NURSE,
-                database: process.env.DB_DATABASE,
-                waitForConnections: true,
-                connectionLimit: 10,
-                queueLimit: 0
-            });
-
-            console.log("Database pools initialized successfully.");
-        } catch (error) {
-            console.error("Error initializing database pools:", error);
-            throw error;
-        }
+      console.log("Database pools initialized successfully.");
+    } catch (error) {
+      console.error("Error initializing database pools:", error);
+      throw error;
     }
+  }
 
-    // Optional: Methods to get a connection from a specific pool
-    getAdminConnection() {
-        return this.poolAdmin.getConnection();
-    }
+  getDatabaseConfig(userEnv, passEnv) {
+    return {
+      host: process.env.DB_HOST,
+      user: process.env[userEnv],
+      password: process.env[passEnv],
+      database: process.env.DB_DATABASE,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0,
+    };
+  }
 
-    getReceptionistConnection() {
-        return this.poolReceptionist.getConnection();
-    }
+  async getConnection(pool) {
+    return pool.getConnection();
+  }
 
-    getDoctorConnection() {
-        return this.poolDoctor.getConnection();
-    }
+  getAdminConnection() {
+    return this.getConnection(this.poolAdmin);
+  }
 
-    getNurseConnection() {
-        return this.poolNurse.getConnection();
-    }
+  getReceptionistConnection() {
+    return this.getConnection(this.poolReceptionist);
+  }
+
+  getDoctorConnection() {
+    return this.getConnection(this.poolDoctor);
+  }
+
+  getNurseConnection() {
+    return this.getConnection(this.poolNurse);
+  }
 }
 
 module.exports = new Database();
