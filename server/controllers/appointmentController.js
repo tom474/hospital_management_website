@@ -1,19 +1,25 @@
-const express = require('express');
-const database = require('../models/database');
 const mongoose = require('mongoose');
 const { documentSchema } = require('../../database/mongodb/schemas');
+const database = require('../models/database');
 
 // Initialize the Document model in MongoDB
 const Document = mongoose.model('Document', documentSchema);
+
+// Helper function to get a connection from the admin pool
+async function getAdminConnection() {
+    return await database.getAdminConnection();
+}
 
 // Get all appointments for a specific patient
 const getPatientAppointments = async (req, res) => {
     try {
         const patient_id = req.params.id;
-        const [rows] = await req.db.query("CALL getAllAppointmentsByPatientId(?)", [patient_id]);
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query("CALL getAllAppointmentsByPatientId(?)", [patient_id]);
+        connection.release();
         res.json(rows[0]);
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json({ error: err.message });
     }
 };
 
@@ -21,10 +27,12 @@ const getPatientAppointments = async (req, res) => {
 const getAppointmentById = async (req, res) => {
     try {
         const appointment_id = req.params.id;
-        const [rows] = await req.db.query("CALL getAppointmentByAppointmentId(?)", [appointment_id]);
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query("CALL getAppointmentByAppointmentId(?)", [appointment_id]);
+        connection.release();
         res.json(rows[0]);
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json({ error: err.message });
     }
 };
 
@@ -33,10 +41,12 @@ const getStaffAppointments = async (req, res) => {
     try {
         const staff_id = req.params.id;
         const { date, start_time, end_time } = req.body;
-        const [rows] = await req.db.query("CALL getAllAppointmentsByStaffId(?, ?, ?, ?)", [staff_id, date, start_time, end_time]);
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query("CALL getAllAppointmentsByStaffId(?, ?, ?, ?)", [staff_id, date, start_time, end_time]);
+        connection.release();
         res.json(rows[0]);
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json({ error: err.message });
     }
 };
 
@@ -44,10 +54,12 @@ const getStaffAppointments = async (req, res) => {
 const getAppointmentsInDuration = async (req, res) => {
     try {
         const { date, start_time, end_time, mode } = req.body;
-        const [rows] = await req.db.query("CALL getAllAppointmentsInDuration(?, ?, ?, ?)", [date, start_time, end_time, mode]);
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query("CALL getAllAppointmentsInDuration(?, ?, ?, ?)", [date, start_time, end_time, mode]);
+        connection.release();
         res.json(rows[0]);
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json({ error: err.message });
     }
 };
 
@@ -55,10 +67,12 @@ const getAppointmentsInDuration = async (req, res) => {
 const createAppointment = async (req, res) => {
     try {
         const { staff_id, patient_id, date, start_time, end_time, purpose } = req.body;
-        const [rows] = await req.db.query("CALL createAppointment(?, ?, ?, ?, ?, ?)", [staff_id, patient_id, date, start_time, end_time, purpose]);
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query("CALL createAppointment(?, ?, ?, ?, ?, ?)", [staff_id, patient_id, date, start_time, end_time, purpose]);
+        connection.release();
         res.json({ message: "Appointment created successfully", appointment: rows[0] });
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json({ error: err.message });
     }
 };
 
@@ -66,10 +80,12 @@ const createAppointment = async (req, res) => {
 const cancelAppointment = async (req, res) => {
     try {
         const appointment_id = req.params.id;
-        const [rows] = await req.db.query("CALL cancelAppointment(?)", [appointment_id]);
+        const connection = await getAdminConnection();
+        const [rows] = await connection.query("CALL cancelAppointment(?)", [appointment_id]);
+        connection.release();
         res.json({ message: "Appointment cancelled successfully", result: rows[0] });
     } catch (err) {
-        res.status(400).json(err);
+        res.status(400).json({ error: err.message });
     }
 };
 
@@ -96,15 +112,18 @@ const addNoteToAppointment = async (req, res) => {
             documentType: note_type,
             documentId: new mongoose.Types.ObjectId().toString(), // Generate a unique ID for document reference
             description: 'Appointment note',
+            content: documentContent
         });
 
         await newDocument.save({ session });
 
         // Save the reference in MySQL
-        const [result] = await req.db.query(
+        const connection = await getAdminConnection();
+        const [result] = await connection.query(
             "CALL createDocumentReference(?, ?, ?, ?, ?)",
             ['Appointment', appointment_id, note_type, newDocument.documentId, 'Appointment note']
         );
+        connection.release();
 
         await session.commitTransaction();
         session.endSession();
@@ -124,5 +143,5 @@ module.exports = {
     getAppointmentsInDuration,
     createAppointment,
     cancelAppointment,
-    addNoteToAppointment // Export the new function
+    addNoteToAppointment
 };
