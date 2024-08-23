@@ -1,21 +1,28 @@
 const express = require("express");
 const patientRouter = express.Router();
-const patientController = require("../controllers/patientController");
-const assignDatabasePool = require("../middleware/assignDatabasePool");
+const {
+    getAllPatients,
+    getPatientById,
+    getPatientByName,
+    searchPatientsById,
+    searchPatientsByName,
+    createPatient,
+    updatePatient,
+    deletePatient,
+    addPatientDocument
+} = require("../controllers/patientController");
+const assignDatabasePool = require("../middlewares/assignDatabasePool");
 
-// Apply the role-based database pool assignment middleware
 patientRouter.use(assignDatabasePool);
 
-patientRouter.get("/", patientController.getAllPatients);
-patientRouter.get("/id/:id", patientController.getPatientById);
-patientRouter.get("/name/:name", patientController.getPatientByName);
-patientRouter.get("/search/id/:id", patientController.searchPatientsById);
-patientRouter.get("/search/name/:name", patientController.searchPatientsByName);
-patientRouter.post("/", patientController.createPatient);
-patientRouter.put("/:id", patientController.updatePatient);
-patientRouter.delete("/:id", patientController.deletePatient);
-
-// New route to add patient documents
-patientRouter.post("/add-document", patientController.addPatientDocument);
+patientRouter.get("/", getAllPatients);
+patientRouter.get("/id/:id", getPatientById);
+patientRouter.get("/name/:name", getPatientByName);
+patientRouter.get("/search/id/:id", searchPatientsById);
+patientRouter.get("/search/name/:name", searchPatientsByName);
+patientRouter.post("/", createPatient);
+patientRouter.put("/:id", updatePatient);
+patientRouter.delete("/:id", deletePatient);
+patientRouter.post("/add-document", addPatientDocument);
 
 module.exports = patientRouter;

@@ -1,12 +1,14 @@
 const express = require("express");
 const departmentRouter = express.Router();
-const departmentController = require("../controllers/departmentController");
-const assignDatabasePool = require("../middleware/assignDatabasePool");
+const {
+    getAllDepartments,
+    getDepartmentById
+} = require("../controllers/departmentController");
+const assignDatabasePool = require("../middlewares/assignDatabasePool");
 
-// Apply the role-based database pool assignment middleware
 departmentRouter.use(assignDatabasePool);
 
-departmentRouter.get("/", departmentController.getAllDepartments);
-departmentRouter.get("/:id", departmentController.getDepartmentById);
+departmentRouter.get("/", getAllDepartments);
+departmentRouter.get("/:id", getDepartmentById);
 
 module.exports = departmentRouter;

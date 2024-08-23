@@ -1,15 +1,18 @@
 const express = require("express");
-const treatmentController = require("../controllers/treatmentController");
-const assignDatabasePool = require("../middleware/assignDatabasePool");
+const treatmentRouter = express.Router();
+const {
+    getTreatmentByPatientId,
+    getAllTreatmentInDuration,
+    getAllTreatmentByPatientIdInDuration,
+    createTreatment
+} = require("../controllers/treatmentController");
+const assignDatabasePool = require("../middlewares/assignDatabasePool");
 
-const router = express.Router();
+treatmentRouter.use(assignDatabasePool);
 
-// Apply the role-based database pool assignment middleware
-router.use(assignDatabasePool);
+treatmentRouter.get("/patient/:id", getTreatmentByPatientId);
+treatmentRouter.get("/date/:date", getAllTreatmentInDuration);
+treatmentRouter.post("/patient-date", getAllTreatmentByPatientIdInDuration);
+treatmentRouter.post("/", createTreatment);
 
-router.get("/patient/:id", treatmentController.getTreatmentByPatientId);
-router.get("/date/:date", treatmentController.getAllTreatmentInDuration);
-router.post("/patient-date", treatmentController.getAllTreatmentByPatientIdInDuration);
-router.post("/", treatmentController.createTreatment);
-
-module.exports = router;
+module.exports = treatmentRouter;
