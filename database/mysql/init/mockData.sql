@@ -99,19 +99,6 @@ INSERT INTO Treatment (patient_id, staff_id, date, description) VALUES
     (9, 2, '2023-08-23', 'Neurology follow-up; patient reports reduced frequency of migraines.'),
     (10, 7, '2023-08-24', 'Oncology follow-up; continuing treatment plan.');
 
--- Insert mock data into the DocumentReference table
-INSERT INTO DocumentReference (entity_type, entity_id, document_type, document_id, description) VALUES
-    ('Patient', 1, 'Doctor Note', 'doc_001', 'Routine checkup note.'),
-    ('Patient', 2, 'Lab Result', 'doc_002', 'MRI results showing no abnormalities.'),
-    ('Appointment', 3, 'Doctor Note', 'doc_003', 'Follow-up visit note.'),
-    ('Staff', 4, 'Certificate', 'doc_004', 'Pediatric Advanced Life Support certification.'),
-    ('Patient', 5, 'Diagnostic Image', 'doc_005', 'ECG image.'),
-    ('Patient', 6, 'Oncology Report', 'doc_006', 'Chemotherapy progress report.'),
-    ('Appointment', 7, 'Radiology Report', 'doc_007', 'Chest X-ray report.'),
-    ('Staff', 2, 'Certification', 'doc_008', 'Neurology Specialist Certification.'),
-    ('Appointment', 8, 'Doctor Note', 'doc_009', 'Cardiology follow-up note.'),
-    ('Patient', 10, 'Oncology Report', 'doc_010', 'Follow-up treatment plan.');
-
 -- Re-enable triggers after data insertion
 SET @DISABLE_TRIGGERS = FALSE;
 

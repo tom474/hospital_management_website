@@ -1,5 +1,3 @@
-const { MongoClient } = require("mongodb");
-const { v4: uuidv4 } = require("uuid");
 const database = require("../models/database");
 
 // Get all staffs with optional sorting order and department filter
@@ -64,53 +62,10 @@ const getStaffAvailableTime = async (req, res) => {
     }
 };
 
-// Add a staff document (e.g., certificates, training materials)
-const addStaffDocument = async (req, res) => {
-    const mongoClient = new MongoClient(process.env.MONGO_URI);
-
-    try {
-        const { staff_id, document_type, description, document_content } = req.body;
-
-        // Connect to MongoDB
-        await mongoClient.connect();
-        const db = mongoClient.db(process.env.MONGO_DATABASE_NAME);
-        const Document = db.collection('Documents');
-
-        // Generate a unique document ID
-        const documentId = uuidv4();
-
-        // Insert the document into MongoDB
-        const document = {
-            entityType: "Staff",
-            entityId: staff_id,
-            documentType: document_type,
-            documentId: documentId,
-            description: description,
-            content: document_content
-        };
-        await Document.insertOne(document);
-
-        // Insert the reference into MySQL
-        const [rows] = await database.poolAdmin.query(
-            "CALL createDocumentReference(?, ?, ?, ?, ?)",
-            ['Staff', staff_id, document_type, documentId, description]
-        );
-
-        // Close MongoDB connection
-        await mongoClient.close();
-
-        res.json({ message: "Document added successfully", document: rows[0] });
-    } catch (err) {
-        await mongoClient.close();
-        res.status(400).json({ error: err.message });
-    }
-};
-
 module.exports = {
     getAllStaffs,
     getStaffById,
     getStaffAvailableTime,
     createStaff,
     updateStaff,
-    addStaffDocument,
 };
