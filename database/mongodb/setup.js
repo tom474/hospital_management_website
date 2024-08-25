@@ -22,4 +22,4 @@ const connectMongoDB = async () => {
 
 connectMongoDB();
 
-exports.connectMongoDB = connectMongoDB;
+module.exports = connectMongoDB;

@@ -7,7 +7,7 @@ const getAllTreatments = async (req, res) => {
 		const { start_date, end_date } = req.query;
 
 		if (start_date && end_date) {
-			// Get the patient_id, staff_id, date, and description from MySQL
+			// Get the treatment_id, patient_id, staff_id, date, and description from MySQL
 			const [rows] = await database.poolAdmin.query("CALL getAllTreatmentsInDuration(?, ?)", [
 				start_date,
 				end_date,
@@ -25,7 +25,7 @@ const getAllTreatments = async (req, res) => {
 			}
 			res.json(rows[0]);
 		} else {
-			// Get the patient_id, staff_id, date, and description from MySQL
+			// Get the treatment_id, patient_id, staff_id, date, and description from MySQL
 			const [rows] = await database.poolAdmin.query("CALL getAllTreatments()");
 
 			// Get the diagnoseImage and labResults from MongoDB
@@ -52,7 +52,7 @@ const getTreatmentsByPatientId = async (req, res) => {
 		const { start_date, end_date } = req.query;
 
 		if (start_date && end_date) {
-			// Get the patient_id, staff_id, date, and description from MySQL
+			// Get the treatment_id, patient_id, staff_id, date, and description from MySQL
 			const [rows] = await database.poolAdmin.query("CALL getTreatmentsByPatientIdInDuration(?, ?, ?)", [
 				patient_id,
 				start_date,
@@ -71,7 +71,7 @@ const getTreatmentsByPatientId = async (req, res) => {
 			}
 			res.json(rows[0]);
 		} else {
-			// Get the patient_id, staff_id, date, and description from MySQL
+			// Get the treatment_id, patient_id, staff_id, date, and description from MySQL
 			const [rows] = await database.poolAdmin.query("CALL getTreatmentsByPatientId(?)", [patient_id]);
 
 			// Get the diagnoseImage and labResults from MongoDB
@@ -104,9 +104,15 @@ const createTreatment = async (req, res) => {
 			description,
 		]);
 
+		// Get all the treatments from MySQL
+		const [allRows] = await database.poolAdmin.query("CALL getAllTreatments()");
+
+		// Get the treatment_id of the newly created treatment
+		const treatment_id = allRows[0][allRows[0].length - 1].treatment_id;
+
 		// Save the diagnoseImage and labResults to MongoDB
 		const newTreatment = new treatmentDocument({
-			treatmentId: rows[0][0].treatment_id,
+			treatmentId: treatment_id,
 			diagnoseImage: {
 				data: diagnoseImage,
 				contentType: "base64",
