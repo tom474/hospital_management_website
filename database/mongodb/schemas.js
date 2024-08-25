@@ -1,13 +1,38 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
 
-// Define the schema for documents linked to various entities
-const documentSchema = new Schema({
-  entityType: { type: String, enum: ["Patient", "Staff", "Appointment"], required: true },
-  entityId: { type: String, required: true }, // Reference to the MySQL entity ID
-  documentType: { type: String, required: true },
-  documentId: { type: String, required: true }, // Could be an S3 URL, GridFS ID, etc.
-  description: { type: String },
+// Define the schema for staff's documents
+const staffSchema = new mongoose.Schema({
+	staffId: { type: String, required: true },
+	certificate: {
+		data: { type: String, required: true },
+		contentType: { type: String, default: "base64" },
+	},
 });
 
-module.exports = { documentSchema };
+// Define the schema for appointments' documents
+const appointmentSchema = new mongoose.Schema({
+	appointmentId: { type: String, required: true },
+	notes: {
+		data: { type: String, required: true },
+		contentType: { type: String, default: "text" },
+	},
+});
+
+// Define the schema for treatments' documents
+const treatmentSchema = new mongoose.Schema({
+	treatmentId: { type: String, required: true },
+	diagnoseImage: {
+		data: { type: String, required: true },
+		contentType: { type: String, default: "base64" },
+	},
+	labResults: {
+		data: { type: String, required: true },
+		contentType: { type: String, default: "base64" },
+	},
+});
+
+const staffDocument = mongoose.model("StaffDocument", staffSchema);
+const appointmentDocument = mongoose.model("AppointmentDocument", appointmentSchema);
+const treatmentDocument = mongoose.model("TreatmentDocument", treatmentSchema);
+
+module.exports = { staffDocument, appointmentDocument, treatmentDocument };

@@ -34,7 +34,3 @@ CREATE INDEX idx_appointment_date ON Appointment (date);
 CREATE INDEX idx_treatment_patient_id ON Treatment (patient_id);
 CREATE INDEX idx_treatment_staff_id ON Treatment (staff_id);
 CREATE INDEX idx_treatment_date ON Treatment (date);
-
--- DocumentReference Table Indexes
-CREATE INDEX idx_docref_entity ON DocumentReference (entity_type, entity_id);
-CREATE INDEX idx_docref_document_type ON DocumentReference (document_type);

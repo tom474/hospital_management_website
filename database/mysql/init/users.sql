@@ -100,7 +100,6 @@ GRANT SELECT, INSERT, UPDATE ON Patient_noid TO doctor_role; -- Access patient p
 GRANT SELECT, INSERT, UPDATE ON Treatment_noid TO doctor_role; -- Add and update patient treatments
 GRANT SELECT, INSERT, UPDATE, DELETE ON Appointment_noid TO doctor_role; -- Manage appointments, add notes
 GRANT SELECT ON Staff TO doctor_role; -- View staff schedules
-GRANT SELECT, INSERT, UPDATE ON DocumentReference TO doctor_role; -- Access and manage unstructured data
 
 -- 
 -- Nurse User Privileges
@@ -124,7 +123,6 @@ GRANT SELECT ON Patient_noid TO nurse_role; -- View patient profiles and treatme
 GRANT INSERT, UPDATE ON Treatment_noid TO nurse_role; -- Assist in updating patient treatments
 GRANT SELECT, INSERT, UPDATE ON Appointment_noid TO nurse_role; -- Assist in managing patient appointments and add notes
 GRANT SELECT ON Staff TO nurse_role; -- View staff schedules
-GRANT SELECT, INSERT, UPDATE ON DocumentReference TO nurse_role; -- Manage nursing-related unstructured data
 
 -- 
 -- Receptionist User Privileges

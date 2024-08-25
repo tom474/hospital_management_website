@@ -6,8 +6,8 @@ const {
     updateSchedule
 } = require("../controllers/scheduleController");
 
-scheduleRouter.get("/staff/:id", getSchedulesByStaffId);
+scheduleRouter.get("/:id", getSchedulesByStaffId);
 scheduleRouter.post("/", addSchedule);
-scheduleRouter.put("/:id", updateSchedule);
+scheduleRouter.put("/", updateSchedule);
 
 module.exports = scheduleRouter;

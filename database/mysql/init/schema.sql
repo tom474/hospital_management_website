@@ -69,20 +69,11 @@ CREATE TABLE IF NOT EXISTS Treatment (
     patient_id INT NOT NULL,
     staff_id INT NOT NULL,
     date DATE NOT NULL,
-    description TEXT NOT NULL
+    description VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
 
-CREATE TABLE IF NOT EXISTS DocumentReference (
-    doc_ref_id INT AUTO_INCREMENT PRIMARY KEY,
-    entity_type ENUM('Patient', 'Staff', 'Appointment') NOT NULL,
-    entity_id INT NOT NULL,
-    document_type VARCHAR(50) NOT NULL,
-    document_id VARCHAR(255) NOT NULL,
-    description TEXT
-) ENGINE=InnoDB;
 
 -- Add foreign keys after table creation
-
 ALTER TABLE Staff
 ADD CONSTRAINT fk_staff_manager
 FOREIGN KEY (manager_id) REFERENCES Staff(staff_id) ON DELETE SET NULL,
@@ -112,9 +103,3 @@ ADD CONSTRAINT fk_treatment_patient
 FOREIGN KEY (patient_id) REFERENCES Patient(patient_id) ON DELETE CASCADE,
 ADD CONSTRAINT fk_treatment_staff
 FOREIGN KEY (staff_id) REFERENCES Staff(staff_id) ON DELETE CASCADE;
-
-ALTER TABLE DocumentReference
-ADD CONSTRAINT fk_docref_entity_patient
-FOREIGN KEY (entity_id) REFERENCES Patient(patient_id) ON DELETE CASCADE;
-
--- Note: Foreign key constraints for other entity types in DocumentReference table can be handled similarly based on your data model.

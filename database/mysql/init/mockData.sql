@@ -42,23 +42,23 @@ UPDATE Department SET manager_id = 8 WHERE department_id = 8;
 INSERT INTO JobHistory (staff_id, change_date, previous_job, new_job, previous_salary, new_salary, previous_dept_id, new_dept_id) VALUES
     (1, '2022-01-01', 'Resident Doctor', 'Doctor', 90000.00, 120000.00, NULL, 1),
     (2, '2021-06-15', 'Assistant Doctor', 'Doctor', 80000.00, 115000.00, NULL, 2),
-    (3, '2023-03-10', 'Nurse', 'Head Nurse', 85000.00, 90000.00, NULL, 1),
+    (3, '2024-03-10', 'Nurse', 'Head Nurse', 85000.00, 90000.00, NULL, 1),
     (6, '2020-09-01', 'Pediatrician', 'Chief Pediatrician', 110000.00, 130000.00, 3, 3),
     (7, '2022-02-20', 'Oncologist', 'Chief Oncologist', 115000.00, 125000.00, 7, 7),
     (8, '2021-11-01', 'Radiologist', 'Chief Radiologist', 105000.00, 110000.00, 8, 8);
 
 -- Insert mock data into the Schedule table
 INSERT INTO Schedule (staff_id, start_time, end_time, date) VALUES
-    (1, '08:00:00', '16:00:00', '2023-08-14'),
-    (1, '08:00:00', '16:00:00', '2023-08-16'),
-    (2, '10:00:00', '18:00:00', '2023-08-15'),
-    (3, '08:00:00', '14:00:00', '2023-08-18'),
-    (4, '09:00:00', '17:00:00', '2023-08-14'),
-    (6, '07:00:00', '15:00:00', '2023-08-17'),
-    (7, '09:00:00', '17:00:00', '2023-08-14'),
-    (8, '09:00:00', '17:00:00', '2023-08-16'),
-    (9, '08:00:00', '16:00:00', '2023-08-18'),
-    (10, '10:00:00', '18:00:00', '2023-08-15');
+    (1, '08:00:00', '16:00:00', '2024-08-10'),
+    (1, '08:00:00', '16:00:00', '2024-08-16'),
+    (2, '10:00:00', '18:00:00', '2024-08-15'),
+    (3, '08:00:00', '14:00:00', '2024-08-18'),
+    (4, '09:00:00', '17:00:00', '2024-08-14'),
+    (6, '07:00:00', '15:00:00', '2024-08-17'),
+    (7, '09:00:00', '17:00:00', '2024-08-14'),
+    (8, '09:00:00', '17:00:00', '2024-08-16'),
+    (9, '08:00:00', '16:00:00', '2024-08-18'),
+    (10, '10:00:00', '18:00:00', '2024-08-15');
 
 -- Insert mock data into the Patient table
 INSERT INTO Patient (first_name, last_name, birth_date, address, phone, email, allergies) VALUES
@@ -75,42 +75,29 @@ INSERT INTO Patient (first_name, last_name, birth_date, address, phone, email, a
 
 -- Insert mock data into the Appointment table
 INSERT INTO Appointment (patient_id, staff_id, date, start_time, end_time, purpose, status) VALUES
-    (1, 1, '2023-08-10', '09:00:00', '09:30:00', 'Routine Checkup', 'Completed'),
-    (2, 2, '2023-08-12', '11:00:00', '11:45:00', 'Neurology Consultation', 'Completed'),
-    (3, 3, '2023-08-15', '14:00:00', '14:30:00', 'Follow-up Visit', 'Scheduled'),
-    (4, 6, '2023-08-20', '10:00:00', '10:30:00', 'Pediatric Checkup', 'Scheduled'),
-    (5, 1, '2023-08-25', '13:00:00', '13:30:00', 'Cardiology Consultation', 'Cancelled'),
-    (6, 7, '2023-08-15', '15:00:00', '15:30:00', 'Oncology Consultation', 'Completed'),
-    (7, 8, '2023-08-18', '10:00:00', '10:45:00', 'Radiology Scan', 'Scheduled'),
-    (8, 1, '2023-08-22', '14:00:00', '14:45:00', 'Cardiology Follow-up', 'Scheduled'),
-    (9, 2, '2023-08-23', '11:00:00', '11:30:00', 'Neurology Follow-up', 'Scheduled'),
-    (10, 7, '2023-08-24', '09:00:00', '09:30:00', 'Oncology Follow-up', 'Scheduled');
+    (1, 1, '2024-08-10', '09:00:00', '09:30:00', 'Routine Checkup', 'Completed'),
+    (2, 2, '2024-08-12', '11:00:00', '11:45:00', 'Neurology Consultation', 'Completed'),
+    (3, 3, '2024-08-15', '14:00:00', '14:30:00', 'Follow-up Visit', 'Scheduled'),
+    (4, 6, '2024-08-20', '10:00:00', '10:30:00', 'Pediatric Checkup', 'Scheduled'),
+    (5, 1, '2024-08-25', '13:00:00', '13:30:00', 'Cardiology Consultation', 'Cancelled'),
+    (6, 7, '2024-08-15', '15:00:00', '15:30:00', 'Oncology Consultation', 'Completed'),
+    (7, 8, '2024-08-18', '10:00:00', '10:45:00', 'Radiology Scan', 'Scheduled'),
+    (8, 1, '2024-08-22', '14:00:00', '14:45:00', 'Cardiology Follow-up', 'Scheduled'),
+    (9, 2, '2024-08-23', '11:00:00', '11:30:00', 'Neurology Follow-up', 'Scheduled'),
+    (10, 7, '2024-08-24', '09:00:00', '09:30:00', 'Oncology Follow-up', 'Scheduled');
 
 -- Insert mock data into the Treatment table
 INSERT INTO Treatment (patient_id, staff_id, date, description) VALUES
-    (1, 1, '2023-08-10', 'Routine checkup; all vital signs normal.'),
-    (2, 2, '2023-08-12', 'Neurology consultation; patient reports migraines. MRI recommended.'),
-    (3, 3, '2023-08-15', 'Follow-up visit; healing well after surgery.'),
-    (4, 6, '2023-08-20', 'Pediatric checkup; patient in good health, vaccinations updated.'),
-    (5, 1, '2023-08-25', 'Cardiology consultation; ECG showed normal results.'),
-    (6, 7, '2023-08-15', 'Oncology consultation; reviewing chemotherapy progress.'),
-    (7, 8, '2023-08-18', 'Radiology scan; chest X-ray, no abnormalities found.'),
-    (8, 1, '2023-08-22', 'Cardiology follow-up; slight improvement in blood pressure.'),
-    (9, 2, '2023-08-23', 'Neurology follow-up; patient reports reduced frequency of migraines.'),
-    (10, 7, '2023-08-24', 'Oncology follow-up; continuing treatment plan.');
-
--- Insert mock data into the DocumentReference table
-INSERT INTO DocumentReference (entity_type, entity_id, document_type, document_id, description) VALUES
-    ('Patient', 1, 'Doctor Note', 'doc_001', 'Routine checkup note.'),
-    ('Patient', 2, 'Lab Result', 'doc_002', 'MRI results showing no abnormalities.'),
-    ('Appointment', 3, 'Doctor Note', 'doc_003', 'Follow-up visit note.'),
-    ('Staff', 4, 'Certificate', 'doc_004', 'Pediatric Advanced Life Support certification.'),
-    ('Patient', 5, 'Diagnostic Image', 'doc_005', 'ECG image.'),
-    ('Patient', 6, 'Oncology Report', 'doc_006', 'Chemotherapy progress report.'),
-    ('Appointment', 7, 'Radiology Report', 'doc_007', 'Chest X-ray report.'),
-    ('Staff', 2, 'Certification', 'doc_008', 'Neurology Specialist Certification.'),
-    ('Appointment', 8, 'Doctor Note', 'doc_009', 'Cardiology follow-up note.'),
-    ('Patient', 10, 'Oncology Report', 'doc_010', 'Follow-up treatment plan.');
+    (1, 1, '2024-08-10', 'Routine checkup; all vital signs normal.'),
+    (2, 2, '2024-08-12', 'Neurology consultation; patient reports migraines. MRI recommended.'),
+    (3, 3, '2024-08-15', 'Follow-up visit; healing well after surgery.'),
+    (4, 6, '2024-08-20', 'Pediatric checkup; patient in good health, vaccinations updated.'),
+    (5, 1, '2024-08-25', 'Cardiology consultation; ECG showed normal results.'),
+    (6, 7, '2024-08-15', 'Oncology consultation; reviewing chemotherapy progress.'),
+    (7, 8, '2024-08-18', 'Radiology scan; chest X-ray, no abnormalities found.'),
+    (8, 1, '2024-08-22', 'Cardiology follow-up; slight improvement in blood pressure.'),
+    (9, 2, '2024-08-23', 'Neurology follow-up; patient reports reduced frequency of migraines.'),
+    (10, 7, '2024-08-24', 'Oncology follow-up; continuing treatment plan.');
 
 -- Re-enable triggers after data insertion
 SET @DISABLE_TRIGGERS = FALSE;

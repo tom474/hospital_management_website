@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const connectMongoDB = require("../database/mongodb/setup");
 
 const patientRouter = require("./routes/patientRoutes");
 const staffRouter = require("./routes/staffRoutes");
@@ -13,6 +14,7 @@ const appointmentRouter = require("./routes/appointmentRoutes");
 
 const app = express();
 const port = 4000;
+connectMongoDB();
 
 // Middleware setup
 app.use(cors());
@@ -30,10 +32,10 @@ app.use("/appointment", appointmentRouter);
 
 // Health check route
 app.get("/", (req, res) => {
-  res.json({ message: "The server is running!" });
+	res.json({ message: "The server is running!" });
 });
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}/`);
+	console.log(`Server running on http://localhost:${port}/`);
 });
