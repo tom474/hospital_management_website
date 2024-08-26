@@ -92,7 +92,6 @@ export default function TreatmentModal({ patient }) {
 								Doctor:
 							</label>
 							<Select
-								defaultInputValue="Select a doctor..."
 								value={treatment.doctor}
 								name="doctor"
 								onChange={(selectedOption) =>
@@ -223,7 +222,7 @@ export default function TreatmentModal({ patient }) {
 							}}
 							className="w-6/12 btn btn-outline btn-error text-white"
 						>
-							cancel
+							Cancel
 						</button>
 					</div>
 				</form>

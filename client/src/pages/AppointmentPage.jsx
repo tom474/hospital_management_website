@@ -1,29 +1,20 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import DurationModal from "../components/appointment/main/DurationModal";
 import AppointmentTable from "../components/appointment/main/AppointmentTable";
 
 export default function AppointmentPage() {
 	const [duration, setDuration] = useState({
-		date: "",
-		startTime: "",
-		endTime: ""
+		startDate: "",
+		endDate: ""
 	});
 
 	const [mode, setMode] = useState(true);
 
 	const checkDuration = (duration) => {
-		if (
-			duration &&
-			duration.date &&
-			duration.startTime &&
-			duration.endTime
-		) {
+		if (duration && duration.startDate && duration.endDate) {
 			setDuration({
-				date: duration.date,
-				startTime: duration.startTime,
-				endTime: duration.endTime
+				startDate: duration.startDate,
+				endDate: duration.endDate
 			});
 		} else {
 			document.getElementById("duration_modal").showModal();
@@ -47,20 +38,41 @@ export default function AppointmentPage() {
 			<h1 className="mt-5 text-center w-full text-blue-400 text-5xl font-bold">
 				Appointment Management
 			</h1>
-			<div className="flex justify-between">
-				<div className="p-2 flex items-center w-3/12 bg-blue-400 rounded text-white font-semibold text-lg">
-					<p>
-						{duration.date} {"("} {duration.startTime} -{" "}
-						{duration.endTime} {")"}
-					</p>
+
+			<div className="flex justify-between mt-2">
+				<div className="flex gap-1">
+					<div
+						onClick={() => setMode(true)}
+						className={`p-2 rounded bg-blue-400 text-white hover:bg-blue-300 cursor-pointer ${
+							mode && "bg-blue-900"
+						}`}
+					>
+						<p>Available</p>
+					</div>
+
+					<div
+						onClick={() => setMode(false)}
+						className={`p-2 rounded bg-blue-400 text-white hover:bg-blue-300 cursor-pointer ${
+							!mode && "bg-blue-900"
+						}`}
+					>
+						<p>Busy</p>
+					</div>
 				</div>
 
-				<div className="flex justify-center items-center">
+				<div className="flex gap-1">
+					<div className="p-2 flex items-center bg-blue-400 rounded text-white font-semibold text-lg">
+						<p>
+							{duration.startDate} {"-> "} {duration.endDate}
+						</p>
+					</div>
+
 					{duration && (
 						<DurationModal
 							key={"appointment_page"}
 							duration={duration}
 							onUpdate={handleUpdateDuration}
+							type="duration"
 						/>
 					)}
 
@@ -70,33 +82,10 @@ export default function AppointmentPage() {
 								.getElementById("duration_modal")
 								.showModal();
 						}}
-						className="py-2 px-3 h-fit w-36 text-center bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300 cursor-pointer"
+						className="px-2 flex justify-center items-center bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300 cursor-pointer"
 					>
-						<span>
-							<FontAwesomeIcon icon={faPlus} />
-						</span>{" "}
 						Edit Duration
 					</div>
-				</div>
-			</div>
-
-			<div className="flex gap-1">
-				<div
-					onClick={() => setMode(true)}
-					className={`p-2 rounded bg-blue-400 text-white hover:bg-blue-300 cursor-pointer ${
-						mode && "bg-blue-900"
-					}`}
-				>
-					<p>Available</p>
-				</div>
-
-				<div
-					onClick={() => setMode(false)}
-					className={`p-2 rounded bg-blue-400 text-white hover:bg-blue-300 cursor-pointer ${
-						!mode && "bg-blue-900"
-					}`}
-				>
-					<p>Busy</p>
 				</div>
 			</div>
 
