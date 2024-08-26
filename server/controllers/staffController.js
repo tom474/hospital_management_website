@@ -4,10 +4,10 @@ const staffDocument = require("../../database/mongodb/schemas").staffDocument;
 // Get all staffs with optional sorting order and department filter
 const getAllStaffs = async (req, res) => {
 	try {
-		const { order = "DEFAULT", department_id = null } = req.query;
+		const { order = "DEFAULT", department_id = null, job_type = null } = req.query;
 
-		// Get staff_id, first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id from MySQL
-		const [rows] = await database.poolAdmin.query("CALL getAllStaffs(?, ?)", [order, department_id]);
+		// Get staff data from MySQL
+		const [rows] = await database.poolAdmin.query("CALL getAllStaffs(?, ?, ?)", [order, department_id, job_type]);
 
 		// Get the certificate from MongoDB
 		for (let i = 0; i < rows[0].length; i++) {
