@@ -1,6 +1,30 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 import { formatSalary } from "../../../utils/common";
+import Select from "react-select";
+
+const dummyDoctors = [
+	{ id: 1, name: "Dr. John Smith" },
+	{ id: 2, name: "Dr. Emily Johnson" },
+	{ id: 3, name: "Dr. Michael Brown" },
+	{ id: 4, name: "Dr. Sarah Davis" },
+	{ id: 5, name: "Dr. David Wilson" },
+	{ id: 6, name: "Dr. Sarah Davis" },
+	{ id: 7, name: "Dr. David Wilson" },
+	{ id: 8, name: "Dr. Sarah Davis" },
+	{ id: 9, name: "Dr. David Wilson" },
+	{ id: 10, name: "Dr. Sarah Davis" },
+	{ id: 11, name: "Dr. David Wilson" },
+	{ id: 12, name: "Dr. Sarah Davis" },
+	{ id: 13, name: "Dr. David Wilson" },
+	{ id: 14, name: "Dr. Sarah Davis" },
+	{ id: 15, name: "Dr. David Wilson" },
+	{ id: 16, name: "Dr. Sarah Davis" },
+	{ id: 17, name: "Dr. David Wilson" },
+	{ id: 18, name: "Dr. Sarah Davis" },
+	{ id: 19, name: "Dr. David Wilson" },
+	{ id: 20, name: "Dr. Sarah Davis" }
+];
 
 export default function StaffInformation({ staff }) {
 	const [staffUpdate, setStaffUpdate] = useState(staff);
@@ -23,6 +47,15 @@ export default function StaffInformation({ staff }) {
 		setIsUpdate(false);
 	};
 
+	const options = dummyDoctors.map((doctor) => ({
+		value: {
+			id: doctor.id,
+			name: doctor.name
+		},
+		label: doctor.name
+	}));
+
+	console.log(staffUpdate);
 	const role = localStorage.getItem("role");
 
 	return (
@@ -122,7 +155,7 @@ export default function StaffInformation({ staff }) {
 						</label>
 						{isUpdate ? (
 							<label className="input input-bordered flex items-center gap-2 bg-slate-50 border-sky-200">
-								<p>đ</p>
+								<p>$</p>
 								<input
 									type="number"
 									placeholder="Enter salary name"
@@ -169,6 +202,38 @@ export default function StaffInformation({ staff }) {
 				</div>
 
 				<div className="mt-3">
+					<label htmlFor="doctor" className="text-black text-sm mb-2">
+						Manager:
+					</label>
+					{isUpdate ? (
+						<Select
+							value={
+								options.filter(
+									(option) =>
+										option.value.name ===
+										staffUpdate.manager
+								)[0]
+							}
+							name="manager"
+							onChange={(selectedOption) =>
+								setStaffUpdate((prev) => ({
+									...prev,
+									manager: selectedOption.value.name
+								}))
+							}
+							options={options}
+							placeholder="Select a doctor..."
+							isSearchable
+							className="text-black font-medium border-sky-200 "
+						/>
+					) : (
+						<div className="font-semibold text-black w-full py-2 px-3 rounded-lg border-[1px] border-solid border-gray-400 bg-slate-100">
+							{staffUpdate.manager}
+						</div>
+					)}
+				</div>
+
+				<div className="mt-3">
 					<label htmlFor="department" className="text-black text-sm">
 						Department
 					</label>
@@ -208,7 +273,7 @@ export default function StaffInformation({ staff }) {
 							onClick={() => setIsUpdate(false)}
 							className="w-6/12 btn btn-outline btn-error text-white"
 						>
-							cancel
+							Cancel
 						</button>
 					</div>
 				)}

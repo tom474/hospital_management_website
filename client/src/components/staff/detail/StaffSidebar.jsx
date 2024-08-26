@@ -1,5 +1,8 @@
 import { faClock, faUser } from "@fortawesome/free-regular-svg-icons";
-import { faNotesMedical } from "@fortawesome/free-solid-svg-icons";
+import {
+	faBookMedical,
+	faNotesMedical
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { useState } from "react";
@@ -15,13 +18,18 @@ export default function StaffSidebar({ staff }) {
 			selected: true
 		},
 		{
-			title: "Staff Schedule",
+			title: "Schedule",
 			icon: <FontAwesomeIcon icon={faClock} />,
 			selected: false
 		},
 		{
-			title: "Appointment History",
+			title: "Appointment",
 			icon: <FontAwesomeIcon icon={faNotesMedical} />,
+			selected: false
+		},
+		{
+			title: "Job History",
+			icon: <FontAwesomeIcon icon={faBookMedical} />,
 			selected: false
 		}
 	]);

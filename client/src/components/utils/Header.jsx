@@ -92,17 +92,17 @@ export default function Header({ role }) {
 						<div className="relative">
 							<p
 								onClick={() => setMode(!mode)}
-								className="font-semibold text-blue-400 cursor-pointer"
+								className="font-bold text-rose-700 cursor-pointer"
 							>
-								{role}
+								Role: {role}
 							</p>
 							<div
 								onClick={onLogout}
-								className={`absolute mt-3 cursor-pointer w-20 p-4 rounded right-[3px] bg-blue-400 hover:bg-blue-300 text-white font-semibold ${
+								className={`absolute mt-3 cursor-pointer text-center w-32 p-3 rounded right-[-15px] bg-rose-500 hover:bg-rose-400 text-white font-semibold ${
 									mode ? "block" : "hidden"
 								}`}
 							>
-								<p>logout</p>
+								<p>Change role</p>
 							</div>
 						</div>
 					)}

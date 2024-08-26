@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import ScheduleDetail from "../patient/detail/ScheduleDetail";
+import { displayStatus } from "../../utils/common";
 
 const dummyData = [
 	{
@@ -12,7 +13,7 @@ const dummyData = [
 		patient: "John Doe",
 		startTime: "10:00",
 		endTime: "11:00",
-		status: "Booked",
+		status: "Scheduled",
 		purpose: "Consultation"
 	},
 	{
@@ -22,7 +23,7 @@ const dummyData = [
 		patient: "John Mice",
 		startTime: "02:00",
 		endTime: "03:00",
-		status: "Booked",
+		status: "Scheduled",
 		purpose: "Medical Checkup"
 	},
 	{
@@ -52,7 +53,7 @@ const dummyData = [
 		patient: "David Doe",
 		startTime: "01:00",
 		endTime: "02:00",
-		status: "Booked",
+		status: "Completed",
 		purpose: "Vaccination"
 	}
 ];
@@ -78,15 +79,6 @@ export default function AppointmentReport() {
 	);
 	const totalPages = Math.ceil(dummyData.length / patientsPerPage);
 	const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-	const displayStatus = (status) => {
-		const defaultStyle = "badge border-none text-white font-semibold";
-		if (status === "Booked") {
-			return <p className={`${defaultStyle}  bg-green-400`}>{status}</p>;
-		} else {
-			return <p className={`${defaultStyle}  bg-red-400`}>{status}</p>;
-		}
-	};
 
 	return (
 		<div className="w-full mb-6">
@@ -131,7 +123,10 @@ export default function AppointmentReport() {
 									{data.purpose}
 								</td>
 								<td className="align-top text-black">
-									<ScheduleDetail schedule={data} />
+									<ScheduleDetail
+										schedule={data}
+										isStaff={true}
+									/>
 									<div
 										onClick={() => {
 											document
@@ -150,7 +145,7 @@ export default function AppointmentReport() {
 					</tbody>
 				</table>
 			</div>
-			<div className="flex justify-end mb-5 mt-2">
+			<div className="flex justify-center mb-5 mt-2">
 				{Array.from({ length: totalPages }, (_, i) => (
 					<button
 						key={i + 1}

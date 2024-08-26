@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { useState } from "react";
 import ScheduleDetail from "../../patient/detail/ScheduleDetail";
-import DurationModal from "../../appointment/main/DurationModal";
+import { displayStatus } from "../../../utils/common";
 
 const dummyData = [
 	{
@@ -13,7 +13,7 @@ const dummyData = [
 		patient: "John Doe",
 		startTime: "10:00",
 		endTime: "11:00",
-		status: "Booked",
+		status: "Scheduled",
 		purpose: "Consultation"
 	},
 	{
@@ -23,7 +23,7 @@ const dummyData = [
 		patient: "John Mice",
 		startTime: "02:00",
 		endTime: "03:00",
-		status: "Booked",
+		status: "Scheduled",
 		purpose: "Medical Checkup"
 	},
 	{
@@ -53,7 +53,7 @@ const dummyData = [
 		patient: "David Doe",
 		startTime: "01:00",
 		endTime: "02:00",
-		status: "Booked",
+		status: "Completed",
 		purpose: "Vaccination"
 	}
 ];
@@ -69,11 +69,6 @@ const columns = [
 ];
 
 export default function StaffAppointment({ staff }) {
-	const [duration, setDuration] = useState({
-		date: "",
-		startTime: "",
-		endTime: ""
-	});
 	const [currentPage, setCurrentPage] = useState(1);
 	const patientsPerPage = 10;
 	const indexOfLastSchedule = currentPage * patientsPerPage;
@@ -87,48 +82,12 @@ export default function StaffAppointment({ staff }) {
 
 	console.log(staff);
 
-	const displayStatus = (status) => {
-		const defaultStyle = "badge border-none text-white font-semibold";
-		if (status === "Booked") {
-			return <p className={`${defaultStyle}  bg-green-400`}>{status}</p>;
-		} else {
-			return <p className={`${defaultStyle}  bg-red-400`}>{status}</p>;
-		}
-	};
-
-	const handleDuration = (newDuration) => {
-		setDuration(newDuration);
-		document.getElementById("duration_modal").close();
-	};
-
-	const time =
-		duration.date +
-		"- (" +
-		duration.startTime +
-		" - " +
-		duration.endTime +
-		")";
-
 	return (
 		<div className="w-9/12 mb-6">
 			<div className="mb-2 flex justify-between">
-				<DurationModal
-					key={"staff_appointment	"}
-					duration={duration}
-					onUpdate={handleDuration}
-				/>
 				<h1 className="font-semibold text-3xl text-blue-600">
 					Staff appointment
 				</h1>
-
-				<div
-					onClick={() => {
-						document.getElementById("duration_modal").showModal();
-					}}
-					className="p-2 bg-blue-400 w-fit text-center text-white font-semibold rounded transition ease-in-out hover:bg-blue-300 cursor-pointer"
-				>
-					<p>{duration.date === "" ? "Filter" : time}</p>
-				</div>
 			</div>
 
 			<div className="border-[1px] rounded-lg border-solid border-gray-400 p-2">
@@ -172,7 +131,10 @@ export default function StaffAppointment({ staff }) {
 									{data.purpose}
 								</td>
 								<td className="align-top text-black">
-									<ScheduleDetail schedule={data} />
+									<ScheduleDetail
+										schedule={data}
+										isStaff={true}
+									/>
 									<div
 										onClick={() => {
 											document

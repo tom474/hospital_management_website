@@ -7,6 +7,10 @@
 	color: black;
 }
 
+.btn-outline.btn-primary:hover {
+	color: white;
+}
+
 .btn-outline.btn-success:hover {
 	color: white;
 }

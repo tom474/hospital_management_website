@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import ScheduleDetail from "./ScheduleDetail";
 import { useState } from "react";
+import { displayStatus } from "../../../utils/common";
 
 const dummyData = [
 	{
@@ -12,7 +13,7 @@ const dummyData = [
 		patient: "John Doe",
 		startTime: "10:00",
 		endTime: "11:00",
-		status: "Booked",
+		status: "Scheduled",
 		purpose: "Consultation"
 	},
 	{
@@ -22,7 +23,7 @@ const dummyData = [
 		patient: "John Doe",
 		startTime: "02:00",
 		endTime: "03:00",
-		status: "Booked",
+		status: "Scheduled",
 		purpose: "Medical Checkup"
 	},
 	{
@@ -42,7 +43,7 @@ const dummyData = [
 		patient: "John Doe",
 		startTime: "11:30",
 		endTime: "12:30",
-		status: "Cancelled",
+		status: "Completed",
 		purpose: "Dermatology Consultation"
 	},
 	{
@@ -52,7 +53,7 @@ const dummyData = [
 		patient: "John Doe",
 		startTime: "01:00",
 		endTime: "02:00",
-		status: "Booked",
+		status: "Scheduled",
 		purpose: "Vaccination"
 	}
 ];
@@ -80,26 +81,17 @@ export default function Schedule({ patient }) {
 	const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
 	console.log(patient);
-	const displayJobType = (status) => {
-		const defaultStyle = "badge border-none text-white font-semibold";
-		if (status === "Booked") {
-			return <p className={`${defaultStyle}  bg-green-400`}>{status}</p>;
-		} else {
-			return <p className={`${defaultStyle}  bg-red-400`}>{status}</p>;
-		}
-	};
 
 	return (
 		<div className="w-9/12 mb-6">
 			<div className="mb-2 flex justify-between">
 				<h1 className="font-semibold text-3xl text-blue-600">
-					Patient Schedule
+					Patient Appointment
 				</h1>
 			</div>
 
 			<div className="border-[1px] rounded-lg border-solid border-gray-400 p-2">
 				<table className="table">
-					{/* head */}
 					<thead>
 						<tr>
 							{columns.map((column) => (
@@ -132,7 +124,7 @@ export default function Schedule({ patient }) {
 									{data.startTime} - {data.endTime}
 								</td>
 								<td className="align-top text-black flex justify-center">
-									{displayJobType(data.status)}
+									{displayStatus(data.status)}
 								</td>
 								<td className="align-top text-black">
 									{data.purpose}

@@ -30,7 +30,7 @@ export default function Root() {
 		<>
 			<Login loginFunction={handleLogin} />
 			<div className="min-h-screen flex flex-col">
-				<div className="w-1200 mx-auto flex-1 flex flex-col">
+				<div className="mx-12 flex-1 flex flex-col">
 					<Header role={role} />
 					<main className="flex-1">
 						<Outlet />
