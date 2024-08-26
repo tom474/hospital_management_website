@@ -197,9 +197,9 @@ const getWorksByStaffIdInDuration = async (req, res) => {
 		const staff_id = req.params.id;
 		const { start_date, end_date } = req.query;
 		const [rows] = await database.poolAdmin.query("CALL getWorksByStaffIdInDuration(?, ?, ?)", [
+			staff_id,
 			start_date,
 			end_date,
-			staff_id,
 		]);
 		res.json(rows[0]);
 	} catch (err) {

@@ -234,3 +234,26 @@ LEFT JOIN
     Appointment a ON p.patient_id = a.patient_id AND a.date = (SELECT MAX(date) FROM Appointment WHERE patient_id = p.patient_id)
 LEFT JOIN 
     Treatment t ON p.patient_id = t.patient_id AND t.date = (SELECT MAX(date) FROM Treatment WHERE patient_id = p.patient_id);
+
+-- View to display staff schedules with appointments
+CREATE OR REPLACE VIEW StaffScheduleWithAppointments AS
+SELECT 
+    s.staff_id,
+    st.first_name,
+    st.last_name,
+    st.email,
+    st.job_type,
+    d.department_name,
+    s.date,
+    s.start_time AS schedule_start_time,
+    s.end_time AS schedule_end_time,
+    a.start_time AS appointment_start_time,
+    a.end_time AS appointment_end_time
+FROM 
+    Schedule s
+INNER JOIN 
+    Staff st ON s.staff_id = st.staff_id
+INNER JOIN 
+    Department d ON st.department_id = d.department_id
+LEFT JOIN 
+    Appointment a ON s.staff_id = a.staff_id AND s.date = a.date;

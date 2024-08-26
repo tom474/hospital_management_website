@@ -52,7 +52,7 @@ INSERT INTO Schedule (staff_id, start_time, end_time, date) VALUES
     (1, '08:00:00', '16:00:00', '2024-08-10'),
     (1, '08:00:00', '16:00:00', '2024-08-16'),
     (2, '10:00:00', '18:00:00', '2024-08-15'),
-    (3, '08:00:00', '14:00:00', '2024-08-18'),
+    (3, '08:00:00', '16:00:00', '2024-08-15'),
     (4, '09:00:00', '17:00:00', '2024-08-14'),
     (6, '07:00:00', '15:00:00', '2024-08-17'),
     (7, '09:00:00', '17:00:00', '2024-08-14'),
@@ -76,7 +76,9 @@ INSERT INTO Patient (first_name, last_name, birth_date, address, phone, email, a
 -- Insert mock data into the Appointment table
 INSERT INTO Appointment (patient_id, staff_id, date, start_time, end_time, purpose, status) VALUES
     (1, 1, '2024-08-10', '09:00:00', '09:30:00', 'Routine Checkup', 'Completed'),
-    (2, 2, '2024-08-12', '11:00:00', '11:45:00', 'Neurology Consultation', 'Completed'),
+    (1, 1, '2024-08-10', '13:00:00', '14:00:00', 'Routine Checkup', 'Completed'),
+    (2, 2, '2024-08-15', '11:00:00', '11:45:00', 'Neurology Consultation', 'Completed'),
+    (2, 2, '2024-08-15', '14:00:00', '15:00:00', 'Neurology Consultation', 'Completed'),
     (3, 3, '2024-08-15', '14:00:00', '14:30:00', 'Follow-up Visit', 'Scheduled'),
     (4, 6, '2024-08-20', '10:00:00', '10:30:00', 'Pediatric Checkup', 'Scheduled'),
     (5, 1, '2024-08-25', '13:00:00', '13:30:00', 'Cardiology Consultation', 'Cancelled'),
