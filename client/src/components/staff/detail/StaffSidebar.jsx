@@ -1,8 +1,5 @@
 import { faClock, faUser } from "@fortawesome/free-regular-svg-icons";
-import {
-	faBookMedical,
-	faNotesMedical
-} from "@fortawesome/free-solid-svg-icons";
+import { faNotesMedical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import { useState } from "react";
@@ -26,11 +23,6 @@ export default function StaffSidebar({ staff }) {
 			title: "Appointment",
 			icon: <FontAwesomeIcon icon={faNotesMedical} />,
 			selected: false
-		},
-		{
-			title: "Job History",
-			icon: <FontAwesomeIcon icon={faBookMedical} />,
-			selected: false
 		}
 	]);
 
@@ -48,6 +40,10 @@ export default function StaffSidebar({ staff }) {
 
 		if (jobType === "Receptionist") {
 			defaultStyle += " bg-yellow-400 text-white";
+		}
+
+		if (jobType === "Administrative") {
+			defaultStyle += " bg-red-400 text-white";
 		}
 
 		return (
@@ -71,17 +67,17 @@ export default function StaffSidebar({ staff }) {
 
 		// Redirect to the selected option to display the corresponding content in other component.
 		const direction = title.toLowerCase().replace(" ", "_");
-		navigate(`/staff/${staff.id}?option=${direction}`);
+		navigate(`/staff/${staff.staff_id}?option=${direction}`);
 	};
 
 	return (
 		<div className="w-3/12 flex flex-col justify-center items-center border-solid border-[1px] rounded-xl border-slate-500 h-fit">
 			<div className="w-full flex justify-end mr-4 mb-3">
-				{displayJobType(staff.jobType)}
+				{displayJobType(staff.job_type)}
 			</div>
 			<div className="flex flex-col items-center mb-5">
 				<p className="text-2xl text-blue-600 font-semibold">
-					{staff.firstName} {staff.lastName}
+					{staff.first_name} {staff.last_name}
 				</p>
 
 				<p className="mt-1 italic text-gray-500 text-base">

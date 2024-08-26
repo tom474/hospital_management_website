@@ -1,27 +1,24 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import StaffSidebar from "../components/staff/detail/StaffSidebar";
 import StaffInformation from "../components/staff/detail/StaffInformation";
 import StaffSchedule from "../components/staff/detail/StaffSchedule";
 import StaffAppointment from "../components/staff/detail/StaffAppointment";
 import JobHistory from "../components/staff/detail/JobHistory";
-
-const staff = {
-	id: 1,
-	jobType: "Doctor",
-	firstName: "John",
-	lastName: "Doe",
-	manager: "Dr. Jane Smith",
-	email: "JohnDoe@gmail.com",
-	department: "Department 1",
-	salary: 1000
-};
+import { useExtractSearchParams } from "../utils/common";
+import { useGetData } from "../api/apiHooks";
+import Loading from "../components/utils/Loading";
 
 export default function StaffDetailPage() {
-	const location = useLocation();
-	const queryParams = new URLSearchParams(location.search);
-	// Get the value of the query parameter "option" to determine which content to display
-	const option = queryParams.get("option");
+	const option = useExtractSearchParams("option");
+	const { staffId } = useParams();
 
+	const { data: staff, isPending } = useGetData(`/staff/id/${staffId}`, [
+		"staff",
+		"get_by_id",
+		staffId
+	]);
+
+	if (isPending) return <Loading />;
 	return (
 		<div className="mt-4">
 			<div className="mb-3 ">
@@ -34,15 +31,17 @@ export default function StaffDetailPage() {
 			</div>
 
 			<div className="flex flex-row gap-4">
-				<StaffSidebar staff={staff} />
+				<StaffSidebar staff={staff[0]} />
 
 				{option == "staff_information" && (
-					<StaffInformation staff={staff} />
+					<StaffInformation staff={staff[0]} />
 				)}
-				{option == null && <StaffInformation staff={staff} />}
-				{option == "schedule" && <StaffSchedule staff={staff} />}
-				{option == "appointment" && <StaffAppointment staff={staff} />}
-				{option === "job_history" && <JobHistory staff={staff} />}
+				{option == null && <StaffInformation staff={staff[0]} />}
+				{option == "schedule" && <StaffSchedule staff={staff[0]} />}
+				{option == "appointment" && (
+					<StaffAppointment staff={staff[0]} />
+				)}
+				{option === "job_history" && <JobHistory staff={staff[0]} />}
 			</div>
 		</div>
 	);

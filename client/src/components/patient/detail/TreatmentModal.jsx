@@ -15,7 +15,12 @@ export default function TreatmentModal({ patient }) {
 			document.getElementById("my_modal_1").close();
 		}
 	});
-	const { data: doctors } = useGetData("/staff", ["staff"]);
+
+	const { data: doctors } = useGetData("/staff?job_type=Doctor", [
+		"staff",
+		"get_all_doctors"
+	]);
+
 	const [treatment, setTreatment] = useState({
 		doctor: null,
 		date: null,
@@ -41,7 +46,6 @@ export default function TreatmentModal({ patient }) {
 		setTreatment((prev) => ({ ...prev, [name]: null }));
 	};
 
-	// convert doctors to correct format for react select library
 	let options = [];
 
 	if (doctors) {

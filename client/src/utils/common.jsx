@@ -65,6 +65,33 @@ export const displayStatus = (status) => {
 	}
 };
 
+export const displayJobType = (jobType) => {
+	let defaultStyle =
+		"py-2 text-xs rounded-full text-center w-fit min-w-24 font-bold";
+
+	if (jobType === "Doctor") {
+		defaultStyle += " bg-blue-400 text-white";
+	}
+
+	if (jobType === "Nurse") {
+		defaultStyle += " bg-green-400 text-white";
+	}
+
+	if (jobType === "Receptionist") {
+		defaultStyle += " bg-yellow-400 text-white";
+	}
+
+	if (jobType === "Administrative") {
+		defaultStyle += " bg-red-400 text-white";
+	}
+
+	return (
+		<td className="align-top text-black flex justify-center">
+			<p className={`${defaultStyle} `}>{jobType}</p>
+		</td>
+	);
+};
+
 export const fileToBase64 = (file) => {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
