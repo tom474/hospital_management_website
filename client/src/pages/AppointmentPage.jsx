@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import DurationModal from "../components/appointment/main/DurationModal";
 import AppointmentTable from "../components/appointment/main/AppointmentTable";
+import { useNavigate } from "react-router-dom";
 
 export default function AppointmentPage() {
+	const navigate = useNavigate();
+
 	const [duration, setDuration] = useState({
 		startDate: "",
 		endDate: ""
@@ -33,6 +36,11 @@ export default function AppointmentPage() {
 		checkDuration(newDuration);
 	};
 
+	const handleView = (mode) => {
+		setMode(mode === "available" ? true : false);
+		navigate(`/appointment?mode=${mode}`);
+	};
+
 	return (
 		<div className="flex flex-col mt-5 gap-5">
 			<h1 className="mt-5 text-center w-full text-blue-400 text-5xl font-bold">
@@ -42,7 +50,7 @@ export default function AppointmentPage() {
 			<div className="flex justify-between mt-2">
 				<div className="flex gap-1">
 					<div
-						onClick={() => setMode(true)}
+						onClick={() => handleView("available")}
 						className={`p-2 rounded bg-blue-400 text-white hover:bg-blue-300 cursor-pointer ${
 							mode && "bg-blue-900"
 						}`}
@@ -51,7 +59,7 @@ export default function AppointmentPage() {
 					</div>
 
 					<div
-						onClick={() => setMode(false)}
+						onClick={() => handleView("busy")}
 						className={`p-2 rounded bg-blue-400 text-white hover:bg-blue-300 cursor-pointer ${
 							!mode && "bg-blue-900"
 						}`}
@@ -89,7 +97,7 @@ export default function AppointmentPage() {
 				</div>
 			</div>
 
-			<AppointmentTable date={duration.date} />
+			<AppointmentTable duration={duration} />
 		</div>
 	);
 }
