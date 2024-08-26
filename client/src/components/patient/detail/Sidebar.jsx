@@ -15,12 +15,12 @@ export default function Sidebar({ patient }) {
 			selected: true
 		},
 		{
-			title: "Schedule",
+			title: "Appointment",
 			icon: <FontAwesomeIcon icon={faClock} />,
 			selected: false
 		},
 		{
-			title: "Treatment History",
+			title: "Treatment",
 			icon: <FontAwesomeIcon icon={faNotesMedical} />,
 			selected: false
 		}

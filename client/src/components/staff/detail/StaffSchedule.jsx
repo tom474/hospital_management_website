@@ -8,42 +8,42 @@ import StaffScheduleModal from "./StaffScheduleModal";
 const mockData = [
 	{
 		id: 1,
-		dayOfWeek: "Monday",
+		date: "2024-08-01",
 		shift: "General Shift",
 		startTime: "08:00",
 		endTime: "17:00"
 	},
 	{
 		id: 2,
-		dayOfWeek: "Tuesday",
+		date: "2024-08-02",
 		shift: "General Shift",
 		startTime: "08:00",
 		endTime: "17:00"
 	},
 	{
 		id: 3,
-		dayOfWeek: "Wednesday",
+		date: "2024-08-03",
 		shift: "Night Shift",
 		startTime: "18:00",
 		endTime: "02:00"
 	},
 	{
 		id: 4,
-		dayOfWeek: "Thursday",
+		date: "2024-08-04",
 		shift: "General Shift",
 		startTime: "08:00",
 		endTime: "17:00"
 	},
 	{
 		id: 5,
-		dayOfWeek: "Friday",
+		date: "2024-08-05",
 		shift: "General Shift",
 		startTime: "08:00",
 		endTime: "17:00"
 	},
 	{
 		id: 6,
-		dayOfWeek: "Saturday",
+		date: "2024-08-06",
 		shift: "General Shift",
 		startTime: "08:00",
 		endTime: "17:00"
@@ -51,7 +51,7 @@ const mockData = [
 ];
 
 const columns = [
-	{ key: "dayOfWeek", title: "Day of Week", size: "w-[10%]" },
+	{ key: "date", title: "Date", size: "w-[10%]" },
 	{ key: "shift", title: "Shift", size: "w-[10%]" },
 	{ key: "time", title: "Time", size: "w-[15%]" },
 	{ key: "action", title: "Action", size: "w-[0%]" }
@@ -130,7 +130,7 @@ export default function StaffSchedule({ staff }) {
 						{currentSchedule.map((data, index) => (
 							<tr key={index}>
 								<td className="align-top text-black font-semibold">
-									{data.dayOfWeek}
+									{data.date}
 								</td>
 								<td className="align-top text-black flex justify-center">
 									{displayShift(data.shift)}

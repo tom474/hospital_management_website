@@ -11,7 +11,6 @@ const patient = {
 	email: "JohnDoe@gmail.com",
 	phoneNumber: "0901213241",
 	birthDate: "2000-01-01",
-	bloodType: "A+",
 	address: "123 Main St, Springfield, IL",
 	allergies: "Peanuts, Shellfish, Pollen"
 };
@@ -40,8 +39,8 @@ export default function PatientDetailPage() {
 					<PatientInformation patient={patient} />
 				)}
 				{option == null && <PatientInformation patient={patient} />}
-				{option == "schedule" && <Schedule patient={patient} />}
-				{option == "treatment_history" && (
+				{option == "appointment" && <Schedule patient={patient} />}
+				{option == "treatment" && (
 					<TreatmentHistory patient={patient} />
 				)}
 			</div>
