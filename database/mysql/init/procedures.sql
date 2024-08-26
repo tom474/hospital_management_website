@@ -381,61 +381,76 @@ CREATE PROCEDURE getAvailableStaffsInDuration(
     IN p_end_date DATE
 )
 BEGIN
-    -- Temporary table to hold available slots
-    CREATE TEMPORARY TABLE TempAvailableSlots AS
-    SELECT 
-        s.staff_id,
-        st.first_name,
-        st.last_name,
-        st.email,
-        st.job_type,
-        d.department_name,
-        s.date,
-        s.start_time,
-        s.end_time
-    FROM 
-        Schedule s
-    INNER JOIN 
-        Staff st ON s.staff_id = st.staff_id
-    INNER JOIN 
-        Department d ON st.department_id = d.department_id
-    WHERE 
-        s.date BETWEEN p_start_date AND p_end_date;
-    
-    -- Subtract appointment times from the available slots
-    DELETE FROM TempAvailableSlots
-    WHERE EXISTS (
-        SELECT 1 
-        FROM Appointment a 
-        WHERE 
-            a.staff_id = TempAvailableSlots.staff_id
-            AND a.date = TempAvailableSlots.date
-            AND (
-                (a.start_time <= TempAvailableSlots.start_time AND a.end_time > TempAvailableSlots.start_time)
-                OR
-                (a.start_time < TempAvailableSlots.end_time AND a.end_time >= TempAvailableSlots.end_time)
-                OR
-                (a.start_time >= TempAvailableSlots.start_time AND a.end_time <= TempAvailableSlots.end_time)
-            )
+    -- Temporary table for storing intermediate results
+    CREATE TEMPORARY TABLE TempAvailableSlots (
+        staff_id INT,
+        first_name VARCHAR(50),
+        last_name VARCHAR(50),
+        email VARCHAR(100),
+        job_type VARCHAR(50),
+        department_name VARCHAR(100),
+        date DATE,
+        start_time TIME,
+        end_time TIME
     );
 
-    -- Split available slots based on existing appointments
-    SELECT
-        tas.staff_id,
-        tas.first_name,
-        tas.last_name,
-        tas.email,
-        tas.job_type,
-        tas.department_name,
-        tas.date,
-        GREATEST(tas.start_time, IFNULL(a.end_time, tas.start_time)) AS start_time,
-        LEAST(tas.end_time, IFNULL(a.start_time, tas.end_time)) AS end_time
+    -- Insert the initial slots before the first appointment or full schedule if no appointments
+    INSERT INTO TempAvailableSlots (staff_id, first_name, last_name, email, job_type, department_name, date, start_time, end_time)
+    SELECT 
+        staff_id,
+        first_name,
+        last_name,
+        email,
+        job_type,
+        department_name,
+        date,
+        schedule_start_time AS start_time,
+        IFNULL(MIN(appointment_start_time), schedule_end_time) AS end_time
     FROM 
-        TempAvailableSlots tas
-    LEFT JOIN 
-        Appointment a ON tas.staff_id = a.staff_id AND tas.date = a.date
+        StaffScheduleWithAppointments
     WHERE 
-        tas.start_time < a.start_time OR tas.end_time > a.end_time OR a.start_time IS NULL;
+        date BETWEEN p_start_date AND p_end_date
+    GROUP BY 
+        staff_id, first_name, last_name, email, job_type, department_name, date, schedule_start_time, schedule_end_time;
+
+    -- Insert the slots between appointments
+    INSERT INTO TempAvailableSlots (staff_id, first_name, last_name, email, job_type, department_name, date, start_time, end_time)
+    SELECT 
+        staff_id,
+        first_name,
+        last_name,
+        email,
+        job_type,
+        department_name,
+        date,
+        appointment_end_time AS start_time,
+        LEAD(appointment_start_time, 1, schedule_end_time) OVER (PARTITION BY staff_id, date ORDER BY appointment_start_time) AS end_time
+    FROM 
+        StaffScheduleWithAppointments
+    WHERE 
+        date BETWEEN p_start_date AND p_end_date
+        AND appointment_start_time IS NOT NULL;
+
+    -- Remove any invalid slots (where start_time >= end_time)
+    DELETE FROM TempAvailableSlots
+    WHERE 
+        start_time >= end_time;
+
+    -- Return the available slots for all staff
+    SELECT 
+        staff_id,
+        first_name,
+        last_name,
+        email,
+        job_type,
+        department_name,
+        date,
+        start_time,
+        end_time
+    FROM 
+        TempAvailableSlots
+    ORDER BY 
+        staff_id, date, start_time;
 
     -- Drop the temporary table
     DROP TEMPORARY TABLE IF EXISTS TempAvailableSlots;
@@ -447,7 +462,7 @@ CREATE PROCEDURE getBusyStaffsInDuration(
 )
 BEGIN
     SELECT 
-        s.staff_id,
+        a.staff_id,
         st.first_name,
         st.last_name,
         st.email,
