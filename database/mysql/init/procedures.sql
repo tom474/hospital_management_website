@@ -303,14 +303,23 @@ END $$
 
 CREATE PROCEDURE getAllStaffs(
     IN p_order VARCHAR(7),
-    IN p_department_id INT
+    IN p_department_id INT,
+    IN p_job_type VARCHAR(50)
 )
 BEGIN
     SET @query = 'SELECT * FROM Staff';
     
+    SET @whereClause = ' WHERE 1=1';
+    
     IF p_department_id IS NOT NULL THEN
-        SET @query = CONCAT(@query, ' WHERE department_id = ', p_department_id);
+        SET @whereClause = CONCAT(@whereClause, ' AND department_id = ', p_department_id);
     END IF;
+    
+    IF p_job_type IS NOT NULL THEN
+        SET @whereClause = CONCAT(@whereClause, ' AND job_type = ''', p_job_type, '''');
+    END IF;
+    
+    SET @query = CONCAT(@query, @whereClause);
     
     IF p_order = 'ASC' THEN
         SET @query = CONCAT(@query, ' ORDER BY first_name ASC, last_name ASC');
