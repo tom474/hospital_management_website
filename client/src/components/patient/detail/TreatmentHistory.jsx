@@ -1,48 +1,10 @@
-import { faEye } from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
 import TreatmentModal from "./TreatmentModal";
-import TreatmentDetail from "./TreatmentDetail";
-import { useState } from "react";
-
-const dummyData = [
-	{
-		id: 1,
-		date: "2024-08-01",
-		doctor: "Dr. John Smith",
-		patient: "John Doe",
-		description: "General checkup and routine blood tests."
-	},
-	{
-		id: 2,
-		date: "2024-08-02",
-		doctor: "Dr. Emily Johnson",
-		patient: "John Doe",
-		description: "Consultation regarding chronic back pain."
-	},
-	{
-		id: 3,
-		date: "2024-08-03",
-		doctor: "Dr. Michael Brown",
-		patient: "John Doe",
-		description: "Follow-up appointment for allergy treatment."
-	},
-	{
-		id: 4,
-		date: "2024-08-04",
-		doctor: "Dr. Sarah Davis",
-		patient: "John Doe",
-		description: "Skin examination and treatment plan discussion."
-	},
-	{
-		id: 5,
-		date: "2024-08-05",
-		doctor: "Dr. David Wilson",
-		patient: "John Doe",
-		description:
-			"Review of recent test results and medication adjustment. Review of recent test results and medication adjustment."
-	}
-];
+import { useGetData } from "../../../api/apiHooks";
+import { usePaginate } from "../../../utils/common";
+import Loading from "../../utils/Loading";
+import TreatmentItem from "./TreatmentItem";
+import EmptyData from "../../utils/EmptyData";
 
 const columns = [
 	{ key: "date", title: "Date", size: "w-[13%]" },
@@ -54,19 +16,21 @@ const columns = [
 
 export default function TreatmentHistory({ patient }) {
 	const role = localStorage.getItem("role");
+	const patientName = patient.first_name + " " + patient.last_name;
 
-	const [currentPage, setCurrentPage] = useState(1);
-	const patientsPerPage = 10;
-	const indexOfLastTreatment = currentPage * patientsPerPage;
-	const indexOfFirstTreatment = indexOfLastTreatment - patientsPerPage;
-	const currentTreatment = dummyData.slice(
-		indexOfFirstTreatment,
-		indexOfLastTreatment
+	const { data: treatments, isPending } = useGetData(
+		`/treatment/${patient.patient_id}`,
+		["treatment", "get_by_patient_id", patient.patient_id]
 	);
-	const totalPages = Math.ceil(dummyData.length / patientsPerPage);
-	const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-	console.log(patient);
+	const {
+		currentData: currentTreatments,
+		currentPage,
+		paginate,
+		totalPages
+	} = usePaginate(treatments);
+
+	if (isPending) return <Loading />;
 
 	return (
 		<>
@@ -108,44 +72,20 @@ export default function TreatmentHistory({ patient }) {
 							</tr>
 						</thead>
 						<tbody>
-							{currentTreatment.map((data, index) => {
-								console.log(data);
+							{currentTreatments.map((treatment, index) => {
 								return (
-									<tr key={index}>
-										<td className="align-top text-black">
-											{data.date}
-										</td>
-										<td className="align-top text-black">
-											{data.doctor}
-										</td>
-
-										<td className="align-top text-black">
-											{data.patient}
-										</td>
-										<td className="align-top text-black overflow-hidden text-ellipsis whitespace-nowrap max-w-xs">
-											{data.description}
-										</td>
-										<td className="align-top text-black">
-											<TreatmentDetail treatment={data} />
-											<div
-												onClick={() => {
-													document
-														.getElementById(
-															"treatment_" +
-																data.id
-														)
-														.showModal();
-												}}
-												className="btn btn-outline rounded-full btn-success hover:text-white"
-											>
-												<FontAwesomeIcon icon={faEye} />
-											</div>
-										</td>
-									</tr>
+									<TreatmentItem
+										key={index}
+										treatment={treatment}
+										patientName={patientName}
+									/>
 								);
 							})}
 						</tbody>
 					</table>
+					{currentTreatments.length === 0 && (
+						<EmptyData>No treatment found.</EmptyData>
+					)}
 				</div>
 				<div className="flex justify-end mb-5 mt-2">
 					{Array.from({ length: totalPages }, (_, i) => (

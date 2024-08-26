@@ -4,31 +4,18 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import FileDisplay from "../../utils/FileDisplay";
-
-const dummyDoctors = [
-	{ id: 1, name: "Dr. John Smith" },
-	{ id: 2, name: "Dr. Emily Johnson" },
-	{ id: 3, name: "Dr. Michael Brown" },
-	{ id: 4, name: "Dr. Sarah Davis" },
-	{ id: 5, name: "Dr. David Wilson" },
-	{ id: 6, name: "Dr. Sarah Davis" },
-	{ id: 7, name: "Dr. David Wilson" },
-	{ id: 8, name: "Dr. Sarah Davis" },
-	{ id: 9, name: "Dr. David Wilson" },
-	{ id: 10, name: "Dr. Sarah Davis" },
-	{ id: 11, name: "Dr. David Wilson" },
-	{ id: 12, name: "Dr. Sarah Davis" },
-	{ id: 13, name: "Dr. David Wilson" },
-	{ id: 14, name: "Dr. Sarah Davis" },
-	{ id: 15, name: "Dr. David Wilson" },
-	{ id: 16, name: "Dr. Sarah Davis" },
-	{ id: 17, name: "Dr. David Wilson" },
-	{ id: 18, name: "Dr. Sarah Davis" },
-	{ id: 19, name: "Dr. David Wilson" },
-	{ id: 20, name: "Dr. Sarah Davis" }
-];
+import { useGetData, usePostData } from "../../../api/apiHooks";
+import { fileToBase64 } from "../../../utils/common";
+import { queryClient } from "../../../api";
 
 export default function TreatmentModal({ patient }) {
+	const { mutate, isPending } = usePostData({
+		onSuccess: () => {
+			queryClient.invalidateQueries(["treatment"]);
+			document.getElementById("my_modal_1").close();
+		}
+	});
+	const { data: doctors } = useGetData("/staff", ["staff"]);
 	const [treatment, setTreatment] = useState({
 		doctor: null,
 		date: null,
@@ -55,17 +42,36 @@ export default function TreatmentModal({ patient }) {
 	};
 
 	// convert doctors to correct format for react select library
-	const options = dummyDoctors.map((doctor) => ({
-		value: {
-			id: doctor.id,
-			name: doctor.name
-		},
-		label: doctor.name
-	}));
+	let options = [];
 
-	const onSubmit = (e) => {
+	if (doctors) {
+		options = doctors.map((doctor) => ({
+			value: {
+				staff_id: doctor.staff_id,
+				name: doctor.first_name + " " + doctor.last_name
+			},
+			label: doctor.first_name + " " + doctor.last_name
+		}));
+	}
+
+	const onSubmit = async (e) => {
 		e.preventDefault();
 		console.log(treatment);
+
+		const diagnoseImage = await fileToBase64(treatment.diagnoseImage);
+		const labeResults = await fileToBase64(treatment.labeResults);
+
+		mutate({
+			url: "/treatment",
+			post: {
+				patient_id: patient.patient_id,
+				staff_id: treatment.doctor.value.staff_id,
+				date: treatment.date,
+				description: treatment.description,
+				diagnoseImage: diagnoseImage,
+				labResults: labeResults
+			}
+		});
 	};
 
 	return (
@@ -115,7 +121,7 @@ export default function TreatmentModal({ patient }) {
 								Patient:
 							</label>
 							<div className="py-[5.5px] px-4 font-semibold border-solid border-[1px] border-gray-300 rounded-[4px] text-black bg-white">
-								{patient.firstName} {patient.lastName}
+								{patient.first_name} {patient.last_name}
 							</div>
 						</div>
 					</div>
@@ -213,7 +219,11 @@ export default function TreatmentModal({ patient }) {
 
 					<div className="mt-5 flex gap-1">
 						<button className="w-6/12 btn btn-success text-white">
-							Save
+							{isPending ? (
+								<span className="loading loading-spinner loading-lg text-sky-500"></span>
+							) : (
+								"Save"
+							)}
 						</button>
 						<button
 							type="reset"

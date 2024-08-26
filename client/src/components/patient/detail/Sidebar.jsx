@@ -40,14 +40,14 @@ export default function Sidebar({ patient }) {
 
 		// Redirect to the selected option to display the corresponding content in other component.
 		const direction = title.toLowerCase().replace(" ", "_");
-		navigate(`/patient/${patient.id}?option=${direction}`);
+		navigate(`/patient/${patient.patient_id}?option=${direction}`);
 	};
 
 	return (
 		<div className="w-3/12 flex flex-col justify-center items-center border-solid border-[1px] rounded-xl border-slate-500 h-fit">
 			<div className="flex flex-col items-center mt-4 mb-5">
 				<p className="text-2xl text-blue-600 font-semibold">
-					{patient.firstName} {patient.lastName}
+					{patient.first_name} {patient.last_name}
 				</p>
 
 				<p className="mt-1 italic text-gray-500 text-base">
@@ -77,15 +77,5 @@ export default function Sidebar({ patient }) {
 }
 
 Sidebar.propTypes = {
-	patient: PropTypes.shape({
-		id: PropTypes.number.isRequired,
-		firstName: PropTypes.string.isRequired,
-		lastName: PropTypes.string.isRequired,
-		email: PropTypes.string.isRequired,
-		phoneNumber: PropTypes.string.isRequired,
-		birthDate: PropTypes.string.isRequired,
-		bloodType: PropTypes.string.isRequired,
-		address: PropTypes.string.isRequired,
-		allergies: PropTypes.string.isRequired
-	}).isRequired
+	patient: PropTypes.object.isRequired
 };

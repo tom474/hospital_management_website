@@ -1,19 +1,26 @@
 import PropTypes from "prop-types";
-import { displayStatus } from "../../../utils/common";
+import { displayStatus, formatDate } from "../../../utils/common";
 
-export default function ScheduleDetail({ schedule, isStaff = false }) {
+export default function ScheduleDetail({
+	schedule,
+	doctorName,
+	patientName,
+	isStaff = false
+}) {
 	// The sketch page only display data from Mysql database, will handle data from Mongo later.
 	// Including: Note during, after the schedule.
 
 	const role = localStorage.getItem("role");
 
 	return (
-		<dialog id={`schedule_${schedule.id}`} className="modal">
+		<dialog id={`schedule_${schedule.appointment_id}`} className="modal">
 			<div className="modal-box bg-sky-50 max-w-[650px] w-[650px] h-fit max-h-[650px]">
 				<button
 					onClick={() => {
 						document
-							.getElementById(`schedule_${schedule.id}`)
+							.getElementById(
+								`schedule_${schedule.appointment_id}`
+							)
 							.close();
 					}}
 					className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -23,11 +30,13 @@ export default function ScheduleDetail({ schedule, isStaff = false }) {
 				<form>
 					<div className="flex justify-between mt-4 mr-7 items-center">
 						<h3 className="font-bold text-xl text-blue-600">
-							Appointment #{schedule.id}
+							Appointment #{schedule.appointment_id}
 						</h3>
 
 						<div>
-							<p className="text-lg">{schedule.date}</p>
+							<p className="text-lg">
+								{formatDate(schedule.date)}
+							</p>
 						</div>
 					</div>
 
@@ -35,12 +44,12 @@ export default function ScheduleDetail({ schedule, isStaff = false }) {
 						<div className="flex gap-10">
 							<p>
 								<span className="font-semibold">Doctor:</span>{" "}
-								{schedule.doctor}
+								{doctorName}
 							</p>
 
 							<p>
 								<span className="font-semibold">Patient:</span>{" "}
-								{schedule.patient}
+								{patientName}
 							</p>
 						</div>
 
@@ -146,5 +155,7 @@ export default function ScheduleDetail({ schedule, isStaff = false }) {
 
 ScheduleDetail.propTypes = {
 	schedule: PropTypes.object.isRequired,
-	isStaff: PropTypes.bool
+	isStaff: PropTypes.bool,
+	doctorName: PropTypes.string,
+	patientName: PropTypes.string
 };

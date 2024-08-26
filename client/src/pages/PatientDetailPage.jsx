@@ -1,25 +1,22 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Sidebar from "../components/patient/detail/Sidebar";
 import PatientInformation from "../components/patient/detail/PatientInformation";
 import Schedule from "../components/patient/detail/Schedule";
 import TreatmentHistory from "../components/patient/detail/TreatmentHistory";
-
-const patient = {
-	id: 1,
-	firstName: "John",
-	lastName: "Doe",
-	email: "JohnDoe@gmail.com",
-	phoneNumber: "0901213241",
-	birthDate: "2000-01-01",
-	address: "123 Main St, Springfield, IL",
-	allergies: "Peanuts, Shellfish, Pollen"
-};
+import { useExtractSearchParams } from "../utils/common";
+import { useGetData } from "../api/apiHooks";
+import Loading from "../components/utils/Loading";
 
 export default function PatientDetailPage() {
-	const location = useLocation();
-	const queryParams = new URLSearchParams(location.search);
-	// Get the value of the query parameter "option" to determine which content to display
-	const option = queryParams.get("option");
+	const option = useExtractSearchParams("option");
+	const { patientId } = useParams();
+	const { data, isPending } = useGetData(`/patient/id/${patientId}`, [
+		"patient",
+		"get_by_id",
+		patientId
+	]);
+
+	if (isPending) return <Loading />;
 
 	return (
 		<div className="mt-4">
@@ -33,15 +30,15 @@ export default function PatientDetailPage() {
 			</div>
 
 			<div className="flex flex-row gap-4">
-				<Sidebar patient={patient} />
+				<Sidebar patient={data[0]} />
 
 				{option == "personal_information" && (
-					<PatientInformation patient={patient} />
+					<PatientInformation patient={data[0]} />
 				)}
-				{option == null && <PatientInformation patient={patient} />}
-				{option == "appointment" && <Schedule patient={patient} />}
+				{option == null && <PatientInformation patient={data[0]} />}
+				{option == "appointment" && <Schedule patient={data[0]} />}
 				{option == "treatment" && (
-					<TreatmentHistory patient={patient} />
+					<TreatmentHistory patient={data[0]} />
 				)}
 			</div>
 		</div>

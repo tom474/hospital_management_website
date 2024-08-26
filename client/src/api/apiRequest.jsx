@@ -2,20 +2,20 @@ import instance from "./index";
 
 export const getDataAPI = async (url) => {
 	const res = await instance.get(`${url}`);
-	return res;
+	return res.data;
 };
 
-export const postDataAPI = async (url, post) => {
+export const postDataAPI = async ({ url, post }) => {
 	const res = await instance.post(`${url}`, post);
-	return res;
+	return res.data;
 };
 
-export const putDataAPI = async (url, post) => {
+export const putDataAPI = async ({ url, post }) => {
 	const res = await instance.put(`${url}`, post);
-	return res;
+	return res.data;
 };
 
-export const deleteDataAPI = async (url, post) => {
-	const res = await instance.delete(`${url}`, post);
-	return res;
+export const deleteDataAPI = async (url) => {
+	const res = await instance.delete(`${url}`);
+	return res.data;
 };
