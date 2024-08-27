@@ -4,6 +4,7 @@ import Select from "react-select";
 import { useGetData, usePostData } from "../../../api/apiHooks";
 import { queryClient } from "../../../api";
 import Loading from "../../utils/Loading";
+import { adjustDateByOneDay } from "../../../utils/common";
 
 export default function AppointmentModal({
 	date,
@@ -52,7 +53,7 @@ export default function AppointmentModal({
 			post: {
 				patient_id: appointment.patient.value.id,
 				staff_id: doctor.staff_id,
-				date: appointment.defaultDate,
+				date: adjustDateByOneDay(appointment.defaultDate),
 				start_time: appointment.startTime,
 				end_time: appointment.endTime,
 				purpose: appointment.purpose,

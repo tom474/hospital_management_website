@@ -3,6 +3,7 @@ import { faCalendarCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AppointmentModal from "./AppointmentModal";
 import {
+	adjustDateByOneDay,
 	formatDate,
 	formatTime,
 	useExtractSearchParams,
@@ -25,15 +26,19 @@ const columns = [
 export default function AppointmentTable({ duration }) {
 	const mode = useExtractSearchParams("mode");
 	let query = {
-		url: `/staff/available?start_date=${duration.startDate}&end_date=${duration.endDate}`,
+		url: `/staff/available?start_date=${adjustDateByOneDay(
+			duration.startDate
+		)}&end_date=${adjustDateByOneDay(duration.endDate)}`,
 		key: ["available_staffs", duration]
 	};
 	if (mode === "busy") {
-		query.url = `/staff/busy?start_date=${duration.startDate}&end_date=${duration.endDate}`;
+		query.url = `/staff/busy?start_date=${adjustDateByOneDay(
+			duration.startDate
+		)}&end_date=${adjustDateByOneDay(duration.endDate)}`;
 		query.key = ["busy_staffs", duration];
 	}
+
 	const { data, isPending } = useGetData(query.url, query.key);
-	console.log(data);
 
 	const { currentData, currentPage, paginate, totalPages } =
 		usePaginate(data);

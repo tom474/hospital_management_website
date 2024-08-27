@@ -57,7 +57,9 @@ export default function StaffInformation({ staff }) {
 				qualifications: staffUpdate.qualifications,
 				manager_id: staffUpdate.manager_id,
 				department_id: staffUpdate.department_id,
-				certificate: staffUpdate.certificate.data
+				certificate: staffUpdate.certificate
+					? staffUpdate.certificate.data
+					: ""
 			}
 		});
 		setIsUpdate(false);

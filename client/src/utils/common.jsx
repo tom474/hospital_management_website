@@ -135,3 +135,12 @@ export const verifyAdminOrReceptionist = () => {
 	}
 	return true;
 };
+
+export const adjustDateByOneDay = (dateString) => {
+	if (dateString === "") return "";
+	let date = new Date(dateString);
+
+	date.setDate(date.getDate() + 1);
+
+	return date.toISOString().split("T")[0];
+};

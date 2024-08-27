@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import FileDisplay from "../../utils/FileDisplay";
 import { useGetData, usePostData } from "../../../api/apiHooks";
-import { fileToBase64 } from "../../../utils/common";
+import { adjustDateByOneDay, fileToBase64 } from "../../../utils/common";
 import { queryClient } from "../../../api";
 
 export default function TreatmentModal({ patient }) {
@@ -70,7 +70,7 @@ export default function TreatmentModal({ patient }) {
 			post: {
 				patient_id: patient.patient_id,
 				staff_id: treatment.doctor.value.staff_id,
-				date: treatment.date,
+				date: adjustDateByOneDay(treatment.date),
 				description: treatment.description,
 				diagnoseImage: diagnoseImage,
 				labResults: labeResults

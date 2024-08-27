@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { formatDate } from "../../../utils/common";
+import { adjustDateByOneDay, formatDate } from "../../../utils/common";
 import { queryClient } from "../../../api";
 import Loading from "../../utils/Loading";
 import { usePutData } from "../../../api/apiHooks";
@@ -37,7 +37,7 @@ export default function PatientInformation({ patient }) {
 			post: {
 				first_name: patientUpdate.first_name,
 				last_name: patientUpdate.last_name,
-				birth_date: patientUpdate.birth_date,
+				birth_date: adjustDateByOneDay(patientUpdate.birth_date),
 				address: patientUpdate.address,
 				email: patientUpdate.email,
 				phone: patientUpdate.phone,

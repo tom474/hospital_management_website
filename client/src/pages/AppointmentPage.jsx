@@ -78,6 +78,7 @@ export default function AppointmentPage() {
 					{duration && (
 						<DurationModal
 							key={"appointment_page"}
+							isTreatment={true}
 							duration={duration}
 							onUpdate={handleUpdateDuration}
 							type="duration"

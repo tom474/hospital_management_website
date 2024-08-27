@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import DurationModal from "../components/appointment/main/DurationModal";
+import ReportSideBar from "../components/report/ReportSideBar";
+import { useExtractSearchParams } from "../utils/common";
 import TreatmentReport from "../components/report/TreatmentReport";
-import { useLocation, useNavigate } from "react-router-dom";
-import AppointmentReport from "../components/report/AppointmentReport";
+import JobHistory from "../components/report/JobHistory";
+import WorkReport from "../components/report/WorkReport";
 
 export default function ReportPage() {
-	const location = useLocation();
-	const navigate = useNavigate();
-	const queryParams = new URLSearchParams(location.search);
-	// Get the value of the query parameter "option" to determine which content to display
-	const option = queryParams.get("option");
+	const option = useExtractSearchParams("option");
 
 	const [duration, setDuration] = useState({
 		startDate: "",
@@ -43,71 +41,62 @@ export default function ReportPage() {
 	return (
 		<div className="flex flex-col mt-5 gap-5">
 			<h1 className="mt-5 text-center w-full text-blue-400 text-5xl font-bold">
-				System Report
+				Hospital Report
 			</h1>
-			<div className="flex justify-between mt-2">
-				<div className="flex gap-1 mt-2">
-					<div
-						onClick={() =>
-							navigate(`/report?option=treatment_report`)
-						}
-						className={`p-2 rounded bg-blue-400 text-white hover:bg-blue-300 cursor-pointer ${
-							(option === "treatment_report" ||
-								option === null) &&
-							"bg-blue-900"
-						}`}
-					>
-						<p>View all patient treatment in given time</p>
+			<div className="flex gap-5 mt-2">
+				<ReportSideBar />
+				<div className="flex flex-col flex-1 gap-1">
+					<div className="flex justify-between items-center">
+						<h1 className="text-2xl text-blue-400 font-semibold">
+							{(option === "" || option === "treatment") &&
+								"Treatment Report"}
+							{option === "job_history" && "Job History Report"}
+							{option === "work" && "Work Report"}
+						</h1>
+						{option !== "job_history" && (
+							<div className="flex gap-1 items-center">
+								<div className="p-2 bg-blue-400 rounded text-white font-semibold text-lg">
+									<p>
+										{duration.startDate} {" -> "}{" "}
+										{duration.endDate}
+									</p>
+								</div>
+
+								{duration && (
+									<DurationModal
+										key={"report_page"}
+										isTreatment={true}
+										duration={duration}
+										onUpdate={handleUpdateDuration}
+										type="report_duration"
+										mode={"date"}
+									/>
+								)}
+
+								<div
+									onClick={() => {
+										document
+											.getElementById("duration_modal")
+											.showModal();
+									}}
+									className="p-[10px] flex justify-center items-center bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300 cursor-pointer"
+								>
+									Edit Duration
+								</div>
+							</div>
+						)}
 					</div>
 
-					<div
-						onClick={() =>
-							navigate(`/report?option=appointment_report`)
-						}
-						className={`p-2 rounded bg-blue-400 text-white hover:bg-blue-300 cursor-pointer ${
-							option === "appointment_report" && "bg-blue-900"
-						}`}
-					>
-						<p>View the work of all doctors in a given time</p>
-					</div>
-				</div>
-
-				<div className="flex gap-1">
-					<div className="p-2 flex items-center bg-blue-400 rounded text-white font-semibold text-lg">
-						<p>
-							{duration.startDate} {" -> "} {duration.endDate}
-						</p>
-					</div>
-
-					{duration && (
-						<DurationModal
-							key={"report_page"}
-							isTreatment={true}
-							duration={duration}
-							onUpdate={handleUpdateDuration}
-							type="report_duration"
-							mode={"date"}
-						/>
+					{(option === null || option === "treatment") && (
+						<TreatmentReport duration={duration} />
 					)}
 
-					<div
-						onClick={() => {
-							document
-								.getElementById("duration_modal")
-								.showModal();
-						}}
-						className="px-2 flex justify-center items-center bg-blue-400 rounded text-white transition ease-in-out hover:bg-blue-300 cursor-pointer"
-					>
-						Edit Duration
-					</div>
+					{option === "job_history" && (
+						<JobHistory duration={duration} />
+					)}
+					{option === "work" && <WorkReport duration={duration} />}
 				</div>
 			</div>
-
-			{option === "treatment_report" && (
-				<TreatmentReport duration={duration} />
-			)}
-			{option === null && <TreatmentReport duration={duration} />}
-			{option === "appointment_report" && <AppointmentReport />}
 		</div>
 	);
 }

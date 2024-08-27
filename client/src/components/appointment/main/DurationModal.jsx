@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function DurationModal({
 	duration,
@@ -7,7 +7,17 @@ export default function DurationModal({
 	isTreatment = false,
 	type
 }) {
-	const [durationUpdate, setDurationUpdate] = useState(duration);
+	const [durationUpdate, setDurationUpdate] = useState({
+		startDate: duration.startDate,
+		endDate: duration.endDate
+	});
+
+	useEffect(() => {
+		setDurationUpdate({
+			startDate: duration.startDate,
+			endDate: duration.endDate
+		});
+	}, [duration]);
 
 	// Handle input change
 	const handleOnChange = (e) => {

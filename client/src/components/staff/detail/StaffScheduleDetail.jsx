@@ -1,6 +1,10 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
-import { formatDate, formatTime } from "../../../utils/common";
+import {
+	adjustDateByOneDay,
+	formatDate,
+	formatTime
+} from "../../../utils/common";
 import { usePutData } from "../../../api/apiHooks";
 import { queryClient } from "../../../api";
 import Loading from "../../utils/Loading";
@@ -53,7 +57,7 @@ export default function StaffScheduleDetail({ schedule }) {
 				staff_id: scheduleUpdate.staff_id,
 				start_time: scheduleUpdate.start_time,
 				end_time: scheduleUpdate.end_time,
-				date: scheduleUpdate.date
+				date: adjustDateByOneDay(scheduleUpdate.date)
 			}
 		});
 	};
@@ -192,7 +196,7 @@ export default function StaffScheduleDetail({ schedule }) {
 									onClick={() => {
 										document
 											.getElementById(
-												`staff_schedule_${schedule.id}`
+												`staff_schedule_${schedule.schedule_id}`
 											)
 											.close();
 									}}

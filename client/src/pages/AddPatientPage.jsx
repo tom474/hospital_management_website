@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { usePostData } from "../api/apiHooks";
 import { queryClient } from "../api";
+import { adjustDateByOneDay } from "../utils/common";
 
 export default function AddPatientPage() {
 	const navigate = useNavigate();
@@ -38,7 +39,7 @@ export default function AddPatientPage() {
 			post: {
 				first_name: formData.firstName,
 				last_name: formData.lastName,
-				birth_date: formData.birthDate,
+				birth_date: adjustDateByOneDay(formData.birthDate),
 				address: formData.address,
 				email: formData.email,
 				phone: formData.phoneNumber,

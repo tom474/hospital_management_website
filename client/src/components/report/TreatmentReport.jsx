@@ -1,72 +1,94 @@
-import { faEye } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
-import TreatmentDetail from "../patient/detail/TreatmentDetail";
+import { useGetData } from "../../api/apiHooks";
+import { usePaginate } from "../../utils/common";
+import Loading from "../utils/Loading";
+import EmptyData from "../utils/EmptyData";
+import TreatmentReportItem from "./TreatmentReportItem";
+import Select from "react-select";
 import { useState } from "react";
-
-const dummyData = [
-	{
-		id: 1,
-		date: "2024-08-01",
-		doctor: "Dr. John Smith",
-		patient: "John Doe",
-		description: "General checkup and routine blood tests."
-	},
-	{
-		id: 2,
-		date: "2024-08-02",
-		doctor: "Dr. Emily Johnson",
-		patient: "John Doe",
-		description: "Consultation regarding chronic back pain."
-	},
-	{
-		id: 3,
-		date: "2024-08-03",
-		doctor: "Dr. Michael Brown",
-		patient: "John Doe",
-		description: "Follow-up appointment for allergy treatment."
-	},
-	{
-		id: 4,
-		date: "2024-08-04",
-		doctor: "Dr. Sarah Davis",
-		patient: "John Doe",
-		description: "Skin examination and treatment plan discussion."
-	},
-	{
-		id: 5,
-		date: "2024-08-05",
-		doctor: "Dr. David Wilson",
-		patient: "John Doe",
-		description:
-			"Review of recent test results and medication adjustment. Review of recent test results and medication adjustment."
-	}
-];
 
 const columns = [
 	{ key: "date", title: "Date", size: "w-[13%]" },
 	{ key: "doctor", title: "Doctor", size: "w-[18%]" },
 	{ key: "patient", title: "Patient", size: "w-[15%]" },
-	{ key: "description", title: "Description", size: "w-4/12" },
-	{ key: "action", title: "Action", size: "w-[0%]" }
+	{ key: "description", title: "Description", size: "w-4/12" }
 ];
 
 export default function TreatmentReport({ duration }) {
-	const [currentPage, setCurrentPage] = useState(1);
-	const patientsPerPage = 10;
-	const indexOfLastTreatment = currentPage * patientsPerPage;
-	const indexOfFirstTreatment = indexOfLastTreatment - patientsPerPage;
-	const currentTreatment = dummyData.slice(
-		indexOfFirstTreatment,
-		indexOfLastTreatment
+	const [patient, setPatient] = useState(null);
+	const { data: patients, isPending: isPendingPatients } = useGetData(
+		"/patient",
+		["patient"]
 	);
-	const totalPages = Math.ceil(dummyData.length / patientsPerPage);
-	const paginate = (pageNumber) => setCurrentPage(pageNumber);
+	let query = {
+		url: `/treatment?start_date=${duration.startDate}&end_date=${duration.endDate}`,
+		key: [
+			"treatment",
+			"get_all_treatment_in_range",
+			duration.startDate,
+			duration.startDate
+		]
+	};
+	if (patient && patient.value.id !== 0) {
+		query.url = `/treatment/${patient.value.id}?start_date=${duration.startDate}&end_date=${duration.endDate}`;
+		query.key = [
+			"treatment",
+			"get_all_treatment_by_patient_id",
+			patient.value.id,
+			duration.startDate,
+			duration.startDate
+		];
+	}
+	const { data: treatments, isPending } = useGetData(query.url, query.key);
 
-	console.log(duration);
+	const {
+		currentData: currentTreatments,
+		currentPage,
+		paginate,
+		totalPages
+	} = usePaginate(treatments);
+
+	let options = [];
+	if (patients) {
+		options = patients.map((patient) => ({
+			value: {
+				id: patient.patient_id,
+				name: patient.first_name + " " + patient.last_name
+			},
+			label: patient.first_name + " " + patient.last_name
+		}));
+		options.unshift({
+			value: {
+				id: 0,
+				name: "All Patients"
+			},
+			label: "All Patients"
+		});
+	}
+
+	if (isPending && isPendingPatients) return <Loading />;
+
 	return (
 		<>
-			<div className="w-full mb-6">
+			<div className="mt-3">
+				<label htmlFor="doctor" className="text-black text-sm">
+					View treatment of a patient:
+				</label>
+				<div>
+					<Select
+						value={patient} // Changed from `value={patient.name}` to `value={patient}`
+						name="patient"
+						onChange={
+							(selectedOption) => setPatient(selectedOption) // Updated to set the selected option directly
+						}
+						options={options}
+						placeholder="Select a patient..."
+						isSearchable
+						className="text-black font-medium border-sky-200 w-full"
+					/>
+				</div>
+			</div>
+			<div className="w-full mt-3">
 				<div className="border-[1px] rounded-lg border-solid border-gray-400 p-2">
 					<table className="table">
 						{/* head */}
@@ -83,42 +105,21 @@ export default function TreatmentReport({ duration }) {
 							</tr>
 						</thead>
 						<tbody>
-							{currentTreatment.map((data, index) => (
-								<tr key={index}>
-									<td className="align-top text-black">
-										{data.date}
-									</td>
-									<td className="align-top text-black">
-										{data.doctor}
-									</td>
-
-									<td className="align-top text-black">
-										{data.patient}
-									</td>
-									<td className="align-top text-black overflow-hidden text-ellipsis whitespace-nowrap max-w-xs">
-										{data.description}
-									</td>
-									<td className="align-top text-black">
-										<TreatmentDetail treatment={data} />
-										<div
-											onClick={() => {
-												document
-													.getElementById(
-														"treatment_" + data.id
-													)
-													.showModal();
-											}}
-											className="btn btn-outline rounded-full btn-success hover:text-white"
-										>
-											<FontAwesomeIcon icon={faEye} />
-										</div>
-									</td>
-								</tr>
-							))}
+							{currentTreatments.map((treatment, index) => {
+								return (
+									<TreatmentReportItem
+										key={index}
+										treatment={treatment}
+									/>
+								);
+							})}
 						</tbody>
 					</table>
+					{currentTreatments.length === 0 && (
+						<EmptyData>No treatment found.</EmptyData>
+					)}
 				</div>
-				<div className="flex justify-center mb-5 mt-2">
+				<div className="flex justify-end mb-5 mt-2">
 					{Array.from({ length: totalPages }, (_, i) => (
 						<button
 							key={i + 1}

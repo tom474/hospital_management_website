@@ -3,6 +3,7 @@ import { useState } from "react";
 import { usePostData } from "../../../api/apiHooks";
 import { queryClient } from "../../../api";
 import Loading from "../../utils/Loading";
+import { adjustDateByOneDay } from "../../../utils/common";
 
 export default function StaffScheduleModal({ staff }) {
 	const { mutate, isPending } = usePostData({
@@ -48,7 +49,7 @@ export default function StaffScheduleModal({ staff }) {
 				staff_id: scheduleUpdate.staff.id,
 				start_time: scheduleUpdate.startTime,
 				end_time: scheduleUpdate.endTime,
-				date: scheduleUpdate.date
+				date: adjustDateByOneDay(scheduleUpdate.date)
 			}
 		});
 	};
