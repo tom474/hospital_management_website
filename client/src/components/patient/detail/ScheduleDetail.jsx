@@ -42,6 +42,16 @@ export default function ScheduleDetail({
 		});
 	};
 
+	const onCancelAppointment = () => {
+		mutate({
+			url: `/appointment/${schedule.appointment_id}`,
+			post: {
+				status: "Cancelled",
+				notes: updateAttribute.notes
+			}
+		});
+	};
+
 	return (
 		<dialog id={`schedule_${schedule.appointment_id}`} className="modal">
 			<div className="modal-box bg-sky-50 max-w-[650px] w-[650px] h-fit max-h-[650px]">
@@ -149,7 +159,10 @@ export default function ScheduleDetail({
 						(role == "Receptionist" || role == "Admin") &&
 						schedule.status === "Scheduled" && (
 							<div className="mt-5 flex gap-1">
-								<button className="w-6/12 btn btn-success text-white">
+								<button
+									onClick={onCancelAppointment}
+									className="w-6/12 btn btn-success text-white"
+								>
 									Cancel Appointment
 								</button>
 								<button

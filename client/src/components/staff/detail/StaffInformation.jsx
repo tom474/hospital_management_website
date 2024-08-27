@@ -6,6 +6,8 @@ import { useGetData, usePutData } from "../../../api/apiHooks";
 import ImageModal from "../../utils/ImageModal";
 import { queryClient } from "../../../api";
 import Loading from "../../utils/Loading";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 export default function StaffInformation({ staff }) {
 	const { mutate, isPending } = usePutData({
@@ -13,7 +15,18 @@ export default function StaffInformation({ staff }) {
 			queryClient.invalidateQueries("staff");
 		}
 	});
-	const [staffUpdate, setStaffUpdate] = useState(staff);
+	const [staffUpdate, setStaffUpdate] = useState({
+		staff_id: staff.staff_id,
+		first_name: staff.first_name,
+		last_name: staff.last_name,
+		email: staff.email,
+		salary: staff.salary,
+		job_type: staff.job_type,
+		qualifications: staff.qualifications,
+		manager_id: staff.manager_id,
+		department_id: staff.department_id,
+		certificate: staff.certificate ? staff.certificate : null
+	});
 	const [isUpdate, setIsUpdate] = useState(false);
 	const { data: manager } = useGetData(`/staff/id/${staff.manager_id}`, [
 		"staff",
@@ -335,7 +348,30 @@ export default function StaffInformation({ staff }) {
 							</div>
 						)}
 					</div>
-					{staff.certificate && (
+					{isUpdate && staffUpdate.certificate === null && (
+						<div className="mt-5">
+							<div className="flex justify-between">
+								<p className="text-black">Certificate</p>
+								<label
+									htmlFor="certificate"
+									className="text-black text-sm mr-2 p-2 rounded-full hover:bg-green-100 hover:text-green-400"
+								>
+									<FontAwesomeIcon icon={faPlus} />
+								</label>
+							</div>
+							<p className="text-center">
+								Please upload a certificate
+							</p>
+							<input
+								type="file"
+								onChange={handleFileChange}
+								name="certificate"
+								id="certificate"
+								className="hidden"
+							/>
+						</div>
+					)}
+					{staffUpdate.certificate && (
 						<div className="mt-3">
 							<label
 								htmlFor="email"
