@@ -11,6 +11,7 @@ import {
 } from "../../../utils/common";
 import { useGetData } from "../../../api/apiHooks";
 import Loading from "../../utils/Loading";
+import EmptyData from "../../utils/EmptyData";
 
 const columns = [
 	{ key: "ID", title: "ID", size: "w-[2%]" },
@@ -57,6 +58,10 @@ export default function AppointmentTable({ duration }) {
 
 		if (jobType === "Receptionist") {
 			defaultStyle += " bg-yellow-400 text-white";
+		}
+
+		if (jobType === "Administrative") {
+			defaultStyle += " bg-red-400 text-white";
 		}
 
 		return (
@@ -141,6 +146,9 @@ export default function AppointmentTable({ duration }) {
 						))}
 					</tbody>
 				</table>
+				{currentData.length === 0 && (
+					<EmptyData>No staff found.</EmptyData>
+				)}
 			</div>
 			<div className="flex justify-center mb-5">
 				{Array.from({ length: totalPages }, (_, i) => (

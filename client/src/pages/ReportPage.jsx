@@ -48,7 +48,7 @@ export default function ReportPage() {
 				<div className="flex flex-col flex-1 gap-1">
 					<div className="flex justify-between items-center">
 						<h1 className="text-2xl text-blue-400 font-semibold">
-							{(option === "" || option === "treatment") &&
+							{(option === null || option === "treatment") &&
 								"Treatment Report"}
 							{option === "job_history" && "Job History Report"}
 							{option === "work" && "Work Report"}

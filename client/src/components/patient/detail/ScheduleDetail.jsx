@@ -21,7 +21,7 @@ export default function ScheduleDetail({
 	});
 	const [updateAttribute, setUpdateAttribute] = useState({
 		status: schedule.status,
-		notes: ""
+		notes: schedule.notes.data
 	});
 
 	const handleOnChange = (e) => {
@@ -107,6 +107,19 @@ export default function ScheduleDetail({
 							{schedule.purpose}
 						</p>
 					</div>
+					{!isStaff && (
+						<div className="mt-4">
+							<p>
+								<span className="font-semibold text-lg">
+									Notes
+								</span>{" "}
+							</p>
+
+							<p className="text-base p-3 rounded bg-slate-300 mt-2">
+								{schedule.notes.data}
+							</p>
+						</div>
+					)}
 					{isStaff && (
 						<>
 							<div className="mt-4">
@@ -159,12 +172,12 @@ export default function ScheduleDetail({
 						(role == "Receptionist" || role == "Admin") &&
 						schedule.status === "Scheduled" && (
 							<div className="mt-5 flex gap-1">
-								<button
+								<div
 									onClick={onCancelAppointment}
 									className="w-6/12 btn btn-success text-white"
 								>
 									Cancel Appointment
-								</button>
+								</div>
 								<button
 									type="reset"
 									onClick={() => {

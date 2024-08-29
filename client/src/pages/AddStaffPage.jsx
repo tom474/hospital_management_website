@@ -64,6 +64,7 @@ export default function AddStaffPage() {
 		}));
 	}
 
+	console.log(options);
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		// Handle form submission logic here

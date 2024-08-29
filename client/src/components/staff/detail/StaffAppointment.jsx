@@ -3,6 +3,7 @@ import { usePaginate } from "../../../utils/common";
 import { useGetData } from "../../../api/apiHooks";
 import StaffAppointmentItem from "./StaffAppointmentItem";
 import Loading from "../../utils/Loading";
+import EmptyData from "../../utils/EmptyData";
 
 const columns = [
 	{ key: "date", title: "Date", size: "w-[10%]" },
@@ -66,6 +67,9 @@ export default function StaffAppointment({ staff }) {
 						))}
 					</tbody>
 				</table>
+				{appointments.length === 0 && (
+					<EmptyData>No appointment found.</EmptyData>
+				)}
 			</div>
 			<div className="flex justify-end mb-5 mt-2">
 				{Array.from({ length: totalPages }, (_, i) => (
