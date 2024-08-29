@@ -5,7 +5,7 @@ import Loading from "../utils/Loading";
 import EmptyData from "../utils/EmptyData";
 import TreatmentReportItem from "./TreatmentReportItem";
 import Select from "react-select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const columns = [
 	{ key: "date", title: "Date", size: "w-[13%]" },
@@ -20,26 +20,42 @@ export default function TreatmentReport({ duration }) {
 		"/patient",
 		["patient"]
 	);
+	const [currentDuration, setCurrentDuration] = useState({
+		startDate: duration.startDate,
+		endDate: duration.endDate
+	});
+
+	useEffect(() => {
+		setCurrentDuration({
+			startDate: duration.startDate,
+			endDate: duration.endDate
+		});
+	}, [duration]);
+
 	let query = {
-		url: `/treatment?start_date=${duration.startDate}&end_date=${duration.endDate}`,
+		url: `/treatment?start_date=${currentDuration.startDate}&end_date=${currentDuration.endDate}`,
 		key: [
 			"treatment",
 			"get_all_treatment_in_range",
-			duration.startDate,
-			duration.startDate
+			currentDuration.startDate,
+			currentDuration.endDate
 		]
 	};
 	if (patient && patient.value.id !== 0) {
-		query.url = `/treatment/${patient.value.id}?start_date=${duration.startDate}&end_date=${duration.endDate}`;
+		query.url = `/treatment/${patient.value.id}?start_date=${currentDuration.startDate}&end_date=${currentDuration.endDate}`;
 		query.key = [
 			"treatment",
 			"get_all_treatment_by_patient_id",
 			patient.value.id,
-			duration.startDate,
-			duration.startDate
+			currentDuration.startDate,
+			currentDuration.endDate
 		];
 	}
-	const { data: treatments, isPending } = useGetData(query.url, query.key);
+	const {
+		data: treatments,
+		isPending,
+		isFetched
+	} = useGetData(query.url, query.key);
 
 	const {
 		currentData: currentTreatments,
@@ -66,7 +82,7 @@ export default function TreatmentReport({ duration }) {
 		});
 	}
 
-	if (isPending && isPendingPatients) return <Loading />;
+	if (isPending && isPendingPatients && isFetched) return <Loading />;
 
 	return (
 		<>
