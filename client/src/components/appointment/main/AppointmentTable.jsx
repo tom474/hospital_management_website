@@ -13,19 +13,32 @@ import { useGetData } from "../../../api/apiHooks";
 import Loading from "../../utils/Loading";
 import EmptyData from "../../utils/EmptyData";
 
-const columns = [
-	{ key: "ID", title: "ID", size: "w-[2%]" },
-	{ key: "Name", title: "Name", size: "w-[8%]" },
-	{ key: "Email", title: "Email", size: "w-[5%]" },
-	{ key: "JobType", title: "Job Type", size: "w-1/12" },
-	{ key: "Date", title: "Date", size: "w-1/12" },
-	{ key: "Department", title: "Department", size: "w-[5%]" },
-	{ key: "Time", title: "Time", size: "w-1/12" },
-	{ key: "Action", title: "Action", size: "w-[0%]" }
-];
-
 export default function AppointmentTable({ duration }) {
 	const mode = useExtractSearchParams("mode");
+	let columns = [];
+	if (mode === "busy") {
+		columns = [
+			{ key: "ID", title: "ID", size: "w-[2%]" },
+			{ key: "Name", title: "Name", size: "w-[8%]" },
+			{ key: "Email", title: "Email", size: "w-[5%]" },
+			{ key: "JobType", title: "Job Type", size: "w-1/12" },
+			{ key: "Date", title: "Date", size: "w-1/12" },
+			{ key: "Department", title: "Department", size: "w-[5%]" },
+			{ key: "Time", title: "Time", size: "w-1/12" }
+		];
+	} else {
+		columns = [
+			{ key: "ID", title: "ID", size: "w-[2%]" },
+			{ key: "Name", title: "Name", size: "w-[8%]" },
+			{ key: "Email", title: "Email", size: "w-[5%]" },
+			{ key: "JobType", title: "Job Type", size: "w-1/12" },
+			{ key: "Date", title: "Date", size: "w-1/12" },
+			{ key: "Department", title: "Department", size: "w-[5%]" },
+			{ key: "Time", title: "Time", size: "w-1/12" },
+			{ key: "Action", title: "Action", size: "w-[0%]" }
+		];
+	}
+
 	let query = {
 		url: `/staff/available?start_date=${adjustDateByOneDay(
 			duration.startDate
@@ -118,30 +131,33 @@ export default function AppointmentTable({ duration }) {
 									{formatTime(staff.start_time)} -{" "}
 									{formatTime(staff.end_time)}
 								</td>
-
-								<td className="align-top text-black">
-									<AppointmentModal
-										doctor={staff}
-										date={formatDate(staff.date)}
-										minTime={formatTime(staff.start_time)}
-										maxTime={formatTime(staff.end_time)}
-										index={index}
-									/>
-									<div
-										onClick={() => {
-											document
-												.getElementById(
-													`appointment_modal_${staff.staff_id}_${index}`
-												)
-												.showModal();
-										}}
-										className="btn btn-outline rounded-full btn-success hover:text-white"
-									>
-										<FontAwesomeIcon
-											icon={faCalendarCheck}
+								{mode !== "busy" && (
+									<td className="align-top text-black">
+										<AppointmentModal
+											doctor={staff}
+											date={formatDate(staff.date)}
+											minTime={formatTime(
+												staff.start_time
+											)}
+											maxTime={formatTime(staff.end_time)}
+											index={index}
 										/>
-									</div>
-								</td>
+										<div
+											onClick={() => {
+												document
+													.getElementById(
+														`appointment_modal_${staff.staff_id}_${index}`
+													)
+													.showModal();
+											}}
+											className="btn btn-outline rounded-full btn-success hover:text-white"
+										>
+											<FontAwesomeIcon
+												icon={faCalendarCheck}
+											/>
+										</div>
+									</td>
+								)}
 							</tr>
 						))}
 					</tbody>

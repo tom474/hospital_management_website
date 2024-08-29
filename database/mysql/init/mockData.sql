@@ -55,6 +55,12 @@ INSERT INTO Schedule (staff_id, start_time, end_time, date) VALUES
     (4, '08:00:00', '17:00:00', '2024-08-31'),
     (5, '18:00:00', '02:00:00', '2024-08-31'),
     (6, '08:00:00', '17:00:00', '2024-09-01');
+    (1, '08:00:00', '17:00:00', '2024-08-11'),
+    (2, '08:00:00', '17:00:00', '2024-08-31'),
+    (3, '18:00:00', '02:00:00', '2024-08-29'),
+    (4, '08:00:00', '17:00:00', '2024-08-27'),
+    (5, '18:00:00', '02:00:00', '2024-08-30'),
+    (6, '08:00:00', '17:00:00', '2024-09-01');
 
 -- Insert mock data into the Patient table
 INSERT INTO Patient (first_name, last_name, birth_date, address, phone, email, allergies) VALUES
@@ -92,7 +98,11 @@ INSERT INTO Treatment (patient_id, staff_id, date, description) VALUES
     (3, 3, '2024-08-15', 'Follow-up visit; healing well after surgery.'),
     (4, 6, '2024-08-20', 'Pediatric checkup; patient in good health, vaccinations updated.'),
     (5, 1, '2024-08-25', 'Cardiology consultation; ECG showed normal results.'),
-    (6, 7, '2024-08-15', 'Oncology consultation; reviewing chemotherapy progress.');
+    (6, 7, '2024-08-15', 'Oncology consultation; reviewing chemotherapy progress.'),
+    (7, 8, '2024-08-18', 'Radiology scan; chest X-ray, no abnormalities found.'),
+    (8, 1, '2024-08-22', 'Cardiology follow-up; slight improvement in blood pressure.'),
+    (9, 2, '2024-08-23', 'Neurology follow-up; patient reports reduced frequency of migraines.'),
+    (10,7, '2024-08-24', 'Oncology follow-up; continuing treatment plan.');
 
 -- Re-enable triggers after data insertion
 SET @DISABLE_TRIGGERS = FALSE;
