@@ -22,14 +22,14 @@ INSERT INTO Department (department_name, manager_id) VALUES
 INSERT INTO Staff (first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id) VALUES
     ('John', 'Doe', 'john.doe@hospital.com', 120000.00, 'Doctor', 'MD, Cardiology', NULL, 1),
     ('Jane', 'Smith', 'jane.smith@hospital.com', 115000.00, 'Doctor', 'MD, Neurology', NULL, 2),
-    ('Sarah', 'Johnson', 'sarah.johnson@hospital.com', 90000.00, 'Nurse', 'RN', NULL, 1),
-    ('Michael', 'Brown', 'michael.brown@hospital.com', 95000.00, 'Nurse', 'RN', NULL, 3),
-    ('Emily', 'Davis', 'emily.davis@hospital.com', 80000.00, 'Administrative', 'MBA, Hospital Management', NULL, 5),
+    ('Sarah', 'Johnson', 'sarah.johnson@hospital.com', 90000.00, 'Doctor', 'RN', NULL, 1),
+    ('Michael', 'Brown', 'michael.brown@hospital.com', 95000.00, 'Doctor', 'RN', NULL, 3),
+    ('Emily', 'Davis', 'emily.davis@hospital.com', 80000.00, 'Doctor', 'MBA, Hospital Management', NULL, 5),
     ('Laura', 'Wilson', 'laura.wilson@hospital.com', 125000.00, 'Doctor', 'MD, Oncology', NULL, 7),
-    ('David', 'Anderson', 'david.anderson@hospital.com', 110000.00, 'Doctor', 'MD, Radiology', NULL, 8),
-    ('Sophia', 'Moore', 'sophia.moore@hospital.com', 95000.00, 'Nurse', 'RN', NULL, 7),
-    ('Liam', 'Lewis', 'liam.lewis@hospital.com', 150000.00, 'Doctor', 'MD, Cardiology', NULL, 1),
-    ('William', 'King', 'william.king@hospital.com', 160000.00, 'Doctor', 'MD, Neurology', NULL, 6);
+    ('David', 'Anderson', 'david.anderson@hospital.com', 110000.00, 'Nurse', 'MD, Radiology', NULL, 8),
+    ('Sophia', 'Moore', 'sophia.moore@hospital.com', 95000.00, 'Receptionist', 'RN', NULL, 7),
+    ('Liam', 'Lewis', 'liam.lewis@hospital.com', 150000.00, 'Nurse', 'MD, Cardiology', NULL, 1),
+    ('William', 'King', 'william.king@hospital.com', 160000.00, 'Receptionist', 'MD, Neurology', NULL, 6);
 
 -- Update the Department table with manager IDs
 UPDATE Department SET manager_id = 1 WHERE department_id = 1;
@@ -50,24 +50,11 @@ INSERT INTO JobHistory (staff_id, change_date, previous_job, new_job, previous_s
 -- Insert mock data into the Schedule table
 INSERT INTO Schedule (staff_id, start_time, end_time, date) VALUES
     (1, '08:00:00', '17:00:00', '2024-08-10'),
-    (1, '08:00:00', '17:00:00', '2024-08-16'),
     (2, '08:00:00', '17:00:00', '2024-08-30'),
     (3, '18:00:00', '02:00:00', '2024-08-30'),
     (4, '08:00:00', '17:00:00', '2024-08-31'),
     (5, '18:00:00', '02:00:00', '2024-08-31'),
-    (6, '08:00:00', '17:00:00', '2024-09-01'),
-    (7, '18:00:00', '02:00:00', '2024-09-01'),
-    (8, '08:00:00', '17:00:00', '2024-09-02'),
-    (9, '18:00:00', '02:00:00', '2024-09-02'),
-    (10, '08:00:00', '17:00:00', '2024-09-03'),
-    (2, '08:00:00', '17:00:00', '2024-08-15'),
-    (3, '08:00:00', '17:00:00', '2024-08-15'),
-    (4, '08:00:00', '17:00:00', '2024-08-14'),
-    (6, '18:00:00', '02:00:00', '2024-08-17'),
-    (7, '18:00:00', '02:00:00', '2024-08-14'),
-    (8, '18:00:00', '02:00:00', '2024-08-16'),
-    (9, '08:00:00', '17:00:00', '2024-08-18'),
-    (10, '18:00:00', '02:00:00', '2024-08-15');
+    (6, '08:00:00', '17:00:00', '2024-09-01');
 
 -- Insert mock data into the Patient table
 INSERT INTO Patient (first_name, last_name, birth_date, address, phone, email, allergies) VALUES

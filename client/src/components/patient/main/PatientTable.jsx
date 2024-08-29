@@ -98,7 +98,7 @@ export default function PatientTable() {
 					</tbody>
 				</table>
 				{currentData.length === 0 && (
-					<EmptyData>No Patient Found.</EmptyData>
+					<EmptyData>No patient found.</EmptyData>
 				)}
 			</div>
 			<div className="flex justify-center mb-5">
