@@ -1,7 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { usePostData } from "../api/apiHooks";
+import { queryClient } from "../api";
+import { adjustDateByOneDay } from "../utils/common";
 
 export default function AddPatientPage() {
+	const navigate = useNavigate();
+	const { mutate, isPending } = usePostData({
+		onSuccess: () => {
+			queryClient.invalidateQueries("patient");
+			navigate("/patient");
+		}
+	});
+
 	const [formData, setFormData] = useState({
 		firstName: "",
 		lastName: "",
@@ -23,7 +34,18 @@ export default function AddPatientPage() {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		// Handle form submission logic here
-		console.log(formData);
+		mutate({
+			url: "/patient",
+			post: {
+				first_name: formData.firstName,
+				last_name: formData.lastName,
+				birth_date: adjustDateByOneDay(formData.birthDate),
+				address: formData.address,
+				email: formData.email,
+				phone: formData.phoneNumber,
+				allergies: formData.allergies
+			}
+		});
 	};
 
 	return (
@@ -127,11 +149,12 @@ export default function AddPatientPage() {
 							className="w-full px-3 py-2 border rounded-lg bg-white"
 						/>
 					</div>
-					<button
-						type="submit"
-						className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
-					>
-						Add Patient
+					<button className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">
+						{isPending ? (
+							<span className="loading loading-spinner loading-sm"></span>
+						) : (
+							"Add Patient"
+						)}
 					</button>
 				</form>
 			</div>

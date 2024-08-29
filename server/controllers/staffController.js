@@ -4,10 +4,17 @@ const staffDocument = require("../../database/mongodb/schemas").staffDocument;
 // Get all staffs with optional sorting order and department filter
 const getAllStaffs = async (req, res) => {
 	try {
-		const { order = "DEFAULT", department_id = null, job_type = null } = req.query;
+		const {
+			order = "DEFAULT",
+			department_id = null,
+			job_type = null
+		} = req.query;
 
 		// Get staff data from MySQL
-		const [rows] = await database.poolAdmin.query("CALL getAllStaffs(?, ?, ?)", [order, department_id, job_type]);
+		const [rows] = await database.poolAdmin.query(
+			"CALL getAllStaffs(?, ?, ?)",
+			[order, department_id, job_type]
+		);
 
 		// Get the certificate from MongoDB
 		for (let i = 0; i < rows[0].length; i++) {
@@ -30,7 +37,9 @@ const getStaffById = async (req, res) => {
 		const staff_id = req.params.id;
 
 		// Get staff_id, first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id from MySQL
-		const [rows] = await database.poolAdmin.query("CALL getStaffById(?)", [staff_id]);
+		const [rows] = await database.poolAdmin.query("CALL getStaffById(?)", [
+			staff_id
+		]);
 
 		// Get the certificate from MongoDB
 		const staff = await staffDocument.findOne({ staffId: staff_id });
@@ -56,23 +65,29 @@ const createStaff = async (req, res) => {
 			qualifications,
 			manager_id,
 			department_id,
-			certificate,
+			certificate
 		} = req.body;
 
 		// Insert staff_id, first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id into MySQL
-		const [rows] = await database.poolAdmin.query("CALL createStaff(?, ?, ?, ?, ?, ?, ?, ?)", [
-			first_name,
-			last_name,
-			email,
-			salary,
-			job_type,
-			qualifications,
-			manager_id,
-			department_id,
-		]);
+		const [rows] = await database.poolAdmin.query(
+			"CALL createStaff(?, ?, ?, ?, ?, ?, ?, ?)",
+			[
+				first_name,
+				last_name,
+				email,
+				salary,
+				job_type,
+				qualifications,
+				manager_id,
+				department_id
+			]
+		);
 
 		// Get all staffs from MySQL
-		const [allStaffs] = await database.poolAdmin.query("CALL getAllStaffs(?, ?)", ["DEFAULT", null]);
+		const [allStaffs] = await database.poolAdmin.query(
+			"CALL getAllStaffs(?, ?, ?)",
+			["DEFAULT", null, null]
+		);
 
 		// Get the staff_id of the last staff created
 		const staff_id = allStaffs[0][allStaffs[0].length - 1].staff_id;
@@ -80,7 +95,7 @@ const createStaff = async (req, res) => {
 		// Insert staffId, certificate into MongoDB
 		const newStaffDocument = new staffDocument({
 			staffId: staff_id,
-			certificate: { data: certificate, contentType: "base64" },
+			certificate: { data: certificate, contentType: "base64" }
 		});
 		await newStaffDocument.save();
 
@@ -103,21 +118,24 @@ const updateStaff = async (req, res) => {
 			qualifications,
 			manager_id,
 			department_id,
-			certificate,
+			certificate
 		} = req.body;
 
 		// Update staff_id, first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id in MySQL
-		await database.poolAdmin.query("CALL updateStaff(?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-			staff_id,
-			first_name,
-			last_name,
-			email,
-			salary,
-			job_type,
-			qualifications,
-			manager_id,
-			department_id,
-		]);
+		await database.poolAdmin.query(
+			"CALL updateStaff(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			[
+				staff_id,
+				first_name,
+				last_name,
+				email,
+				salary,
+				job_type,
+				qualifications,
+				manager_id,
+				department_id
+			]
+		);
 
 		// Update certificate in MongoDB
 		await staffDocument.updateOne(
@@ -137,10 +155,10 @@ const getAvailableStaffsInDuration = async (req, res) => {
 		const { start_date, end_date } = req.query;
 
 		// Get staff_id, first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id from MySQL
-		const [rows] = await database.poolAdmin.query("CALL getAvailableStaffsInDuration(?, ?)", [
-			start_date,
-			end_date,
-		]);
+		const [rows] = await database.poolAdmin.query(
+			"CALL getAvailableStaffsInDuration(?, ?)",
+			[start_date, end_date]
+		);
 
 		// Get the certificate from MongoDB
 		for (let i = 0; i < rows[0].length; i++) {
@@ -163,7 +181,10 @@ const getBusyStaffsInDuration = async (req, res) => {
 		const { start_date, end_date } = req.query;
 
 		// Get staff_id, first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id from MySQL
-		const [rows] = await database.poolAdmin.query("CALL getBusyStaffsInDuration(?, ?)", [start_date, end_date]);
+		const [rows] = await database.poolAdmin.query(
+			"CALL getBusyStaffsInDuration(?, ?)",
+			[start_date, end_date]
+		);
 
 		// Get the certificate from MongoDB
 		for (let i = 0; i < rows[0].length; i++) {
@@ -184,7 +205,10 @@ const getBusyStaffsInDuration = async (req, res) => {
 const getWorksInDuration = async (req, res) => {
 	try {
 		const { start_date, end_date } = req.query;
-		const [rows] = await database.poolAdmin.query("CALL getWorksInDuration(?, ?)", [start_date, end_date]);
+		const [rows] = await database.poolAdmin.query(
+			"CALL getWorksInDuration(?, ?)",
+			[start_date, end_date]
+		);
 		res.json(rows[0]);
 	} catch (err) {
 		res.status(400).json({ error: err.message });
@@ -196,11 +220,10 @@ const getWorksByStaffIdInDuration = async (req, res) => {
 	try {
 		const staff_id = req.params.id;
 		const { start_date, end_date } = req.query;
-		const [rows] = await database.poolAdmin.query("CALL getWorksByStaffIdInDuration(?, ?, ?)", [
-			staff_id,
-			start_date,
-			end_date,
-		]);
+		const [rows] = await database.poolAdmin.query(
+			"CALL getWorksByStaffIdInDuration(?, ?, ?)",
+			[staff_id, start_date, end_date]
+		);
 		res.json(rows[0]);
 	} catch (err) {
 		res.status(400).json({ error: err.message });
@@ -215,5 +238,5 @@ module.exports = {
 	getAvailableStaffsInDuration,
 	getBusyStaffsInDuration,
 	getWorksInDuration,
-	getWorksByStaffIdInDuration,
+	getWorksByStaffIdInDuration
 };

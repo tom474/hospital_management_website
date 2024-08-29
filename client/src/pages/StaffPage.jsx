@@ -1,14 +1,35 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StaffTable from "../components/staff/main/StaffTable";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useGetData } from "../api/apiHooks";
+import { useState } from "react";
 
 export default function StaffPage() {
-	const handleOnChange = (e) => {
-		console.log(e.target.value);
+	const { data: departments } = useGetData("/department", ["department"]);
+	const navigate = useNavigate();
+	const [order, setOrder] = useState("");
+	const [department, setDepartment] = useState("");
+	const role = localStorage.getItem("role");
+
+	const handleOrderChange = (e) => {
+		const value = e.target.value;
+		setOrder(value !== "None" ? value : "");
+		updateURL(value !== "None" ? value : "", department);
 	};
 
-	const role = localStorage.getItem("role");
+	const handleDepartmentChange = (e) => {
+		const value = e.target.value;
+		setDepartment(value !== "All" ? value : "");
+		updateURL(order, value !== "All" ? value : "");
+	};
+
+	const updateURL = (order, department) => {
+		let query = [];
+		if (order) query.push(`order=${order}`);
+		if (department) query.push(`department=${department}`);
+		navigate(`/staff?${query.join("&")}`);
+	};
 
 	return (
 		<div className="flex flex-col mt-5 gap-5">
@@ -22,7 +43,7 @@ export default function StaffPage() {
 						name="name"
 						className="select select-bordered bg-white"
 						defaultValue={"Sort By Name"}
-						onChange={handleOnChange}
+						onChange={handleOrderChange}
 					>
 						<option disabled>Sort By Name</option>
 						<option>None</option>
@@ -34,16 +55,19 @@ export default function StaffPage() {
 						name="department"
 						className="select select-bordered bg-white"
 						defaultValue={"Sort By Department"}
-						onChange={handleOnChange}
+						onChange={handleDepartmentChange}
 					>
 						<option disabled>Sort By Department</option>
 						<option>All</option>
-						<option>Department 1</option>
-						<option>Department 2</option>
-						<option>Department 3</option>
-						<option>Department 4</option>
-						<option>Department 5</option>
-						<option>Department 6</option>
+						{departments &&
+							departments.map((department) => (
+								<option
+									value={department.department_id}
+									key={department.department_id}
+								>
+									{department.department_name}
+								</option>
+							))}
 					</select>
 				</div>
 				{role === "Admin" && (

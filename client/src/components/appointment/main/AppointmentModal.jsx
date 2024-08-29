@@ -1,39 +1,39 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 import Select from "react-select";
+import { useGetData, usePostData } from "../../../api/apiHooks";
+import { queryClient } from "../../../api";
+import Loading from "../../utils/Loading";
+import { adjustDateByOneDay } from "../../../utils/common";
 
-const dummyPatients = [
-	{ id: 1, name: "John Smith" },
-	{ id: 2, name: "Emily Johnson" },
-	{ id: 3, name: "Michael Brown" },
-	{ id: 4, name: "Sarah Davis" },
-	{ id: 5, name: "David Wilson" },
-	{ id: 6, name: "Sarah Davis" },
-	{ id: 7, name: "David Wilson" },
-	{ id: 8, name: "Sarah Davis" },
-	{ id: 9, name: "David Wilson" },
-	{ id: 10, name: "Sarah Davis" },
-	{ id: 11, name: "David Wilson" },
-	{ id: 12, name: "Sarah Davis" },
-	{ id: 13, name: "David Wilson" },
-	{ id: 14, name: "Sarah Davis" },
-	{ id: 15, name: "David Wilson" },
-	{ id: 16, name: "Sarah Davis" },
-	{ id: 17, name: "David Wilson" },
-	{ id: 18, name: "Sarah Davis" },
-	{ id: 19, name: "David Wilson" },
-	{ id: 20, name: "Sarah Davis" }
-];
+export default function AppointmentModal({
+	date,
+	doctor,
+	minTime,
+	maxTime,
+	index
+}) {
+	const { mutate, isPending } = usePostData({
+		onSuccess: () => {
+			queryClient.invalidateQueries("appointment");
+			queryClient.invalidateQueries("available_staffs");
+			queryClient.invalidateQueries("busy_staffs");
+			document
+				.getElementById(`appointment_modal_${doctor.staff_id}_${index}`)
+				.close();
+		}
+	});
 
-export default function AppointmentModal({ date, doctor }) {
+	const { data: patients } = useGetData(`/patient`, ["patient"]);
 	const [appointment, setAppointment] = useState({
-		doctor: doctor.firstName + " " + doctor.lastName,
+		doctor: doctor.first_name + " " + doctor.last_name,
 		patient: null,
 		startTime: "",
 		endTime: "",
 		defaultDate: date,
-		status: "Booked",
-		purpose: ""
+		status: "Scheduled",
+		purpose: "",
+		notes: ""
 	});
 
 	// Handle input change
@@ -48,18 +48,36 @@ export default function AppointmentModal({ date, doctor }) {
 		e.preventDefault();
 
 		console.log(appointment);
+		mutate({
+			url: "/appointment",
+			post: {
+				patient_id: appointment.patient.value.id,
+				staff_id: doctor.staff_id,
+				date: adjustDateByOneDay(appointment.defaultDate),
+				start_time: appointment.startTime,
+				end_time: appointment.endTime,
+				purpose: appointment.purpose,
+				notes: appointment.notes
+			}
+		});
 	};
 
-	const options = dummyPatients.map((patient) => ({
-		value: {
-			id: patient.id,
-			name: patient.name
-		},
-		label: patient.name
-	}));
+	let options = [];
+	if (patients) {
+		options = patients.map((patient) => ({
+			value: {
+				id: patient.patient_id,
+				name: patient.first_name + " " + patient.last_name
+			},
+			label: patient.first_name + " " + patient.last_name
+		}));
+	}
 
 	return (
-		<dialog id={`appointment_modal_${doctor.id}`} className="modal">
+		<dialog
+			id={`appointment_modal_${doctor.staff_id}_${index}`}
+			className="modal"
+		>
 			<div className="modal-box bg-sky-50 max-w-[650px] w-[650px] h-fit max-h-[650px]">
 				<h3 className="font-bold text-lg text-blue-500">
 					Create appointment
@@ -69,7 +87,7 @@ export default function AppointmentModal({ date, doctor }) {
 						onClick={() => {
 							document
 								.getElementById(
-									`appointment_modal_${doctor.id}`
+									`appointment_modal_${doctor.staff_id}_${index}`
 								)
 								.close();
 						}}
@@ -124,17 +142,44 @@ export default function AppointmentModal({ date, doctor }) {
 						<div className="flex items-center gap-3 mt-2">
 							<select
 								defaultValue={"Choose appointment purpose..."}
+								value={appointment.purpose}
+								onChange={handleOnChange}
+								name="purpose"
 								className="select select-bordered w-full bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
 							>
 								<option disabled>
 									Choose appointment purpose...
 								</option>
-								<option>Consultation</option>
-								<option>Medical Checkup</option>
-								<option>Lab Test</option>
-								<option>Dermatology Consultation</option>
-								<option>Vaccination</option>
+								<option value={"Consultation"}>
+									Consultation
+								</option>
+								<option value={"Medical Checkup"}>
+									Medical Checkup
+								</option>
+								<option value={"Lab Test"}>Lab Test</option>
+								<option value={"Dermatology Consultation"}>
+									Dermatology Consultation
+								</option>
+								<option value={"Vaccination"}>
+									Vaccination
+								</option>
 							</select>
+						</div>
+					</div>
+
+					<div className="mt-3">
+						<label htmlFor="doctor" className="text-black text-sm">
+							Notes:
+						</label>
+						<div className="flex items-center gap-3 mt-2">
+							<textarea
+								value={appointment.notes}
+								onChange={handleOnChange}
+								placeholder="Enter notes"
+								name="notes"
+								id="notes"
+								className="input input-bordered resize-none flex-1 h-20 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
+							/>
 						</div>
 					</div>
 
@@ -169,6 +214,8 @@ export default function AppointmentModal({ date, doctor }) {
 									placeholder="Enter start time"
 									name="startTime"
 									id="startTime"
+									min={minTime}
+									max={maxTime}
 									value={appointment.startTime}
 									onChange={handleOnChange}
 									className="input input-bordered flex-1 h-10 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
@@ -189,6 +236,8 @@ export default function AppointmentModal({ date, doctor }) {
 									placeholder="Enter end time"
 									name="endTime"
 									id="endTime"
+									min={minTime}
+									max={maxTime}
 									value={appointment.endTime}
 									onChange={handleOnChange}
 									className="input input-bordered flex-1 h-10 bg-slate-50 text-black font-medium border-[1px] border-gray-300 rounded-[4px]"
@@ -196,17 +245,27 @@ export default function AppointmentModal({ date, doctor }) {
 							</div>
 						</div>
 					</div>
+					<p className="text-center mt-3">
+						You can only create an appointment between{" "}
+						<span className="text-blue-600 font-bold">
+							{minTime}
+						</span>{" "}
+						and{" "}
+						<span className="text-blue-600 font-bold">
+							{maxTime}
+						</span>
+					</p>
 
 					<div className="mt-5 flex gap-1">
 						<button className="w-6/12 btn btn-success text-white">
-							Save
+							{isPending ? <Loading isFull={false} /> : "Save"}
 						</button>
 						<button
 							type="reset"
 							onClick={() => {
 								document
 									.getElementById(
-										`appointment_modal_${doctor.id}`
+										`appointment_modal_${doctor.staff_id}_${index}`
 									)
 									.close();
 							}}
@@ -223,5 +282,8 @@ export default function AppointmentModal({ date, doctor }) {
 
 AppointmentModal.propTypes = {
 	date: PropTypes.string.isRequired,
-	doctor: PropTypes.object.isRequired
+	doctor: PropTypes.object.isRequired,
+	minTime: PropTypes.string.isRequired,
+	maxTime: PropTypes.string.isRequired,
+	index: PropTypes.number.isRequired
 };

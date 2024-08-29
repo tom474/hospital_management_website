@@ -1,12 +1,22 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
+import { usePostData } from "../../../api/apiHooks";
+import { queryClient } from "../../../api";
+import Loading from "../../utils/Loading";
+import { adjustDateByOneDay } from "../../../utils/common";
 
 export default function StaffScheduleModal({ staff }) {
+	const { mutate, isPending } = usePostData({
+		onSuccess: () => {
+			queryClient.invalidateQueries("schedule");
+			document.getElementById(`staff_schedule_modal`).close();
+		}
+	});
 	const [scheduleUpdate, setScheduleUpdate] = useState({
 		staff: {
-			id: staff.id,
-			firstName: staff.firstName,
-			lastName: staff.lastName
+			id: staff.staff_id,
+			first_name: staff.first_name,
+			last_name: staff.last_name
 		},
 		date: null,
 		shift: "General Shift",
@@ -33,8 +43,15 @@ export default function StaffScheduleModal({ staff }) {
 	const onSubmit = (e) => {
 		e.preventDefault();
 		console.log(scheduleUpdate);
-
-		document.getElementById(`staff_schedule_modal`).close();
+		mutate({
+			url: "/schedule",
+			post: {
+				staff_id: scheduleUpdate.staff.id,
+				start_time: scheduleUpdate.startTime,
+				end_time: scheduleUpdate.endTime,
+				date: adjustDateByOneDay(scheduleUpdate.date)
+			}
+		});
 	};
 
 	return (
@@ -64,9 +81,9 @@ export default function StaffScheduleModal({ staff }) {
 							<input
 								type="text"
 								value={
-									scheduleUpdate.staff.firstName +
+									scheduleUpdate.staff.first_name +
 									" " +
-									scheduleUpdate.staff.lastName
+									scheduleUpdate.staff.last_name
 								}
 								name="staff"
 								id="staff"
@@ -176,7 +193,11 @@ export default function StaffScheduleModal({ staff }) {
 
 						<div className="mt-5 flex gap-1">
 							<button className="w-6/12 btn btn-success text-white">
-								Update
+								{isPending ? (
+									<Loading isFull={false} />
+								) : (
+									"Create"
+								)}
 							</button>
 							<button
 								type="reset"

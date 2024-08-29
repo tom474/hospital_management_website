@@ -1,131 +1,8 @@
-import { faEye } from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { formatSalary } from "../../../utils/common";
-
-const staffs = [
-	{
-		id: 1,
-		jobType: "Doctor",
-		firstName: "John",
-		lastName: "Doe",
-		manager: "John Doe",
-		email: "JohnDoe@gmail.com",
-		department: "Cardiology",
-		salary: 1000
-	},
-	{
-		id: 2,
-		jobType: "Nurse",
-		firstName: "Jane",
-		lastName: "Smith",
-		manager: "John Doe",
-		email: "JaneSmith@gmail.com",
-		department: "Pediatrics",
-		salary: 8000
-	},
-	{
-		id: 3,
-		jobType: "Doctor",
-		firstName: "Emily",
-		lastName: "Jones",
-		manager: "John Doe",
-		email: "EmilyJones@gmail.com",
-		department: "Surgery",
-		salary: 12000
-	},
-	{
-		id: 4,
-		jobType: "Doctor",
-		firstName: "Michael",
-		lastName: "Brown",
-		email: "MichaelBrown@gmail.com",
-		manager: "John Doe",
-		department: "Pharmacy",
-		salary: 900
-	},
-	{
-		id: 5,
-		jobType: "Nurse",
-		firstName: "Jessica",
-		lastName: "Taylor",
-		manager: "John Doe",
-		email: "JessicaTaylor@gmail.com",
-		department: "Rehabilitation",
-		salary: 9500
-	},
-	{
-		id: 6,
-		jobType: "Nurse",
-		firstName: "David",
-		lastName: "Wilson",
-		manager: "John Doe",
-		email: "DavidWilson@gmail.com",
-		department: "Radiology",
-		salary: 850
-	},
-	{
-		id: 7,
-		jobType: "Receptionist",
-		firstName: "Emma",
-		lastName: "Davis",
-		email: "EmmaDavis@gmail.com",
-		manager: "John Doe",
-		department: "Administration",
-		salary: 500
-	},
-	{
-		id: 8,
-		jobType: "Doctor",
-		firstName: "Christopher",
-		lastName: "Martinez",
-		email: "ChristopherMartinez@gmail.com",
-		manager: "John Doe",
-		department: "Neurology",
-		salary: 1100
-	},
-	{
-		id: 9,
-		jobType: "Nurse",
-		firstName: "Sophia",
-		lastName: "Anderson",
-		email: "SophiaAnderson@gmail.com",
-		manager: "John Doe",
-		department: "Emergency",
-		salary: 8200
-	},
-	{
-		id: 10,
-		jobType: "Receptionist",
-		firstName: "Matthew",
-		lastName: "Lee",
-		email: "MatthewLee@gmail.com",
-		manager: "John Doe",
-		department: "Orthopedics",
-		salary: 1250
-	},
-	{
-		id: 11,
-		jobType: "Receptionist",
-		firstName: "Olivia",
-		lastName: "Harris",
-		email: "OliviaHarris@gmail.com",
-		manager: "John Doe",
-		department: "Pathology",
-		salary: 7800
-	},
-	{
-		id: 12,
-		jobType: "Doctor",
-		firstName: "Daniel",
-		lastName: "Clark",
-		manager: "John Doe",
-		email: "DanielClark@gmail.com",
-		department: "Oncology",
-		salary: 1150
-	}
-];
+import { useExtractSearchParams, usePaginate } from "../../../utils/common";
+import { useGetData } from "../../../api/apiHooks";
+import Loading from "../../utils/Loading";
+import StaffItem from "./StaffItem";
+import EmptyData from "../../utils/EmptyData";
 
 const columns = [
 	{ key: "ID", title: "ID", size: "w-[2%]" },
@@ -139,36 +16,35 @@ const columns = [
 ];
 
 export default function StaffTable() {
-	const [currentPage, setCurrentPage] = useState(1);
-	const staffsPerPage = 10;
-	const indexOfLastStaff = currentPage * staffsPerPage;
-	const indexOfFirstStaff = indexOfLastStaff - staffsPerPage;
-	const currentStaffs = staffs.slice(indexOfFirstStaff, indexOfLastStaff);
-	const totalPages = Math.ceil(staffs.length / staffsPerPage);
-	const paginate = (pageNumber) => setCurrentPage(pageNumber);
+	const order = useExtractSearchParams("order");
+	const department = useExtractSearchParams("department");
 
-	const displayJobType = (jobType) => {
-		let defaultStyle =
-			"py-2 text-xs rounded-full text-center w-fit min-w-24 font-bold";
-
-		if (jobType === "Doctor") {
-			defaultStyle += " bg-blue-400 text-white";
-		}
-
-		if (jobType === "Nurse") {
-			defaultStyle += " bg-green-400 text-white";
-		}
-
-		if (jobType === "Receptionist") {
-			defaultStyle += " bg-yellow-400 text-white";
-		}
-
-		return (
-			<td className="align-top text-black flex justify-center">
-				<p className={`${defaultStyle} `}>{jobType}</p>
-			</td>
-		);
+	let query = {
+		url: "/staff",
+		key: ["staff"]
 	};
+
+	if (order && department) {
+		query.url += `?order=${order}&department_id=${department}`;
+		query.key = ["staff", "filter_order_department", order, department];
+	} else if (order) {
+		query.url += `?order=${order}`;
+		query.key = ["staff", "filter_order", order];
+	} else if (department) {
+		query.url += `?department_id=${department}`;
+		query.key = ["staff", "filter_department", department];
+	}
+
+	const { data, isPending } = useGetData(query.url, query.key);
+
+	const {
+		currentData: staffs,
+		currentPage,
+		paginate,
+		totalPages
+	} = usePaginate(data);
+
+	if (isPending) return <Loading />;
 
 	return (
 		<>
@@ -191,40 +67,12 @@ export default function StaffTable() {
 						</tr>
 					</thead>
 					<tbody>
-						{currentStaffs.map((staff, index) => (
-							<tr key={index}>
-								<td className="align-top font-bold text-blue-600">
-									{staff.id}
-								</td>
-								<td className="align-top text-black ">
-									{staff.firstName} {staff.lastName}
-								</td>
-								<td className="align-top text-black">
-									{staff.email}
-								</td>
-								{displayJobType(staff.jobType)}
-								<td className="align-top text-black">
-									{staff.department}
-								</td>
-								<td className="align-top text-black">
-									{staff.manager}
-								</td>
-								<td className="align-top text-black">
-									{formatSalary(staff.salary)}
-								</td>
-
-								<td className="align-top text-black">
-									<Link
-										to={`${staff.id}`}
-										className="btn btn-outline rounded-full btn-success hover:text-white"
-									>
-										<FontAwesomeIcon icon={faEye} />
-									</Link>
-								</td>
-							</tr>
+						{staffs.map((staff) => (
+							<StaffItem key={staff.staff_id} staff={staff} />
 						))}
 					</tbody>
 				</table>
+				{staffs.length === 0 && <EmptyData>No staff found.</EmptyData>}
 			</div>
 			<div className="flex justify-center mb-5">
 				{Array.from({ length: totalPages }, (_, i) => (

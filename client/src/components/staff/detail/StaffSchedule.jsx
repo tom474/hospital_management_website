@@ -1,54 +1,12 @@
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import PropTypes from "prop-types";
-import { useState } from "react";
 import StaffScheduleDetail from "./StaffScheduleDetail";
 import StaffScheduleModal from "./StaffScheduleModal";
-
-const mockData = [
-	{
-		id: 1,
-		date: "2024-08-01",
-		shift: "General Shift",
-		startTime: "08:00",
-		endTime: "17:00"
-	},
-	{
-		id: 2,
-		date: "2024-08-02",
-		shift: "General Shift",
-		startTime: "08:00",
-		endTime: "17:00"
-	},
-	{
-		id: 3,
-		date: "2024-08-03",
-		shift: "Night Shift",
-		startTime: "18:00",
-		endTime: "02:00"
-	},
-	{
-		id: 4,
-		date: "2024-08-04",
-		shift: "General Shift",
-		startTime: "08:00",
-		endTime: "17:00"
-	},
-	{
-		id: 5,
-		date: "2024-08-05",
-		shift: "General Shift",
-		startTime: "08:00",
-		endTime: "17:00"
-	},
-	{
-		id: 6,
-		date: "2024-08-06",
-		shift: "General Shift",
-		startTime: "08:00",
-		endTime: "17:00"
-	}
-];
+import { useGetData } from "../../../api/apiHooks";
+import { formatDate, formatTime, usePaginate } from "../../../utils/common";
+import Loading from "../../utils/Loading";
+import EmptyData from "../../utils/EmptyData";
 
 const columns = [
 	{ key: "date", title: "Date", size: "w-[10%]" },
@@ -56,37 +14,43 @@ const columns = [
 	{ key: "time", title: "Time", size: "w-[15%]" },
 	{ key: "action", title: "Action", size: "w-[0%]" }
 ];
-
 export default function StaffSchedule({ staff }) {
-	console.log(staff);
-	const [currentPage, setCurrentPage] = useState(1);
-	const patientsPerPage = 10;
-	const indexOfLastSchedule = currentPage * patientsPerPage;
-	const indexOfFirstSchedule = indexOfLastSchedule - patientsPerPage;
-	const currentSchedule = mockData.slice(
-		indexOfFirstSchedule,
-		indexOfLastSchedule
-	);
-	const totalPages = Math.ceil(mockData.length / patientsPerPage);
-	const paginate = (pageNumber) => setCurrentPage(pageNumber);
+	const { data, isPending } = useGetData(`schedule/${staff.staff_id}`, [
+		"schedule",
+		"get_by_staff_id",
+		staff.staff_id
+	]);
 
-	const displayShift = (shift) => {
+	const {
+		currentData: schedules,
+		currentPage,
+		paginate,
+		totalPages
+	} = usePaginate(data);
+
+	const displayShift = ({ startTime, endTime }) => {
 		const defaultStyle = "badge border-none text-white font-semibold";
-		if (shift === "General Shift") {
-			return <p className={`${defaultStyle}  bg-green-400`}>{shift}</p>;
+		if (startTime < endTime) {
+			return (
+				<p className={`${defaultStyle}  bg-green-400`}>General Shift</p>
+			);
 		} else {
-			return <p className={`${defaultStyle}  bg-blue-400`}>{shift}</p>;
+			return (
+				<p className={`${defaultStyle}  bg-blue-400`}>Night Shift</p>
+			);
 		}
 	};
 
 	const role = localStorage.getItem("role");
+
+	if (isPending) return <Loading />;
 
 	return (
 		<div className="w-9/12 mb-6">
 			<StaffScheduleModal staff={staff} />
 			<div className="mb-2 flex justify-between">
 				<h1 className="font-semibold text-3xl text-blue-600">
-					{staff.firstName} {staff.lastName}&rsquo;s Schedule
+					{staff.first_name} {staff.last_name}&rsquo;s Schedule
 				</h1>
 
 				{role === "Admin" && (
@@ -127,17 +91,21 @@ export default function StaffSchedule({ staff }) {
 						</tr>
 					</thead>
 					<tbody>
-						{currentSchedule.map((data, index) => (
+						{schedules.map((data, index) => (
 							<tr key={index}>
 								<td className="align-top text-black font-semibold">
-									{data.date}
+									{formatDate(data.date)}
 								</td>
 								<td className="align-top text-black flex justify-center">
-									{displayShift(data.shift)}
+									{displayShift({
+										startTime: data.start_time,
+										endTime: data.end_time
+									})}
 								</td>
 								<td className="align-top text-black ">
 									<p className="flex justify-center">
-										{data.startTime} - {data.endTime}
+										{formatTime(data.start_time)} -{" "}
+										{formatTime(data.end_time)}
 									</p>
 								</td>
 								<td className="align-top text-black">
@@ -146,7 +114,7 @@ export default function StaffSchedule({ staff }) {
 										onClick={() => {
 											document
 												.getElementById(
-													`staff_schedule_${data.id}`
+													`staff_schedule_${data.schedule_id}`
 												)
 												.showModal();
 										}}
@@ -159,6 +127,9 @@ export default function StaffSchedule({ staff }) {
 						))}
 					</tbody>
 				</table>
+				{schedules.length === 0 && (
+					<EmptyData>No Schedule found.</EmptyData>
+				)}
 			</div>
 			<div className="flex justify-end mb-5 mt-2">
 				{Array.from({ length: totalPages }, (_, i) => (

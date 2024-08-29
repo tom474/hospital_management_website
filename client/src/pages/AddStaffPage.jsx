@@ -1,61 +1,89 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Select from "react-select";
-
-const dummyDoctors = [
-	{ id: 1, name: "Dr. John Smith" },
-	{ id: 2, name: "Dr. Emily Johnson" },
-	{ id: 3, name: "Dr. Michael Brown" },
-	{ id: 4, name: "Dr. Sarah Davis" },
-	{ id: 5, name: "Dr. David Wilson" },
-	{ id: 6, name: "Dr. Sarah Davis" },
-	{ id: 7, name: "Dr. David Wilson" },
-	{ id: 8, name: "Dr. Sarah Davis" },
-	{ id: 9, name: "Dr. David Wilson" },
-	{ id: 10, name: "Dr. Sarah Davis" },
-	{ id: 11, name: "Dr. David Wilson" },
-	{ id: 12, name: "Dr. Sarah Davis" },
-	{ id: 13, name: "Dr. David Wilson" },
-	{ id: 14, name: "Dr. Sarah Davis" },
-	{ id: 15, name: "Dr. David Wilson" },
-	{ id: 16, name: "Dr. Sarah Davis" },
-	{ id: 17, name: "Dr. David Wilson" },
-	{ id: 18, name: "Dr. Sarah Davis" },
-	{ id: 19, name: "Dr. David Wilson" },
-	{ id: 20, name: "Dr. Sarah Davis" }
-];
+import { useGetData, usePostData } from "../api/apiHooks";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import FileDisplay from "../components/utils/FileDisplay";
+import { queryClient } from "../api";
+import { fileToBase64 } from "../utils/common";
+import Loading from "../components/utils/Loading";
 
 export default function AddStaffPage() {
+	const navigate = useNavigate();
+	const { mutate, isPending } = usePostData({
+		onSuccess: () => {
+			queryClient.invalidateQueries(["staff"]);
+			navigate("/staff");
+		}
+	});
+
 	const [formData, setFormData] = useState({
 		firstName: "",
 		lastName: "",
-		jobType: "",
+		jobType: "Doctor",
 		email: "",
 		manager: null,
-		department: "",
-		salary: 0
+		department_id: 1,
+		salary: 0,
+		certificate: null,
+		qualification: ""
 	});
 
+	const { data: departments } = useGetData("/department", ["department"]);
+	const { data: staffs } = useGetData(
+		`/staff?department_id=${formData.department_id}`,
+		["staff", "get_by_department", formData.department_id]
+	);
+
 	const handleChange = (e) => {
-		const { name, value } = e.target;
-		setFormData({
-			...formData,
-			[name]: value
-		});
+		const { name, type, value, files } = e.target;
+
+		// Handle file input
+		if (type === "file") {
+			setFormData((prev) => ({ ...prev, [name]: files[0] }));
+		} else {
+			// Handle other types of input (text, date, time, etc.)
+			setFormData((prev) => ({ ...prev, [name]: value }));
+		}
 	};
 
-	const options = dummyDoctors.map((doctor) => ({
-		value: {
-			id: doctor.id,
-			name: doctor.name
-		},
-		label: doctor.name
-	}));
+	const handleRemoveFile = ({ name }) => {
+		setFormData((prev) => ({ ...prev, [name]: null }));
+	};
 
-	const handleSubmit = (e) => {
+	let options = [];
+
+	if (staffs) {
+		options = staffs.map((doctor) => ({
+			value: {
+				id: doctor.staff_id,
+				name: doctor.first_name + " " + doctor.last_name
+			},
+			label: doctor.first_name + " " + doctor.last_name
+		}));
+	}
+
+	console.log(options);
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		// Handle form submission logic here
 		console.log(formData);
+		const file = await fileToBase64(formData.certificate);
+		mutate({
+			url: "/staff",
+			post: {
+				first_name: formData.firstName,
+				last_name: formData.lastName,
+				email: formData.email,
+				salary: formData.salary,
+				job_type: formData.jobType,
+				qualifications: formData.qualification,
+				manager_id: formData.manager.value.id,
+				department_id: formData.department_id,
+				certificate: file
+			}
+		});
 	};
 
 	return (
@@ -149,38 +177,35 @@ export default function AddStaffPage() {
 
 					<div className="mb-4">
 						<label
-							htmlFor="department"
+							htmlFor="department_id"
 							className="text-black text-sm"
 						>
 							Department
 						</label>
 						<div>
 							<select
-								defaultValue={formData.department}
-								name="department"
+								defaultValue={formData.department_id}
+								name="department_id"
 								onChange={handleChange}
 								className="select select-bordered w-full gap-2 bg-white font-semibold"
 							>
 								<option disabled>Choose department</option>
-								<option value={"Department 1"}>
-									Department 1
-								</option>
-								<option value={"Department 2"}>
-									Department 2
-								</option>
-								<option value={"Department 3"}>
-									Department 3
-								</option>
+								{departments &&
+									departments.map((department) => (
+										<option
+											key={department.department_id}
+											value={department.department_id}
+										>
+											{department.department_name}
+										</option>
+									))}
 							</select>
 						</div>
 					</div>
 
 					<div className="mb-4">
-						<label
-							htmlFor="doctor"
-							className="text-black text-sm mb-2"
-						>
-							Manager:
+						<label htmlFor="doctor" className="text-black text-sm">
+							Manager
 						</label>
 						<Select
 							value={formData.manager}
@@ -194,15 +219,67 @@ export default function AddStaffPage() {
 							options={options}
 							placeholder="Select a doctor..."
 							isSearchable
-							className="text-black font-medium border-sky-200 "
+							className="text-black font-medium border-sky-200 mt-3"
 						/>
+					</div>
+
+					<div className="mb-4">
+						<label className="block text-gray-700">
+							Qualification:
+						</label>
+						<input
+							type="text"
+							name="qualification"
+							value={formData.qualification}
+							onChange={handleChange}
+							className="w-full px-3 py-2 border rounded-lg bg-white"
+							required
+						/>
+					</div>
+
+					<div className="mt-5 mb-4">
+						<div className="flex justify-between">
+							<p className="text-black">Certificate:</p>
+							<label
+								htmlFor="certificate"
+								className="text-black text-sm mr-2 p-2 rounded-full hover:bg-green-100 hover:text-green-400 cursor-pointer"
+							>
+								<FontAwesomeIcon icon={faPlus} />
+							</label>
+						</div>
+
+						<input
+							type="file"
+							onChange={handleChange}
+							name="certificate"
+							id="certificate"
+							className="hidden"
+						/>
+						{formData.certificate === null && (
+							<div className="flex justify-center border rounded-md p-2">
+								<p className="text-blue-500 text-xs">
+									*Please upload your highest certificate
+								</p>
+							</div>
+						)}
+						{formData.certificate && (
+							<FileDisplay
+								fileName={formData.certificate.name}
+								size={(
+									formData.certificate.size /
+									(1024 * 1024)
+								).toFixed(1)}
+								onRemove={handleRemoveFile}
+								name="certificate"
+							/>
+						)}
 					</div>
 
 					<button
 						type="submit"
 						className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
 					>
-						Add Staff
+						{isPending ? <Loading isFull={false} /> : "Add Staff"}
 					</button>
 				</form>
 			</div>

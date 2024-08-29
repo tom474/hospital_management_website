@@ -32,7 +32,7 @@ export default function FileDisplay({ fileName, size, onRemove, name }) {
 
 FileDisplay.propTypes = {
 	fileName: PropTypes.string.isRequired,
-	size: PropTypes.number.isRequired,
+	size: PropTypes.string.isRequired,
 	onRemove: PropTypes.func.isRequired,
 	name: PropTypes.string.isRequired
 };

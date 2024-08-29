@@ -180,12 +180,15 @@ END $$
 
 CREATE PROCEDURE getAllJobHistories()
 BEGIN
-    SELECT * FROM JobHistory;
+    SELECT * FROM JobHistory
+    ORDER BY change_date DESC;
 END $$
 
 CREATE PROCEDURE getAllJobHistoryByStaffId(IN p_staff_id INT)
 BEGIN
-    SELECT * FROM JobHistory WHERE staff_id = p_staff_id;
+    SELECT * FROM JobHistory
+    WHERE staff_id = p_staff_id
+    ORDER BY change_date DESC;
 END $$
 
 -- Schedule Procedures

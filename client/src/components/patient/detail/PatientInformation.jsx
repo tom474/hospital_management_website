@@ -1,7 +1,22 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
+import { adjustDateByOneDay, formatDate } from "../../../utils/common";
+import { queryClient } from "../../../api";
+import Loading from "../../utils/Loading";
+import { usePutData } from "../../../api/apiHooks";
 
 export default function PatientInformation({ patient }) {
+	const { mutate, isPending } = usePutData({
+		onSuccess: () => {
+			queryClient.invalidateQueries([
+				"patient",
+				"get_by_id",
+				patient.patient_id
+			]);
+		}
+	});
+
+	patient.birth_date = formatDate(patient.birth_date);
 	const [patientUpdate, setPatientUpdate] = useState(patient);
 	const [isUpdate, setIsUpdate] = useState(false);
 
@@ -17,6 +32,18 @@ export default function PatientInformation({ patient }) {
 	const onSubmit = (e) => {
 		e.preventDefault();
 		console.log(patientUpdate);
+		mutate({
+			url: `/patient/${patient.patient_id}`,
+			post: {
+				first_name: patientUpdate.first_name,
+				last_name: patientUpdate.last_name,
+				birth_date: adjustDateByOneDay(patientUpdate.birth_date),
+				address: patientUpdate.address,
+				email: patientUpdate.email,
+				phone: patientUpdate.phone,
+				allergies: patientUpdate.allergies
+			}
+		});
 		setIsUpdate(false);
 	};
 
@@ -64,7 +91,7 @@ export default function PatientInformation({ patient }) {
 				<div className="flex gap-2 mt-3">
 					<div className="w-6/12">
 						<label
-							htmlFor="firstName"
+							htmlFor="first_name"
 							className="text-black text-sm"
 						>
 							First Name
@@ -73,22 +100,22 @@ export default function PatientInformation({ patient }) {
 							<input
 								type="text"
 								placeholder="Enter first name"
-								value={patientUpdate.firstName}
-								name="firstName"
-								id="firstName"
+								value={patientUpdate.first_name}
+								name="first_name"
+								id="first_name"
 								onChange={handleOnChange}
 								className="input input-bordered w-full bg-slate-50 mt-2 text-black font-medium border-sky-200"
 							/>
 						) : (
 							<div className="font-semibold text-black w-full py-2 px-3 rounded-lg border-[1px] border-solid border-gray-400 bg-slate-100">
-								{patientUpdate.firstName}
+								{patientUpdate.first_name}
 							</div>
 						)}
 					</div>
 
 					<div className="w-6/12">
 						<label
-							htmlFor="lastName"
+							htmlFor="last_name"
 							className="text-black text-sm"
 						>
 							Last Name
@@ -97,15 +124,15 @@ export default function PatientInformation({ patient }) {
 							<input
 								type="text"
 								placeholder="Enter last name"
-								value={patientUpdate.lastName}
-								name="lastName"
-								id="lastName"
+								value={patientUpdate.last_name}
+								name="last_name"
+								id="last_name"
 								onChange={handleOnChange}
 								className="input input-bordered w-full bg-slate-50 mt-2 text-black font-medium border-sky-200"
 							/>
 						) : (
 							<div className="font-semibold text-black w-full py-2 px-3 rounded-lg border-[1px] border-solid border-gray-400 bg-slate-100">
-								{patientUpdate.lastName}
+								{patientUpdate.last_name}
 							</div>
 						)}
 					</div>
@@ -113,25 +140,22 @@ export default function PatientInformation({ patient }) {
 
 				<div className="flex gap-2 mt-3">
 					<div className="w-6/12">
-						<label
-							htmlFor="phoneNumber"
-							className="text-black text-sm"
-						>
+						<label htmlFor="phone" className="text-black text-sm">
 							Phone Number
 						</label>
 						{isUpdate ? (
 							<input
 								type="tel"
 								placeholder="Enter phone number"
-								value={patientUpdate.phoneNumber}
-								name="phoneNumber"
-								id="phoneNumber"
+								value={patientUpdate.phone}
+								name="phone"
+								id="phone"
 								onChange={handleOnChange}
 								className="input input-bordered w-full bg-slate-50 mt-2 text-black font-medium border-sky-200"
 							/>
 						) : (
 							<div className="font-semibold text-black w-full py-2 px-3 rounded-lg border-[1px] border-solid border-gray-400 bg-slate-100">
-								{patientUpdate.phoneNumber}
+								{patientUpdate.phone}
 							</div>
 						)}
 					</div>
@@ -147,15 +171,15 @@ export default function PatientInformation({ patient }) {
 							<input
 								type="date"
 								placeholder="Enter birthday"
-								value={patientUpdate.birthDate}
-								name="birthDate"
+								value={patientUpdate.birth_date}
+								name="birth_date"
 								id="Birthday"
 								onChange={handleOnChange}
 								className="input input-bordered w-full bg-slate-50 mt-2 text-black font-medium border-sky-200"
 							/>
 						) : (
 							<div className="font-semibold text-black w-full py-2 px-3 rounded-lg border-[1px] border-solid border-gray-400 bg-slate-100">
-								{patientUpdate.birthDate}
+								{patientUpdate.birth_date}
 							</div>
 						)}
 					</div>
@@ -205,7 +229,7 @@ export default function PatientInformation({ patient }) {
 				{isUpdate && (
 					<div className="mt-5 flex gap-1">
 						<button className="w-6/12 btn btn-success text-white">
-							Update
+							{isPending ? <Loading /> : "Update"}
 						</button>
 						<button
 							type="reset"
