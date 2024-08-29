@@ -18,39 +18,26 @@ INSERT INTO Department (department_name, manager_id) VALUES
     ('Oncology', NULL),
     ('Radiology', NULL);
 
--- Insert mock data into the Staff table
+-- Insert mock data into the Staff table with 10 staff members removed
 INSERT INTO Staff (first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id) VALUES
     ('John', 'Doe', 'john.doe@hospital.com', 120000.00, 'Doctor', 'MD, Cardiology', NULL, 1),
     ('Jane', 'Smith', 'jane.smith@hospital.com', 115000.00, 'Doctor', 'MD, Neurology', NULL, 2),
     ('Sarah', 'Johnson', 'sarah.johnson@hospital.com', 90000.00, 'Nurse', 'RN', NULL, 1),
     ('Michael', 'Brown', 'michael.brown@hospital.com', 95000.00, 'Nurse', 'RN', NULL, 3),
     ('Emily', 'Davis', 'emily.davis@hospital.com', 80000.00, 'Administrative', 'MBA, Hospital Management', NULL, 5),
-    ('Chris', 'Taylor', 'chris.taylor@hospital.com', 130000.00, 'Doctor', 'MD, Pediatrics', NULL, 3),
     ('Laura', 'Wilson', 'laura.wilson@hospital.com', 125000.00, 'Doctor', 'MD, Oncology', NULL, 7),
     ('David', 'Anderson', 'david.anderson@hospital.com', 110000.00, 'Doctor', 'MD, Radiology', NULL, 8),
     ('Sophia', 'Moore', 'sophia.moore@hospital.com', 95000.00, 'Nurse', 'RN', NULL, 7),
-    ('Daniel', 'Clark', 'daniel.clark@hospital.com', 90000.00, 'Nurse', 'RN', NULL, 8),
-    ('Olivia', 'Martin', 'olivia.martin@hospital.com', 85000.00, 'Nurse', 'RN', NULL, 3),
-    ('Ethan', 'Walker', 'ethan.walker@hospital.com', 140000.00, 'Doctor', 'MD, General Surgery', NULL, 2),
-    ('Mia', 'White', 'mia.white@hospital.com', 120000.00, 'Doctor', 'MD, Dermatology', NULL, 5),
-    ('Noah', 'Harris', 'noah.harris@hospital.com', 130000.00, 'Doctor', 'MD, Orthopedics', NULL, 4),
-    ('Isabella', 'Robinson', 'isabella.robinson@hospital.com', 85000.00, 'Nurse', 'RN', NULL, 2),
     ('Liam', 'Lewis', 'liam.lewis@hospital.com', 150000.00, 'Doctor', 'MD, Cardiology', NULL, 1),
-    ('Ava', 'Young', 'ava.young@hospital.com', 75000.00, 'Administrative', 'BS, Healthcare Admin', NULL, 3),
     ('William', 'King', 'william.king@hospital.com', 160000.00, 'Doctor', 'MD, Neurology', NULL, 6),
-    ('Emily', 'Hall', 'emily.hall@hospital.com', 78000.00, 'Administrative', 'MBA, Healthcare Admin', NULL, 2),
-    ('James', 'Allen', 'james.allen@hospital.com', 98000.00, 'Nurse', 'RN', NULL, 7),
     ('Amelia', 'Wright', 'amelia.wright@hospital.com', 102000.00, 'Nurse', 'RN', NULL, 1),
     ('Lucas', 'Scott', 'lucas.scott@hospital.com', 145000.00, 'Doctor', 'MD, Urology', NULL, 4),
     ('Charlotte', 'Torres', 'charlotte.torres@hospital.com', 76000.00, 'Administrative', 'BS, Business Admin', NULL, 5),
     ('Benjamin', 'Carter', 'benjamin.carter@hospital.com', 135000.00, 'Doctor', 'MD, Gastroenterology', NULL, 6),
-    ('Abigail', 'Mitchell', 'abigail.mitchell@hospital.com', 92000.00, 'Nurse', 'RN', NULL, 2),
-    ('Henry', 'Perez', 'henry.perez@hospital.com', 94000.00, 'Nurse', 'RN', NULL, 3),
     ('Grace', 'Roberts', 'grace.roberts@hospital.com', 115000.00, 'Doctor', 'MD, Endocrinology', NULL, 2),
     ('Mason', 'Edwards', 'mason.edwards@hospital.com', 128000.00, 'Doctor', 'MD, Pulmonology', NULL, 4),
     ('Ella', 'Collins', 'ella.collins@hospital.com', 80000.00, 'Nurse', 'RN', NULL, 5),
     ('Alexander', 'Stewart', 'alexander.stewart@hospital.com', 138000.00, 'Doctor', 'MD, Neurology', NULL, 7);
-
 
 -- Update the Department table with manager IDs
 UPDATE Department SET manager_id = 1 WHERE department_id = 1;
@@ -101,17 +88,7 @@ INSERT INTO Schedule (staff_id, start_time, end_time, date) VALUES
     (17, '08:00:00', '17:00:00', '2024-08-23'),
     (18, '18:00:00', '02:00:00', '2024-08-23'),
     (19, '08:00:00', '17:00:00', '2024-08-24'),
-    (20, '18:00:00', '02:00:00', '2024-08-24'),
-    (21, '08:00:00', '17:00:00', '2024-08-25'),
-    (22, '18:00:00', '02:00:00', '2024-08-25'),
-    (23, '08:00:00', '17:00:00', '2024-08-26'),
-    (24, '18:00:00', '02:00:00', '2024-08-26'),
-    (25, '08:00:00', '17:00:00', '2024-08-27'),
-    (26, '18:00:00', '02:00:00', '2024-08-27'),
-    (27, '08:00:00', '17:00:00', '2024-08-28'),
-    (28, '18:00:00', '02:00:00', '2024-08-28'),
-    (29, '08:00:00', '17:00:00', '2024-08-29'),
-    (30, '18:00:00', '02:00:00', '2024-08-29');
+    (20, '18:00:00', '02:00:00', '2024-08-24');
 
 -- Insert mock data into the Patient table
 INSERT INTO Patient (first_name, last_name, birth_date, address, phone, email, allergies) VALUES
@@ -172,17 +149,7 @@ INSERT INTO Treatment (patient_id, staff_id, date, description) VALUES
     (7, 8, '2024-08-18', 'Radiology scan; chest X-ray, no abnormalities found.'),
     (8, 1, '2024-08-22', 'Cardiology follow-up; slight improvement in blood pressure.'),
     (9, 2, '2024-08-23', 'Neurology follow-up; patient reports reduced frequency of migraines.'),
-    (10, 7, '2024-08-24', 'Oncology follow-up; continuing treatment plan.'),
-    (3, 2, '2024-09-01', 'Neurology consultation; patient experiencing minor headaches. Adjusted medication.'),
-    (4, 3, '2024-09-02', 'Post-surgery follow-up; patient healing well, no complications.'),
-    (5, 4, '2024-09-03', 'Routine checkup; patient in good health, no issues noted.'),
-    (6, 6, '2024-09-04', 'Pediatric checkup; all vaccinations up to date, no health concerns.'),
-    (7, 7, '2024-09-05', 'Oncology consultation; patient responding well to treatment.'),
-    (8, 8, '2024-09-06', 'Radiology scan; no abnormalities detected in chest X-ray.'),
-    (9, 9, '2024-09-07', 'Routine consultation; patient reported minor back pain, recommended physical therapy.'),
-    (10, 10, '2024-09-08', 'Lab test results; blood work within normal ranges, no issues detected.'),
-    (1, 11, '2024-09-09', 'Cardiology consultation; slight improvement in heart condition, continue current medication.'),
-    (2, 12, '2024-09-10', 'Dermatology checkup; mild skin irritation, prescribed topical cream.');
+    (10, 7, '2024-08-24', 'Oncology follow-up; continuing treatment plan.');
 
 -- Re-enable triggers after data insertion
 SET @DISABLE_TRIGGERS = FALSE;
