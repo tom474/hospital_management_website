@@ -137,7 +137,7 @@ export default function WorkReport({ duration }) {
 						</tbody>
 					</table>
 					{currentWorks.length === 0 && (
-						<EmptyData>No history found.</EmptyData>
+						<EmptyData>No work history found.</EmptyData>
 					)}
 				</div>
 				<div className="flex justify-end mb-5 mt-2">
