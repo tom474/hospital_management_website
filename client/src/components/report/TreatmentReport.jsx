@@ -16,10 +16,7 @@ const columns = [
 
 export default function TreatmentReport({ duration }) {
 	const [patient, setPatient] = useState(null);
-	const { data: patients, isPending: isPendingPatients } = useGetData(
-		"/patient",
-		["patient"]
-	);
+	const { data: patients } = useGetData("/patient", ["patient"]);
 	const [currentDuration, setCurrentDuration] = useState({
 		startDate: duration.startDate,
 		endDate: duration.endDate
@@ -51,11 +48,7 @@ export default function TreatmentReport({ duration }) {
 			currentDuration.endDate
 		];
 	}
-	const {
-		data: treatments,
-		isPending,
-		isFetched
-	} = useGetData(query.url, query.key);
+	const { data: treatments, isPending } = useGetData(query.url, query.key);
 
 	const {
 		currentData: currentTreatments,
@@ -82,7 +75,7 @@ export default function TreatmentReport({ duration }) {
 		});
 	}
 
-	if (isPending && isPendingPatients && isFetched) return <Loading />;
+	if (isPending) return <Loading />;
 
 	return (
 		<>

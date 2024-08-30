@@ -20,9 +20,7 @@ const columns = [
 
 export default function WorkReport({ duration }) {
 	const [staff, setStaff] = useState(null);
-	const { data: staffs, isPending: isPendingStaffs } = useGetData("/staff", [
-		"staff"
-	]);
+	const { data: staffs } = useGetData("/staff", ["staff"]);
 
 	let query = {
 		url: `/staff/works?start_date=${duration.startDate}&end_date=${duration.endDate}`,
@@ -69,7 +67,7 @@ export default function WorkReport({ duration }) {
 		});
 	}
 
-	if (isPending && isPendingStaffs) return <Loading />;
+	if (isPending) return <Loading />;
 	return (
 		<>
 			<div className="mt-3">
