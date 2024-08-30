@@ -1,5 +1,6 @@
 const database = require("../models/database");
-const treatmentDocument = require("../../database/mongodb/schemas").treatmentDocument;
+const treatmentDocument =
+	require("../../database/mongodb/schemas").treatmentDocument;
 
 // Get all treatments
 const getAllTreatments = async (req, res) => {
@@ -8,15 +9,17 @@ const getAllTreatments = async (req, res) => {
 
 		if (start_date && end_date) {
 			// Get the treatment_id, patient_id, staff_id, date, and description from MySQL
-			const [rows] = await database.poolAdmin.query("CALL getAllTreatmentsInDuration(?, ?)", [
-				start_date,
-				end_date,
-			]);
+			const [rows] = await database.poolAdmin.query(
+				"CALL getAllTreatmentsInDuration(?, ?)",
+				[start_date, end_date]
+			);
 
 			// Get the diagnoseImage and labResults from MongoDB
 			for (let i = 0; i < rows[0].length; i++) {
 				const treatmentId = rows[0][i].treatment_id;
-				const treatment = await treatmentDocument.findOne({ treatmentId: treatmentId });
+				const treatment = await treatmentDocument.findOne({
+					treatmentId: treatmentId
+				});
 
 				if (treatment) {
 					rows[0][i].diagnoseImage = treatment.diagnoseImage;
@@ -26,12 +29,16 @@ const getAllTreatments = async (req, res) => {
 			res.json(rows[0]);
 		} else {
 			// Get the treatment_id, patient_id, staff_id, date, and description from MySQL
-			const [rows] = await database.poolAdmin.query("CALL getAllTreatments()");
+			const [rows] = await database.poolAdmin.query(
+				"CALL getAllTreatments()"
+			);
 
 			// Get the diagnoseImage and labResults from MongoDB
 			for (let i = 0; i < rows[0].length; i++) {
 				const treatmentId = rows[0][i].treatment_id;
-				const treatment = await treatmentDocument.findOne({ treatmentId: treatmentId });
+				const treatment = await treatmentDocument.findOne({
+					treatmentId: treatmentId
+				});
 
 				if (treatment) {
 					rows[0][i].diagnoseImage = treatment.diagnoseImage;
@@ -53,16 +60,17 @@ const getTreatmentsByPatientId = async (req, res) => {
 
 		if (start_date && end_date) {
 			// Get the treatment_id, patient_id, staff_id, date, and description from MySQL
-			const [rows] = await database.poolAdmin.query("CALL getTreatmentsByPatientIdInDuration(?, ?, ?)", [
-				patient_id,
-				start_date,
-				end_date,
-			]);
+			const [rows] = await database.poolAdmin.query(
+				"CALL getTreatmentsByPatientIdInDuration(?, ?, ?)",
+				[patient_id, start_date, end_date]
+			);
 
 			// Get the diagnoseImage and labResults from MongoDB
 			for (let i = 0; i < rows[0].length; i++) {
 				const treatmentId = rows[0][i].treatment_id;
-				const treatment = await treatmentDocument.findOne({ treatmentId: treatmentId });
+				const treatment = await treatmentDocument.findOne({
+					treatmentId: treatmentId
+				});
 
 				if (treatment) {
 					rows[0][i].diagnoseImage = treatment.diagnoseImage;
@@ -72,12 +80,17 @@ const getTreatmentsByPatientId = async (req, res) => {
 			res.json(rows[0]);
 		} else {
 			// Get the treatment_id, patient_id, staff_id, date, and description from MySQL
-			const [rows] = await database.poolAdmin.query("CALL getTreatmentsByPatientId(?)", [patient_id]);
+			const [rows] = await database.poolAdmin.query(
+				"CALL getTreatmentsByPatientId(?)",
+				[patient_id]
+			);
 
 			// Get the diagnoseImage and labResults from MongoDB
 			for (let i = 0; i < rows[0].length; i++) {
 				const treatmentId = rows[0][i].treatment_id;
-				const treatment = await treatmentDocument.findOne({ treatmentId: treatmentId });
+				const treatment = await treatmentDocument.findOne({
+					treatmentId: treatmentId
+				});
 
 				if (treatment) {
 					rows[0][i].diagnoseImage = treatment.diagnoseImage;
@@ -94,37 +107,61 @@ const getTreatmentsByPatientId = async (req, res) => {
 // Create a new treatment
 const createTreatment = async (req, res) => {
 	try {
-		const { patient_id, staff_id, date, description, diagnoseImage, labResults } = req.body;
-
-		// Save the patient_id, staff_id, date, and description to MySQL
-		const [rows] = await database.poolAdmin.query("CALL createTreatment(?, ?, ?, ?)", [
+		const {
 			patient_id,
 			staff_id,
 			date,
 			description,
-		]);
+			diagnoseImage,
+			labResults
+		} = req.body;
 
-		// Get all the treatments from MySQL
-		const [allRows] = await database.poolAdmin.query("CALL getAllTreatments()");
+		// Save the patient_id, staff_id, date, and description to MySQL
+		const [rows] = await database.poolAdmin.query(
+			"CALL createTreatment(?, ?, ?, ?, @result)",
+			[patient_id, staff_id, date, description]
+		);
 
-		// Get the treatment_id of the newly created treatment
-		const treatment_id = allRows[0][allRows[0].length - 1].treatment_id;
+		const [result] = await database.poolAdmin.query("SELECT @result");
+		const resultCode = result[0]["@result"];
 
-		// Save the diagnoseImage and labResults to MongoDB
-		const newTreatment = new treatmentDocument({
-			treatmentId: treatment_id,
-			diagnoseImage: {
-				data: diagnoseImage,
-				contentType: "base64",
-			},
-			labResults: {
-				data: labResults,
-				contentType: "base64",
-			},
-		});
-		await newTreatment.save();
+		if (resultCode === 0) {
+			// Get all the treatments from MySQL
+			const [allRows] = await database.poolAdmin.query(
+				"CALL getAllTreatments()"
+			);
 
-		res.json({ message: "Treatment created successfully" });
+			// Get the treatment_id of the newly created treatment
+			const treatment_id = allRows[0][allRows[0].length - 1].treatment_id;
+
+			// Save the diagnoseImage and labResults to MongoDB
+			const newTreatment = new treatmentDocument({
+				treatmentId: treatment_id,
+				diagnoseImage: {
+					data: diagnoseImage,
+					contentType: "base64"
+				},
+				labResults: {
+					data: labResults,
+					contentType: "base64"
+				}
+			});
+			await newTreatment.save();
+
+			res.json({ message: "Treatment created successfully" });
+		} else if (resultCode === 2) {
+			res.status(400).json({
+				error: "Invalid argument value"
+			});
+		} else if (resultCode === 1) {
+			res.status(400).json({
+				error: "Patient or staff does not exist"
+			});
+		} else {
+			res.status(500).json({
+				error: "Internal server error"
+			});
+		}
 	} catch (err) {
 		res.status(400).json({ error: err.message });
 	}
@@ -133,5 +170,5 @@ const createTreatment = async (req, res) => {
 module.exports = {
 	getAllTreatments,
 	getTreatmentsByPatientId,
-	createTreatment,
+	createTreatment
 };

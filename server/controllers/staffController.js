@@ -70,7 +70,7 @@ const createStaff = async (req, res) => {
 
 		// Insert staff_id, first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id into MySQL
 		const [rows] = await database.poolAdmin.query(
-			"CALL createStaff(?, ?, ?, ?, ?, ?, ?, ?)",
+			"CALL createStaff(?, ?, ?, ?, ?, ?, ?, ?, @result)",
 			[
 				first_name,
 				last_name,
@@ -83,23 +83,38 @@ const createStaff = async (req, res) => {
 			]
 		);
 
-		// Get all staffs from MySQL
-		const [allStaffs] = await database.poolAdmin.query(
-			"CALL getAllStaffs(?, ?, ?)",
-			["DEFAULT", null, null]
-		);
+		const [result] = await database.poolAdmin.query("SELECT @result");
+		const resultCode = result[0]["@result"];
 
-		// Get the staff_id of the last staff created
-		const staff_id = allStaffs[0][allStaffs[0].length - 1].staff_id;
+		if (resultCode === 0) {
+			// Get all staffs from MySQL
+			const [allStaffs] = await database.poolAdmin.query(
+				"CALL getAllStaffs(?, ?, ?)",
+				["DEFAULT", null, null]
+			);
 
-		// Insert staffId, certificate into MongoDB
-		const newStaffDocument = new staffDocument({
-			staffId: staff_id,
-			certificate: { data: certificate, contentType: "base64" }
-		});
-		await newStaffDocument.save();
+			// Get the staff_id of the last staff created
+			const staff_id = allStaffs[0][allStaffs[0].length - 1].staff_id;
 
-		res.json({ message: "Staff created successfully" });
+			// Insert staffId, certificate into MongoDB
+			const newStaffDocument = new staffDocument({
+				staffId: staff_id,
+				certificate: { data: certificate, contentType: "base64" }
+			});
+			await newStaffDocument.save();
+
+			res.json({ message: "Staff created successfully" });
+		} else if (resultCode === 1) {
+			res.status(400).json({
+				error: "Staff already exists with this email"
+			});
+		} else if (resultCode === 2) {
+			res.status(400).json({
+				error: "Invalid argument value"
+			});
+		} else {
+			res.status(500).json({ error: "Internal server error" });
+		}
 	} catch (err) {
 		res.status(400).json({ error: err.message });
 	}
@@ -123,7 +138,7 @@ const updateStaff = async (req, res) => {
 
 		// Update staff_id, first_name, last_name, email, salary, job_type, qualifications, manager_id, department_id in MySQL
 		await database.poolAdmin.query(
-			"CALL updateStaff(?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			"CALL updateStaff(?, ?, ?, ?, ?, ?, ?, ?, ?, @result)",
 			[
 				staff_id,
 				first_name,
@@ -137,13 +152,28 @@ const updateStaff = async (req, res) => {
 			]
 		);
 
-		// Update certificate in MongoDB
-		await staffDocument.updateOne(
-			{ staffId: staff_id },
-			{ certificate: { data: certificate, contentType: "base64" } }
-		);
+		const [result] = await database.poolAdmin.query("SELECT @result");
+		const resultCode = result[0]["@result"];
 
-		res.json({ message: "Staff updated successfully" });
+		if (resultCode === 0) {
+			// Update certificate in MongoDB
+			await staffDocument.updateOne(
+				{ staffId: staff_id },
+				{ certificate: { data: certificate, contentType: "base64" } }
+			);
+
+			res.json({ message: "Staff updated successfully" });
+		} else if (resultCode === 1) {
+			res.status(400).json({
+				error: "Staff or Department does not exist"
+			});
+		} else if (resultCode === 2) {
+			res.status(400).json({
+				error: "Invalid argument value"
+			});
+		} else {
+			res.status(500).json({ error: "Internal server error" });
+		}
 	} catch (err) {
 		res.status(400).json({ error: err.message });
 	}
