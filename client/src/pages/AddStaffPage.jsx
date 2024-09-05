@@ -91,7 +91,7 @@ export default function AddStaffPage() {
 			<div className="mb-3 mt-5">
 				<Link
 					className="text-2xl font-bold cursor-pointer transition ease-in-out hover:text-blue-600"
-					to={"/patient"}
+					to={"/staff"}
 				>
 					Back
 				</Link>

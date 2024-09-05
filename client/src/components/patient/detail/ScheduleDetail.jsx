@@ -5,23 +5,16 @@ import { usePutData } from "../../../api/apiHooks";
 import { queryClient } from "../../../api";
 import Loading from "../../utils/Loading";
 
-export default function ScheduleDetail({
-	schedule,
-	doctorName,
-	patientName,
-	isStaff = false
-}) {
+export default function ScheduleDetail({ schedule, doctorName, patientName, isStaff = false }) {
 	const { mutate, isPending } = usePutData({
 		onSuccess: () => {
 			queryClient.invalidateQueries("appointment");
-			document
-				.getElementById(`schedule_${schedule.appointment_id}`)
-				.close();
-		}
+			document.getElementById(`schedule_${schedule.appointment_id}`).close();
+		},
 	});
 	const [updateAttribute, setUpdateAttribute] = useState({
 		status: schedule.status,
-		notes: schedule.notes.data
+		notes: schedule.notes.data,
 	});
 
 	const handleOnChange = (e) => {
@@ -37,8 +30,8 @@ export default function ScheduleDetail({
 			url: `/appointment/${schedule.appointment_id}`,
 			post: {
 				status: updateAttribute.status,
-				notes: updateAttribute.notes
-			}
+				notes: updateAttribute.notes,
+			},
 		});
 	};
 
@@ -47,8 +40,8 @@ export default function ScheduleDetail({
 			url: `/appointment/${schedule.appointment_id}`,
 			post: {
 				status: "Cancelled",
-				notes: updateAttribute.notes
-			}
+				notes: updateAttribute.notes,
+			},
 		});
 	};
 
@@ -57,11 +50,7 @@ export default function ScheduleDetail({
 			<div className="modal-box bg-sky-50 max-w-[650px] w-[650px] h-fit max-h-[650px]">
 				<button
 					onClick={() => {
-						document
-							.getElementById(
-								`schedule_${schedule.appointment_id}`
-							)
-							.close();
+						document.getElementById(`schedule_${schedule.appointment_id}`).close();
 					}}
 					className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
 				>
@@ -69,27 +58,21 @@ export default function ScheduleDetail({
 				</button>
 				<form onSubmit={onSubmit}>
 					<div className="flex justify-between mt-4 mr-7 items-center">
-						<h3 className="font-bold text-xl text-blue-600">
-							Appointment #{schedule.appointment_id}
-						</h3>
+						<h3 className="font-bold text-xl text-blue-600">Appointment #{schedule.appointment_id}</h3>
 
 						<div>
-							<p className="text-lg">
-								{formatDate(schedule.date)}
-							</p>
+							<p className="text-lg">{formatDate(schedule.date)}</p>
 						</div>
 					</div>
 
 					<div className="flex justify-between mt-4 text-base mr-6">
 						<div className="flex gap-10">
 							<p>
-								<span className="font-semibold">Doctor:</span>{" "}
-								{doctorName}
+								<span className="font-semibold">Doctor:</span> {doctorName}
 							</p>
 
 							<p>
-								<span className="font-semibold">Patient:</span>{" "}
-								{patientName}
+								<span className="font-semibold">Patient:</span> {patientName}
 							</p>
 						</div>
 
@@ -98,35 +81,24 @@ export default function ScheduleDetail({
 
 					<div className="mt-4">
 						<p>
-							<span className="font-semibold text-lg">
-								Purpose
-							</span>{" "}
+							<span className="font-semibold text-lg">Purpose</span>{" "}
 						</p>
 
-						<p className="text-base p-3 rounded bg-slate-300 mt-2">
-							{schedule.purpose}
-						</p>
+						<p className="text-base p-3 rounded bg-slate-300 mt-2">{schedule.purpose}</p>
 					</div>
 					{!isStaff && (
 						<div className="mt-4">
 							<p>
-								<span className="font-semibold text-lg">
-									Notes
-								</span>{" "}
+								<span className="font-semibold text-lg">Notes</span>{" "}
 							</p>
 
-							<p className="text-base p-3 rounded bg-slate-300 mt-2">
-								{schedule.notes.data}
-							</p>
+							<p className="text-base p-3 rounded bg-slate-300 mt-2">{schedule.notes.data}</p>
 						</div>
 					)}
 					{isStaff && (
 						<>
 							<div className="mt-4">
-								<label
-									htmlFor="status"
-									className="font-semibold text-lg"
-								>
+								<label htmlFor="status" className="font-semibold text-lg">
 									Status
 								</label>
 								<select
@@ -136,23 +108,14 @@ export default function ScheduleDetail({
 									onChange={handleOnChange}
 									className="select select-bordered w-full bg-white"
 								>
-									<option value={"Scheduled"}>
-										Scheduled
-									</option>
-									<option value={"Completed"}>
-										Completed
-									</option>
-									<option value={"Cancelled"}>
-										Cancelled
-									</option>
+									<option value={"Scheduled"}>Scheduled</option>
+									<option value={"Completed"}>Completed</option>
+									<option value={"Cancelled"}>Cancelled</option>
 								</select>
 							</div>
 
 							<div className="mt-4">
-								<label
-									htmlFor="note"
-									className="font-semibold text-lg"
-								>
+								<label htmlFor="note" className="font-semibold text-lg">
 									Notes
 								</label>
 								<div>
@@ -169,23 +132,16 @@ export default function ScheduleDetail({
 						</>
 					)}
 					{!isStaff &&
-						(role == "Receptionist" || role == "Admin") &&
+						(role == "Receptionist" || role == "Admin" || role == "Doctor") &&
 						schedule.status === "Scheduled" && (
 							<div className="mt-5 flex gap-1">
-								<div
-									onClick={onCancelAppointment}
-									className="w-6/12 btn btn-success text-white"
-								>
+								<div onClick={onCancelAppointment} className="w-6/12 btn btn-success text-white">
 									Cancel Appointment
 								</div>
 								<button
 									type="reset"
 									onClick={() => {
-										document
-											.getElementById(
-												`schedule_${schedule.id}`
-											)
-											.close();
+										document.getElementById(`schedule_${schedule.appointment_id}`).close();
 									}}
 									className="w-6/12 btn btn-outline btn-error text-white"
 								>
@@ -197,20 +153,12 @@ export default function ScheduleDetail({
 					{(role == "Receptionist" || role == "Admin") && isStaff && (
 						<div className="mt-5 flex gap-1">
 							<button className="w-6/12 btn btn-success text-white">
-								{isPending ? (
-									<Loading isFull={false} />
-								) : (
-									"Update Appointment"
-								)}
+								{isPending ? <Loading isFull={false} /> : "Update Appointment"}
 							</button>
 							<button
 								type="reset"
 								onClick={() => {
-									document
-										.getElementById(
-											`schedule_${schedule.appointment_id}`
-										)
-										.close();
+									document.getElementById(`schedule_${schedule.appointment_id}`).close();
 								}}
 								className="w-6/12 btn btn-outline btn-error text-white"
 							>
@@ -228,5 +176,5 @@ ScheduleDetail.propTypes = {
 	schedule: PropTypes.object.isRequired,
 	isStaff: PropTypes.bool,
 	doctorName: PropTypes.string,
-	patientName: PropTypes.string
+	patientName: PropTypes.string,
 };
