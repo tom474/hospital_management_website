@@ -1,0 +1,15 @@
+{
+    "name": "mongodb-setup",
+    "version": "1.0.0",
+    "description": "Setup script for MongoDB database in the HospitalManagementSystem project",
+    "main": "setup.js",
+    "scripts": {
+      "setup": "node setup.js",
+      "setup-with-mock": "node setup.js --mock"
+    },
+    "dependencies": {
+      "mongodb": "^5.5.0",
+      "mongoose": "^7.6.0"
+    }
+  }
+  

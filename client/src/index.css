@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#root {
+	background-color: rgb(240 249 255);
+	color: black;
+}
+
+.btn-outline.btn-primary:hover {
+	color: white;
+}
+
+.btn-outline.btn-success:hover {
+	color: white;
+}
+
+.btn-outline.btn-error:hover {
+	color: white;
+}
+
+.input:disabled {
+	background-color: rgb(214, 214, 214);
+	border: none;
+	color: black;
+}
