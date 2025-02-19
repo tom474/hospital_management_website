@@ -56,7 +56,7 @@ Navigate to the project directory
 cd hospital_management_website
 ```
 
-Create `.env` file and set up environment variables
+Create `.env` file in `server` and set up environment variables
 
 ```
 DB_HOST="localhost"
